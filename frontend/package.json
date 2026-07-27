@@ -6,9 +6,10 @@
     "start": "craco start"
   },
   "dependencies": {
+    "@craco/craco": "^7.1.0",
+    "@tanstack/react-query": "^5.101.4",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "@craco/craco": "^7.1.0"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "eslint": "^8.57.1",
