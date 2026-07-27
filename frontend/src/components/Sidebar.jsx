@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUI } from "@/contexts/UIContext";
 import { useCart } from "@/contexts/CartContext";
-import { Home, Hammer, Search, MessageSquare, ShoppingCart, Sparkles, PanelLeftClose, PanelLeftOpen, Tag, Rocket, BarChart3, ShieldAlert, Heart, Lightbulb, FolderOpen, LayoutGrid, AlertTriangle, Book, Calculator } from "lucide-react";
+import { Home, Hammer, Search, MessageSquare, ShoppingCart, Sparkles, PanelLeftClose, PanelLeftOpen, Tag, Rocket, BarChart3, ShieldAlert, Heart, Lightbulb, FolderOpen, LayoutGrid, AlertTriangle, Book, Calculator, BookOpen } from "lucide-react";
 import { BRAND_NAME } from "@/lib/branding";
 import BrandLogo from "@/components/BrandLogo";
 
