@@ -171,7 +171,7 @@ export default function PolicyEditor() {
                 <div className="flex flex-wrap gap-3">
                   <label className="text-sm font-medium">Icon</label>
                   <div className="flex flex-wrap gap-2">
-                    {Object.entries(icons).map(([name, Icon]) => (
+                    {Object.entries(ICONS).map(([name, Icon]) => (
                       <button
                         key={name}
                         onClick={() => setNewRule(nr => ({...nr, icon: name}))}
