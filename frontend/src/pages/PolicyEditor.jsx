@@ -5,7 +5,7 @@ import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Scale, User, ShieldCheck, AlertTriangle, Tag, FolderOpen, Rocket, LayoutGrid, Calculator, MessageSquare, Lightbulb, BookOpen } from "lucide-react";
+import { Scale, User, Shield, ShieldCheck, AlertTriangle, Tag, FolderOpen, Rocket, LayoutGrid, Calculator, MessageSquare, Lightbulb, BookOpen } from "lucide-react";
 
 const ICONS = {
   Scale, User, ShieldCheck, AlertTriangle, Tag, FolderOpen, Rocket,
@@ -220,7 +220,7 @@ export default function PolicyEditor() {
                       <div className="flex flex-wrap gap-3">
                         <label className="text-sm font-medium">Icon</label>
                         <div className="flex flex-wrap gap-2">
-                          {Object.entries(icons).map(([name, Icon]) => (
+                          {Object.entries(ICONS).map(([name, Icon]) => (
                             <button
                               key={name}
                               onClick={() => handleUpdateRule(rule.rule_id, {...rule, icon: name})}
@@ -245,7 +245,7 @@ export default function PolicyEditor() {
                     // View mode
                     <div className="flex justify-between items-start">
                       {(() => {
-                        const RuleIcon = icons[rule.icon] || Shield;
+                        const RuleIcon = ICONS[rule.icon] || Shield;
                         return (
                           <>
                             <div className="flex-1">
