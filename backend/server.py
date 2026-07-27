@@ -16,9 +16,6 @@ from pathlib import Path
 from pydantic import BaseModel, EmailStr, Field
 from typing import List, Optional, Dict, Literal
 from datetime import datetime, timezone, timedelta
-from emergentintegrations.payments.stripe.checkout import (
-    StripeCheckout, CheckoutSessionResponse, CheckoutStatusResponse, CheckoutSessionRequest
-)
 from commission_utils import round_money, calculate_marketplace_commission
 
 ROOT_DIR = Path(__file__).parent
