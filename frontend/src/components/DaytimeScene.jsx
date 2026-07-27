@@ -106,7 +106,7 @@ function PalmTree({ x, y }) {
   );
 }
 
-function Snow-covered Evergreen({ x, y }) {
+function SnowCoveredEvergreen({ x, y }) {
   return (
     <g transform={`translate(${x}, ${y})`}>
       <rect x="-3" y="-10" width="6" height="15" fill="#5c3a1e" stroke="#3d2510" strokeWidth="0.5" />
