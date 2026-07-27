@@ -1,0 +1,129 @@
+/* eslint-disable */
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { api, fileUrl } from "@/lib/api";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
+
+const CARRIERS = ["USPS", "UPS", "FedEx", "DHL"];
+
+export default function SellerOrderDetail() {
+  const { transactionId } = useParams();
+  const [order, setOrder] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!transactionId) return;
+    api.get(`/seller/orders/${transactionId}`).then((r) => setOrder(r.data)).catch(() => {});
+  }, [transactionId]);
+
+  const saveTracking = async (listingId, tracking, carrier) => {
+    if (!tracking || !carrier) return;
+    setSaving(true);
+    try {
+      await api.put(`/seller/orders/${order.transaction_id}/tracking`, { listing_id: listingId, tracking_number: tracking, carrier });
+      const r = await api.get(`/seller/orders/${order.transaction_id}`);
+      setOrder(r.data);
+    } catch (e) {
+      console.error(e);
+      alert("Could not save tracking");
+    }
+    setSaving(false);
+  };
+
+  if (!order) {
+    return (
+      <div className="pt-14 min-h-screen px-6 md:px-12 lg:px-24">
+        <div className="text-sm text-muted-foreground">Loading order details…</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="pt-14 min-h-screen px-6 md:px-12 lg:px-24">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <div className="text-xs font-tech uppercase tracking-[0.3em] text-muted-foreground">Seller Order</div>
+          <h1 className="font-display text-3xl font-light">Order {order.transaction_id}</h1>
+        </div>
+        <Button variant="outline" onClick={() => navigate(-1)}>
+          Back
+        </Button>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-[1.5fr_1fr]">
+        <div className="border border-border rounded-xl p-6 space-y-6">
+          <div className="text-sm text-muted-foreground">Buyer</div>
+          <div className="font-medium">{order.buyer_email || order.buyer_id}</div>
+          <div className="text-sm text-muted-foreground">Order Status</div>
+          <div className="font-medium">{order.status}</div>
+          <div className="text-sm text-muted-foreground">Payment Status</div>
+          <div className="font-medium">{order.payment_status}</div>
+          <div className="text-sm text-muted-foreground">Created</div>
+          <div className="font-medium">{new Date(order.created_at).toLocaleString()}</div>
+        </div>
+
+        <div className="border border-border rounded-xl p-6 space-y-6">
+          <div className="text-sm text-muted-foreground">Totals</div>
+          <div className="grid gap-2 text-sm">
+            <div className="flex justify-between"><span>Order Amount</span><span>${order.amount?.toFixed(2)}</span></div>
+            <div className="flex justify-between"><span>Shipping Fee</span><span>${order.shipping_fee?.toFixed(2)}</span></div>
+            <div className="flex justify-between"><span>Platform Fee</span><span>${order.platform_fee?.toFixed(2)}</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-8 border border-border rounded-xl overflow-hidden">
+        <div className="bg-secondary/50 px-6 py-4 font-medium">Items</div>
+        <div className="divide-y divide-border">
+          {order.line_items.map((li) => (
+            <div key={li.listing_id} className="p-6">
+              <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                  <div className="font-medium">{li.listing_id}</div>
+                  <div className="text-[12px] text-muted-foreground">Seller item</div>
+                </div>
+                <div className="text-sm text-muted-foreground">Status: {li.status || order.status}</div>
+                <div className="text-sm">${(li.total_amount || 0).toFixed(2)}</div>
+              </div>
+
+              <div className="mt-4 grid gap-3 lg:grid-cols-3">
+                <Input
+                  defaultValue={li.tracking_number || ""}
+                  placeholder="Tracking number"
+                  onChange={(e) => (li._tracking = e.target.value)}
+                  className="w-full"
+                />
+                <Select
+                  defaultValue={li.carrier || ""}
+                  onChange={(e) => (li._carrier = e.target.value)}
+                  className="w-full"
+                >
+                  <option value="">Carrier</option>
+                  {CARRIERS.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </Select>
+                <Button
+                  size="sm"
+                  onClick={() => saveTracking(li.listing_id, li._tracking || li.tracking_number || "", li._carrier || li.carrier || "")}
+                  disabled={saving}
+                >
+                  Save Tracking
+                </Button>
+              </div>
+
+              <div className="mt-4 grid gap-2 text-sm text-muted-foreground">
+                <div><strong>Carrier:</strong> {li.carrier || "—"}</div>
+                <div><strong>Tracking #:</strong> {li.tracking_number || "—"}</div>
+                <div><strong>Shipped at:</strong> {li.shipped_at ? new Date(li.shipped_at).toLocaleString() : "Not shipped yet"}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}

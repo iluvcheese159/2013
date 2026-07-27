@@ -1,0 +1,30 @@
+{
+  "name": "frontend",
+  "version": "0.1.0",
+  "scripts": {
+    "build": "craco build",
+    "start": "craco start"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "craco": "^7.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^9.23.0",
+    "eslint-config-react-app": "^6.0.1",
+    "eslint-plugin-react": "^7.33.2"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

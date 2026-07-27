@@ -1,0 +1,97 @@
+/* eslint-disable */
+import { useEffect, useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import Bob from "./Bob";
+import { useRouter } from "next/router";
+
+export default function WarningBob() {
+  const { user } = useAuth();
+  const router = useRouter();
+  const [warningShown, setWarningShown] = useState(false);
+  const [warningTimestamp, setWarningTimestamp] = useState(0);
+
+  // Check if we should show warning based on enforcement status
+  useEffect(() => {
+    // Only show warning on client-side and for non-owners
+    if (typeof window === "undefined" || !user) return;
+    
+    // Don't show for platform owners/admins
+    if (user?.is_platform_owner) return;
+    
+    const enforcementStatus = user?.enforcement_status;
+    const now = Date.now();
+    
+    // Show warning if user is warned and we haven't shown it recently (cooldown: 5 minutes)
+    if (
+      enforcementStatus === "Warned" && 
+      (!warningShown || now - warningTimestamp > 5 * 60 * 1000)
+    ) {
+      setWarningShown(true);
+      setWarningTimestamp(now);
+    }
+    
+    // Reset warning flag if enforcement status changes (e.g., warning resolved)
+    if (enforcementStatus !== "Warned" && warningShown) {
+      setWarningShown(false);
+    }
+  }, [user, warningShown]);
+
+  // Hide warning after display duration
+  useEffect(() => {
+    if (warningShown) {
+      const timer = setTimeout(() => {
+        setWarningShown(false);
+      }, 8000); // Show for 8 seconds
+      
+      return () => clearTimeout(timer);
+    }
+  }, [warningShown]);
+
+  if (!warningShown) return null;
+
+  return (
+    <div 
+      className="fixed inset-0 z-50 pointer-events-none"
+      style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center',
+        pointerEvents: 'none' 
+      }}
+    >
+      {/* Bob container - positioned to not block content */}
+      <div 
+        className="relative"
+        style={{
+          maxWidth: '80vw',
+          maxHeight: '80vh'
+        }}
+      >
+        <Bob 
+          state="warning" 
+          isWarning={true} 
+          onWarningComplete={() => {
+            // Optional: callback when warning completes
+          }}
+        />
+        {/* Warning text overlay - positioned to be visible */}
+        <div 
+          className="absolute bottom-[-60px] left-1/2 -translate-x-1/2"
+          style={{
+            background: 'rgba(0, 0, 0, 0.8)',
+            color: '#fff',
+            padding: '8px 16px',
+            borderRadius: '4px',
+            fontSize: '14px',
+            fontFamily: 'space-grotesk, sans-serif',
+            textAlign: 'center',
+            whiteSpace: 'nowrap',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
+          }}
+        >
+          Careful — read this
+        </div>
+      </div>
+    </div>
+  );
+}

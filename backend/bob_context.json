@@ -1,0 +1,321 @@
+{
+  "version": 1,
+  "sources": [
+    {
+      "label": "Bob's Knowledge Base (keyword Q&A)",
+      "type": "knowledge",
+      "categories": [
+        "greetings",
+        "basics",
+        "infill",
+        "supports",
+        "materials",
+        "listing",
+        "designStudio",
+        "threads",
+        "pro",
+        "messaging",
+        "clubs",
+        "troubleshooting",
+        "about_bob"
+      ]
+    },
+    {
+      "label": "Documentation Index",
+      "type": "doc",
+      "chars": 1579
+    },
+    {
+      "label": "Print Cosmos Documents",
+      "type": "doc",
+      "chars": 5025
+    },
+    {
+      "label": "Admin Maintenance Guide",
+      "type": "doc",
+      "chars": 7586
+    },
+    {
+      "label": "Product Requirements Document",
+      "type": "doc",
+      "chars": 5570
+    },
+    {
+      "label": "Project README",
+      "type": "doc",
+      "chars": 29
+    },
+    {
+      "label": "Design System Guidelines",
+      "type": "doc",
+      "chars": 14752
+    }
+  ],
+  "knowledge": {
+    "greetings": {
+      "keywords": [
+        "hello",
+        "hi",
+        "hey",
+        "greetings",
+        "what's up",
+        "sup",
+        "howdy"
+      ],
+      "responses": [
+        "Hey there! I'm Bob — your Print Cosmos guide. Ask me anything about 3D printing, our platform, or how to get started!",
+        "Hello! Bob here, ready to help. Whether you're new to 3D printing or a seasoned maker, I can point you in the right direction.",
+        "Hi! I'm Bob, your onboard AI helper. What can I help you with today?",
+        "Greetings, maker! Bob here. I can help you navigate Print Cosmos — from listing your first design to troubleshooting prints."
+      ]
+    },
+    "basics": {
+      "keywords": [
+        "nozzle",
+        "nozzle bed",
+        "print bed",
+        "bed leveling",
+        "heated bed"
+      ],
+      "responses": [
+        "A nozzle is the part of your 3D printer that melts and extrudes filament onto the build surface. Most printers use a 0.4mm nozzle by default, but you can swap in different sizes — finer nozzles (0.2mm) give more detail, wider ones (0.6mm+) print faster. Think of it like the tip of a paintbrush: smaller for detail, bigger for coverage.",
+        "The print bed (also called the build plate) is the surface your model sits on while printing. Most Print Cosmos recommended printers use a heated glass bed at 60°C for PLA or 80–100°C for ABS/PC. A well-leveled bed is critical — the first layer should stick evenly across the whole surface!",
+        "Bed leveling (sometimes called tramming or leveling) ensures your nozzle is the correct distance from the bed. Too close = filament won't stick or you'll scrape the nozzle. Too far = layer separation. Most printers auto-level now, but it's worth checking manually for precision work.",
+        "A heated bed prevents warping by keeping the bottom layers warm during printing. PLA needs 60°C, PETG needs 70–80°C, and ABS needs 90–110°C. Not all printers have heated beds — and that's okay! PLA prints well on a cold bed with proper adhesion (glue stick or blue tape works great)."
+      ]
+    },
+    "infill": {
+      "keywords": [
+        "infill",
+        "infill %",
+        "fill density",
+        "sparse",
+        "density",
+        "hollow",
+        "solid"
+      ],
+      "responses": [
+        "Infill is the internal structure inside a printed object — it's what fills the space between the outer walls (called perimeters or shells). Think of it like the inside of a house: the walls are the perimeters, and infill is the framing and insulation inside.",
+        "Infill percentage controls how hollow or solid your print is. For most functional parts: 10–20% infill is plenty for display models, 20–50% gives good strength for practical items like phone cases, and 50–100% is for high-stress parts like mechanical gears. Higher infill = more filament, longer print time, and stronger part, so there's always a trade-off!",
+        "Common infill patterns include: grid (square — good all-around), triangles (strong in all directions), gyroid (organic, great strength-to-weight), and honeycomb (lightweight with decent strength). Most slicers default to grid, which is a solid starting choice.",
+        "For beginners: start with 20% infill and grid pattern. If your part fails under stress, bump it up to 30–40%. You rarely need more than 50% for most use cases, and going above 70% often just wastes filament without meaningful strength gains."
+      ]
+    },
+    "supports": {
+      "keywords": [
+        "supports",
+        "support",
+        "raft",
+        "skirt",
+        "brim",
+        " scaffolding"
+      ],
+      "responses": [
+        "Supports (also called support structures) are temporary structures your printer creates under overhangs and complex geometry. Think of them like scaffolding around a building — they hold up areas that would otherwise sag or collapse mid-print. When your print is done, you snap them off and they're gone!",
+        "Not every print needs supports. As a general rule: if your model has overhangs greater than about 45 degrees from vertical, you'll need supports. Simple shapes like boxes and pyramids usually don't need them. Flat bridges between two points might need them if they span a gap without support below.",
+        "In Print Cosmos, you can toggle support generation in the Designer Studio when preparing your model for print. The system auto-detects where supports are needed, but you can also manually mark areas. Tip: enable 'support on build plate only' if you want easier cleanup — supports will only connect to the bed, not to your model's surfaces.",
+        "To remove supports cleanly: use needle-nose pliers or flush cutters for the larger chunks, then an exacto knife or sanding stick for remaining nubs. Go slow — you don't want to gouge your model. For delicate prints, let the model cool completely first; warm support material is softer and easier to remove."
+      ]
+    },
+    "materials": {
+      "keywords": [
+        "pla",
+        "petg",
+        "abs",
+        "filament",
+        "material",
+        "filament type",
+        "tpu",
+        "nylon",
+        "resin",
+        "sla",
+        "fda"
+      ],
+      "responses": [
+        "PLA (Polylactic Acid) is the best beginner filament — it's easy to print, biodegradable, doesn't warp, and comes in tons of colors. Print at 190–220°C with no heated bed required. Trade-off: PLA is brittle and has low heat resistance, so don't use it for parts that'll see stress or get hot (like car dashboard pieces).",
+        "PETG (Polyethylene Terephthalate Glycol) is the sweet spot between beginner-friendliness and durability. It's slightly harder to print than PLA (needs a heated bed at 70–80°C) but is much tougher, flexier, and more heat-resistant. Great for functional parts, cases, and anything that needs to last.",
+        "ABS (Acrylonitrile Butadiene Styrene) is the classic engineering plastic — the stuff Lego is made from. It's strong, heat-resistant, and can be acetone-smoothed for a glossy finish. But it's tricky to print: it warps badly, needs an enclosure, a heated bed at 90–110°C, and good ventilation (it has fumes). Recommended for experienced makers only.",
+        "TPU (Thermoplastic Polyurethane) is your flexible filament. It's like printing with rubber — great for phone cases, gaskets, rubber bands, and soft grips. Printing TPU requires a direct-drive extruder (not a Bowden setup) and slow speeds. The key is keeping your retraction distance very short to avoid clogs.",
+        "When in doubt for starting out, go PLA. Once you're comfortable, graduate to PETG for functional parts, and explore ABS/TPU as your skills grow. All three are widely available on Print Cosmos and work with most FDM printers."
+      ]
+    },
+    "listing": {
+      "keywords": [
+        "list",
+        "listing",
+        "how to sell",
+        "how to list",
+        "upload",
+        "publish",
+        "create listing",
+        "make a listing",
+        "selling",
+        "sell something"
+      ],
+      "responses": [
+        "Great question! To list something for sale on Print Cosmos: 1) Go to your Dashboard, 2) Click 'Create New Listing', 3) Upload your 3D model file (STL, OBJ, or our native .pcos format), 4) Fill in the details — title, description, price, category, and filament color options, 5) Choose whether it's free, paid, or a 'pay-what-you-want' model, 6) Click 'Publish' and your listing goes live!",
+        "The Print Cosmos Design Studio is your workspace for preparing models before listing. You can view your model in 3D, add supports, adjust orientation, set infill defaults, and preview the slice. It's built right into the browser — no software to install. Access it from the 'Studio' tab in your dashboard.",
+        "Pricing works with a marketplace fee structure: Print Cosmos takes a commission on every sale. The commission percentage varies by listing type and your seller tier. You can see the exact fee before you publish, and it's all calculated automatically in the pricing section of your listing form.",
+        "To edit or remove a listing after it's published: go to your Dashboard, find the listing in your 'My Listings' section, click the three-dot menu, and choose 'Edit' or 'Delete'. Edited listings get a small visibility boost on the marketplace to reflect the update!"
+      ]
+    },
+    "designStudio": {
+      "keywords": [
+        "design studio",
+        "studio",
+        "designer",
+        "3d designer",
+        "modeling",
+        "3d workshop",
+        "workshop",
+        "create 3d model",
+        "design tool",
+        "builder",
+        "mesh",
+        "import model"
+      ],
+      "responses": [
+        "The Print Cosmos Design Studio is a web-based 3D modeling workspace built right into your browser! It lets you create, edit, and prepare 3D models for printing without installing any software. Features include a full modeling toolkit, support generation, slice preview, and direct publishing to the marketplace.",
+        "To use the Design Studio: 1) Click '3D Designer Workshop' in the top navigation, 2) You can start from scratch with basic shapes (cubes, spheres, cylinders) or import an existing model file (STL, OBJ), 3) Use the toolbar to combine shapes, carve holes, add patterns, and refine your model, 4) The right panel shows print settings like layer height, infill, and supports, 5) Click 'Prepare for Print' to generate supports and preview your slice!",
+        "The Design Studio supports real-time collaboration — you can invite other makers to co-design a model. You'll see each other's cursors and changes in real-time. Perfect for maker teams and collaborative projects!",
+        "If you're new to 3D modeling, start with the 'Starter Templates' in the Design Studio. They come pre-built with common shapes and print-ready settings so you can learn the interface while creating something that actually works."
+      ]
+    },
+    "threads": {
+      "keywords": [
+        "thread",
+        "threads",
+        "filament thread",
+        "thread currency",
+        "coins",
+        "tip",
+        "tip thread",
+        "community thread"
+      ],
+      "responses": [
+        "Threads are Print Cosmos's community currency! You earn them by helping other makers, posting in forums, getting upvotes on your designs, and participating in clubs. You can spend Threads on premium features, advertising your listings, or tipping other creators whose work you appreciate.",
+        "There are several ways to earn Threads daily: 1) Post in forums and get upvotes (more engagement = more threads), 2) Help in the community by answering questions or reviewing designs, 3) Create and sell listings (a percentage of your revenue comes in as Threads), 4) Complete daily challenges found in the dashboard, 5) Join clubs and participate in club activities.",
+        "Your Thread balance is displayed in your profile and in the navbar. Spending Threads on listing boosts, premium features, or tips is instant — the threads go directly to the recipient or the feature they're funding."
+      ]
+    },
+    "pro": {
+      "keywords": [
+        "pro",
+        "subscription",
+        "pro tier",
+        "pro plan",
+        "paid",
+        "premium",
+        "upgrade",
+        "membership",
+        "subscriber",
+        "paid features"
+      ],
+      "responses": [
+        "Print Cosmos Pro is our premium subscription that unlocks advanced features for makers and clubs! Benefits include: higher listing limits, priority marketplace visibility, reduced commission rates, access to premium thread colors and materials, club subscription management for recurring revenue, and expanded analytics for your store.",
+        "To see what Pro includes or subscribe: 1) Go to your Dashboard, 2) Look for the 'Pro' section or 'Upgrade' button in the sidebar, 3) Choose your plan (monthly or annual), 4) Checkout using Stripe or PayPal — your Pro benefits activate instantly after payment!",
+        "Pro subscribers also get a custom Pro Bob avatar with a gold rim accessory visible across the platform, and a badge on their profile showing their Pro status."
+      ]
+    },
+    "messaging": {
+      "keywords": [
+        "message",
+        "chat",
+        "dm",
+        "direct message",
+        "conversation",
+        "talk",
+        "contact",
+        "reach out",
+        "communicate",
+        "contact seller",
+        "message maker"
+      ],
+      "responses": [
+        "You can message other makers directly through the platform! Click on any seller's profile and use the 'Message' button to start a conversation, or use the Messages tab in the navigation bar to see all your conversations at a glance. Messages are organized by thread so you can keep track of multiple conversations.",
+        "You can also use the Discovery Clubs feature to join maker communities, participate in group chats, and connect with like-minded creators! Clubs have their own message streams separate from your personal DMs, so you can share work-in-progress, get feedback, and collaborate with other members.",
+        "To get help from Print Cosmos support: look for the '⚠️' button in the chat sidebar when you have questions about platform features, orders, or issues. Our support team monitors incoming messages and responds typically within a few hours during business days.",
+        "For urgent concerns about an order — like a missing or damaged print — use the 'Contact Seller' button on the order page. This flags the message as priority and notifies the seller directly."
+      ]
+    },
+    "clubs": {
+      "keywords": [
+        "club",
+        "clubs",
+        "discovery club",
+        "membership club",
+        "subscription club",
+        "store subscription",
+        "creator club",
+        "owner club",
+        "join club",
+        "create club"
+      ],
+      "responses": [
+        "Discovery Clubs are Print Cosmos's subscription-based maker communities! Sellers can create their own clubs and set membership tiers with different price points and benefits. Buyers subscribe to clubs to support their favorite makers and get exclusive access to new designs, discounts, and community perks.",
+        "To join a club: browse the Discovery Clubs area on the marketplace, find a club that interests you, click 'Join' and choose your membership tier. You'll get immediate access to club-exclusive designs, pricing, and community features.",
+        "To create a club: go to your Dashboard, click 'Create Club', set up your club name, description, pricing tiers, and membership benefits. Once published, other users can discover and join your club from the Discovery Clubs section!",
+        "Club subscriptions can be monthly or annual, and you set the recurring price per tier. Clubs are a powerful way to build a recurring revenue stream and create a community around your work."
+      ]
+    },
+    "troubleshooting": {
+      "keywords": [
+        "problem",
+        "issue",
+        "bug",
+        "not working",
+        "broken",
+        "error",
+        "not printing",
+        "failed",
+        "print failed",
+        "warp",
+        "warping",
+        "stringing",
+        "blob",
+        "gap",
+        "layer shift",
+        "curl",
+        "detach",
+        "stuck",
+        "won't stick",
+        "rough",
+        "blobby",
+        "under-extrusion",
+        "over-extrusion",
+        "extrusion",
+        "squished",
+        "stringing",
+        "ooz",
+        "fuzzy",
+        "noisy"
+      ],
+      "responses": [
+        "Print failures are frustrating but they're part of the learning process! Common causes and fixes: 1) Bed adhesion issues — clean your bed with isopropyl alcohol, lower your first-layer temperature by 5°C, or try a glue stick, 2) Stringing — increase retraction distance (1-2mm) or enable 'combing' mode in your slicer, 3) Layer shifting — check that your belts are tight and your hotend tightener isn't loose, 4) Under-extrusion — clean your nozzle (heat it and use a needle to clear any debris) and verify your filament isn't tangled on the spool.",
+        "If your model keeps failing at the same spot, try reducing your print speed by 20–30%. Also check your slicer settings — too much infill or too thin walls can cause structural failures. A good starting point is: 20% infill, 3-4 perimeters (walls), and 0.2mm layer height for most prints.",
+        "Temperature troubleshooting: if your print is stringing or oozing, reduce the hotend temp by 5°C and try again. If layers aren't bonding well, increase the temp by 5°C. Finding the right temperature for your filament can take a few tries — keep notes on what works!",
+        "When all else fails, the Print Cosmos community is here to help! Post in the forums with details about your printer, filament, settings, and what went wrong — a fellow maker can likely spot the issue quickly."
+      ]
+    },
+    "about_bob": {
+      "keywords": [
+        "who are you",
+        "what are you",
+        "bob",
+        "yourself",
+        "about",
+        "what is bob",
+        "bob who",
+        "tell me about"
+      ],
+      "responses": [
+        "I'm Bob — Print Cosmos's onboard AI helper! I live in the platform's starfield background and I'm here to guide makers through everything they need to know about 3D printing and the Print Cosmos marketplace. Ask me about nozzles, infill, supports, filament types, how to list a design, club subscriptions, or anything else!",
+        "Hi, I'm Bob, your Print Cosmos AI companion! I can help you with: 3D printing basics (nozzle, infill, supports, materials), platform features (design studio, threads, Pro, clubs, messaging), and troubleshooting common print issues. Just ask!",
+        "Hmm, that's outside my current knowledge base. I'm Bob, Print Cosmos's AI helper — I specialize in 3D printing questions and platform navigation. Try asking about infill, nozzles, supports, materials, the Design Studio, thread earning, Pro features, clubs, or listing on the marketplace!",
+        "I'm still learning about that topic! My expertise is 3D printing and Print Cosmos platform features. Here's what I can help with: nozzle and bed basics, infill and support structures, filament materials (PLA/PETG/ABS/TPU), the Design Studio, Threads/Pro/Clubs, messaging, and troubleshooting print issues.",
+        "That's a great question! Unfortunately I don't have a detailed answer for it yet — but it might be covered in our community forums. The Design Studio, Clubs, and maker community are packed with knowledge from experienced printers who love to share!"
+      ]
+    }
+  },
+  "docs": "## Documentation Index\n\n# Print Cosmos Documentation\n\n## Welcome to Print Cosmos Documentation\n\nThis is the official documentation for Print Cosmos, covering all features, tools, and maintenance procedures. \n\n---\n\n## Core Features\n\n### Analytics Dashboard\n- Overview of key metrics\n- Reporting tools\n- Data visualization\n\n### User Management\n- User search and filtering\n- Verification system\n- Suspension/termination workflows\n- Medal awarding\n\n### Refund Manager\n- Request queue visualization\n- Approval/denial workflow\n- Status tracking\n- Batch processing\n\n### Maintenance Tools\n- Security cleanup (sessions, accounts)\n- Audit logging\n- System health checks\n\n#### API Reference\n- Authentication patterns\n- Rate limiting\n- Pagination\n- Error handling\n\n#### UI Components\n- Card structure\n- Accordion patterns\n- Modals\n- Tables\n- Toast notifications\n\n---\n\n## Maintenance Resources\n\n### How to Submit a Complaint\n1. Go to \\/admin/safety-reports\\\n2. Fill required fields\n3. Submit and track via \\/admin/refund-requests\\\n\n### Dashboard Best Practices\n- Use collapsible widgets\n- Sort by date or financials\n- Export data regularly\n\n---\n\n## Environment Setup\n\n```bash\n# Development\nnpm run dev\n# Production\nnpm run build\n# Documentation Build\nnpm run docs\n```\n\n---\n\n## API Dashboard\n\n### Admin Endpoints\n- List all admin routes\n- Security checks\n- Error responses\n\n### User Endpoints\n- Analytics\n- Refunds\n- Reporting\n\n---\n\n## Accessibility\n\n- WCAG 2.1 compliance\n- Screen reader support\n- Keyboard navigation\n- Color contrast\n\n---\n\n## Support\n\nContact: support@printcosmos.app\n\nDocumentation Version: v1.2.3\n\n---\n\n## Print Cosmos Documents\n\n# Print Cosmos Documents\n\n## Platform Overview\n\nPrint Cosmos is a 3D printing marketplace and design platform where creators can list, sell, and share 3D models. The platform provides tools for designing, printing, and managing models, along with a community-driven marketplace.\n\n\n\n## Trusted Sources\n\nBob trusts the following sources for live web search:\n\n- **Prusa** — help.prusa3d.com — 3D printing guides and troubleshooting\n- **Bambu Lab** — wiki.bambulab.com — Printer setup, materials, and tutorials\n- **IC3D** — ic3dprinters.com — Filament technical data sheets\n- **3DFuel** — 3dfuel.com — Technical library and material specs\n- **MakerBot** — support.makerbot.com — Printer support and guides\n- **Polymaker** — wiki.polymaker.com — Product documents and safety data sheets\n- **3DXTech** — 3dxtech.com — Technical data sheets and safety data sheets\n- **All3DP** — all3dp.com — 3D printing news, guides, and resources\n- **RepRap** — reprap.org — Open-source 3D printing wiki and community\n- **Formlabs** — formlabs.com — 3D printing resources and education\n\n## Design Studio\n\nThe Print Cosmos Design Studio is a web-based 3D modeling workspace built into the browser. It allows users to create, edit, and prepare 3D models for printing without installing any software.\n\nKey features:\n- Full modeling toolkit with primitive shapes (box, sphere, cylinder, cone, torus, etc.)\n- Support generation and slice preview\n- Direct publishing to the marketplace\n- Real-time collaboration with other makers\n- STL, OBJ, PLY, GLTF/GLB import and export\n\n## Marketplace Listings\n\nListings are the core marketplace units. Users can create, browse, search, and filter listings.\n\nListing features:\n- Upload 3D model files (STL, OBJ, or .pcos format)\n- Set title, description, price, category, and filament color options\n- Choose free, paid, or pay-what-you-want pricing\n- Edit or delete listings from the My Listings section\n\n## Thread Currency\n\nThreads are Print Cosmos's community currency earned by:\n- Posting in forums and getting upvotes\n- Helping other makers and answering questions\n- Creating and selling listings\n- Completing daily challenges\n- Joining and participating in clubs\n\nThreads can be spent on premium features, listing boosts, or tipping creators.\n\n## Pro Subscription\n\nPrint Cosmos Pro is the premium subscription tier with benefits including:\n- Higher listing limits\n- Priority marketplace visibility\n- Reduced commission rates\n- Access to premium thread colors and materials\n- Club subscription management for recurring revenue\n- Expanded analytics for stores\n\n## Clubs\n\nDiscovery Clubs are subscription-based maker communities. Sellers create clubs with membership tiers at different price points. Buyers subscribe to support creators and get exclusive access.\n\n## Messaging\n\nUsers can message other makers directly through the platform. Messages are organized by thread. Support DMs can be sent via the chat sidebar with the ⚠️ button for urgent concerns.\n\n## Troubleshooting Common Print Issues\n\nBed adhesion: Clean bed with isopropyl alcohol, use glue stick or blue tape, lower first-layer temperature by 5°C.\n\nStringing: Increase retraction distance (1-2mm), enable combing mode in slicer.\n\nLayer shifting: Check belt tension, tighten hotend fastener.\n\nUnder-extrusion: Clean nozzle with needle, check for filament tangles.\n\nOver-extrusion: Reduce flow rate or temperature by 5°C increments.\n\n## Filament Materials\n\nPLA: Beginner-friendly, biodegradable, easy to print at 190-220°C. No heated bed required. Brittle, low heat resistance.\n\nPETG: Durable, flexible, heat-resistant. Requires heated bed at 70-80°C. Good for functional parts.\n\nABS: Strong, heat-resistant, acetone-smoothable. Requires heated bed at 90-110°C, enclosure, and ventilation. For experienced users.\n\nTPU: Flexible filament for phone cases, gaskets, soft grips. Requires direct-drive extruder and slow speeds.\n\n\n\n## Trusted Sources\n\nBob trusts the following sources for live web search:\n\n- **Prusa** — help.prusa3d.com — 3D printing guides and troubleshooting\n- **Bambu Lab** — wiki.bambulab.com — Printer setup, materials, and tutorials\n- **IC3D** — ic3dprinters.com — Filament technical data sheets\n- **3DFuel** — 3dfuel.com — Technical library and material specs\n- **MakerBot** — support.makerbot.com — Printer support and guides\n- **Polymaker** — wiki.polymaker.com — Product documents and safety data sheets\n- **3DXTech** — 3dxtech.com — Technical data sheets and safety data sheets\n- **All3DP** — all3dp.com — 3D printing news, guides, and resources\n- **RepRap** — reprap.org — Open-source 3D printing wiki and community\n- **Formlabs** — formlabs.com — 3D printing resources and education\n\n## Design Studio Workflow\n\n1. Open the 3D Designer Workshop from navigation\n2. Start from scratch with basic shapes or import an existing model\n3. Use toolbar to combine shapes, carve holes, add patterns\n4. Set print settings (layer height, infill, supports) in right panel\n5. Click Prepare for Print to generate supports and preview slice\n\n---\n\n## Admin Maintenance Guide\n\n# Print Cosmos Admin Maintenance Documentation\n\n## Table of Contents\n1. [Warning Management System](#warning-management-system)\n2. [Refund Manager](#refund-manager)\n3. [User Management Dashboard](#user-management-dashboard)\n4. [Admin Audit Logs](#admin-audit-logs)\n5. [Security Cleanup Tools](#security-cleanup-tools)\n6. [API Reference](#api-reference)\n7. [Configuration](#configuration)\n\n---\n\n## Warning Management System\n\n### Overview\nThe Warning Management system provides tools for platform owners to monitor, issue, and resolve user warnings. It includes cascade detection to identify patterns of problematic behavior.\n\n### Features\n- **Warning Search**: Search users by ID or username\n- **Issue Warnings**: Submit new warnings with custom reasons\n- **Resolve Warnings**: Clear resolved warnings from user history\n- **Purge Warnings**: Permanently delete warning records\n- **Cascade Analysis**: Detect similar warning patterns across users\n\n### UI Components\n- Warning Manager Section in OwnerAnalytics\n- Search Form with validation\n- Warnings Table with actions column\n- Confirmation dialogs for destructive actions\n\n### API Endpoints\n```\nGET    /api/owner/users/{user_id}/warnings\nPOST   /api/owner/users/{user_id}/warn\nPOST   /api/admin/warnings/resolve\nDELETE /api/admin/warnings/purge/{user_id}\nGET    /api/admin/warnings/cascade/{user_id}\n```\n\n### Usage Example\n```javascript\n// Issue a warning\nawait api.post(`/api/owner/users/${userId}/warn`, {\n  reason: \"Spamming users\",\n  level: \"warning\"\n});\n\n// Resolve a warning\nawait api.post(`/api/admin/warnings/resolve`, { \n  user_id: userId \n});\n\n// Cascade analysis\nconst result = await api.get(`/api/admin/warnings/cascade/${userId}`);\n```\n\n---\n\n## Refund Manager\n\n### Overview\nThe Refund Manager provides a centralized interface for reviewing and processing refund requests from users.\n\n### Features\n- **Request Queue**: View all pending refund requests\n- **Approval Workflow**: Approve refunds with single click\n- **Denial Workflow**: Deny refunds with custom reason\n- **Status Tracking**: Real-time status updates\n- **Batch Processing**: Handle multiple requests efficiently\n\n### UI Components\n- Refund Requests Section in OwnerAnalytics\n- Request table with user, amount, reason columns\n- Action buttons with loading states\n- Success/error toast notifications\n\n### API Endpoints\n```\nGET  /api/owner/refund-requests\nPOST /api/owner/refund-requests/{request_id}/approve\nPOST /api/owner/refund-requests/{request_id}/deny\n```\n\n### Workflow\n1. Admin reviews refund request in queue\n2. Click Approve to process refund\n3. Click Deny with reason if needed\n4. System updates request status automatically\n\n### Data Model\n```javascript\ninterface RefundRequest {\n  request_id: string;\n  user_id: string;\n  amount: number;\n  reason: string;\n  created_at: string;\n  status: \"pending\" | \"approved\" | \"denied\";\n}\n```\n\n---\n\n## User Management Dashboard\n\n### Overview\nComprehensive user management with search, verification, suspension, and termination capabilities.\n\n### Features\n- **User Search**: Filter by ID, username, email, or role\n- **Verification Toggle**: Enable/disable user verification status\n- **User Suspension**: Temporarily or permanently suspend accounts\n- **Account Termination**: Permanently delete user accounts\n- **Medal Awards**: Recognize outstanding contributors\n\n### UI Components\n- Search form with real-time filtering\n- User table with role/status columns\n- Dropdown menu for action selection\n- Confirmation dialogs for destructive actions\n\n### API Endpoints\n```\nGET  /api/owner/users/search?q={query}&limit={limit}\nPOST /api/owner/users/{user_id}/toggle-verification\nPOST /api/owner/users/{user_id}/suspend\nPOST /api/owner/users/{user_id}/terminate\nPOST /api/owner/users/{user_id}/award-medal\n```\n\n### Actions\n\n#### Verification Toggle\n```javascript\nawait api.post(`/api/owner/users/${userId}/toggle-verification`);\n```\n\n#### Suspend User\n```javascript\nawait api.post(`/api/owner/users/${userId}/suspend`, {\n  reason: \"Violating terms of service\",\n  duration: \"permanent\" | \"24h\" | \"7d\"\n});\n```\n\n#### Terminate Account\n```javascript\nawait api.post(`/api/owner/users/${userId}/terminate`, {\n  reason: \"Pattern of violations\"\n});\n```\n\n#### Award Medal\n```javascript\nawait api.post(`/api/owner/users/${userId}/award-medal`, {\n  medal_type: \"gold\" | \"silver\" | \"bronze\",\n  criteria: \"Top contributor\"\n});\n```\n\n---\n\n## Admin Audit Logs\n\n### Overview\nComplete audit trail of all administrative actions taken on the platform.\n\n### Features\n- **Action Timeline**: Chronological view of all admin actions\n- **Role-Based Filtering**: Filter by action type or admin\n- **Export Capability**: Download logs for compliance\n- **Real-Time Updates**: Live sync of admin activities\n\n### UI Components\n- Audit Logs Section in OwnerAnalytics\n- Filter dropdown for action types\n- Export button for CSV download\n- Infinite scroll for large datasets\n\n### API Endpoints\n```\nGET /api/admin/audit-logs?limit={limit}&action={type}\n```\n\n### Log Entry Structure\n```javascript\ninterface AuditLogEntry {\n  timestamp: string;\n  admin_id: string;\n  action: string;\n  target_id: string;\n  details: string;\n  ip_address?: string;\n}\n```\n\n### Common Actions Tracked\n- User warnings issued/resolved\n- Refunds approved/denied\n- Accounts suspended/terminated\n- Content removed\n- System configuration changes\n\n---\n\n## Security Cleanup Tools\n\n### Overview\nAutomated tools for maintaining platform health by cleaning up stale data.\n\n### Features\n- **Session Purge**: Remove expired user sessions\n- **Account Cleanup**: Delete unverified old accounts\n- **Report Archival**: Archive resolved reports\n- **Confirmation Prompts**: Prevent accidental data loss\n\n### Cleanup Operations\n\n#### Expired Sessions\nRemoves all sessions older than 30 days.\n\n#### Unverified Accounts\nDeletes accounts that:\n- Have not verified email\n- Were created 90+ days ago\n- Have no activity\n\n#### Report Archive\nArchives resolved reports older than 1 year to reduce database size.\n\n### API Endpoints\n```\nPOST /api/admin/cleanup/expired_sessions\nPOST /api/admin/cleanup/unverified_accounts\nPOST /api/admin/cleanup/old_reports\n```\n\n### Usage\n```javascript\n// Run cleanup operation\nawait api.post(`/api/admin/cleanup/${type}`, {\n  dry_run: false  // Set true to preview without changes\n});\n```\n\n---\n\n## API Reference\n\n### Authentication\nAll admin endpoints require `is_platform_owner: true` in the JWT token.\n\n### Error Responses\n```json\n{\n  \"detail\": \"Forbidden: owner-only access\",\n  \"status_code\": 403\n}\n```\n\n### Rate Limiting\n- 60 requests/minute per IP\n- 1000 requests/hour per user\n- Excess requests return 429\n\n### Pagination\nAll list endpoints support:\n```\nGET /endpoint?limit=50&skip=0\n```\n\n---\n\n## Configuration\n\n### Environment Variables\n```bash\n# Admin settings\nADMIN_REQUIRE_MFA=true\nAUDIT_LOG_RETENTION_DAYS=365\n\n# Cleanup schedules\nCLEANUP_SESSION_INTERVAL=\"24h\"\nCLEANUP_ACCOUNT_AGE_DAYS=90\n```\n\n### Feature Flags\nDisable features if needed:\n```bash\nFEATURE_WARNING_CASCADE=false\nFEATURE_REFUND_QUEUE=true\n```\n\n### Security Settings\n```bash\n# Session cleanup\nSESSION_EXPIRY_DAYS=30\n\n# Account cleanup\nUNVERIFIED_ACCOUNT_THRESHOLD=90\n\n# Refund processing\nREFUND_AUTO_APPROVE_THRESHOLD=10.00\n```\n\n---\n\n## Troubleshooting\n\n### Common Issues\n\n**Warning won't resolve**\n- Check if warning exists in database\n- Verify user has warning status\n\n**Refund approval fails**\n- Verify transaction exists\n- Check payment status\n\n**User search returns no results**\n- Verify search query format\n- Check if user exists\n\n### Support\nContact platform-admin@printcosmos.app for assistance.\n\n---\n\n## Product Requirements Document\n\n# Print Cosmos — PRD\n\n## Original Problem Statement\nBuild a website where users can sell 3D-printed items. The platform takes a percentage of each sale (set to **3.5%**). The product is a hybrid of:\n- **Thingiverse** — share 3D designs\n- **Tinkercad** — design 3D objects in a simple in-browser editor\n- **eBay** — list and sell physical items, only for 3D-printed items\n\nThe landing page introduces the platform; the top nav has tabs to Browse or Design; the top-right has Sign in / Sign up (Google) and a Become a Seller CTA. **Users can also Become a Creator** (publish designs). Before finalizing a listing, the seller can choose to share or not share their design files.\n\n## User-Confirmed Choices (2026-02)\n- Auth: **Emergent-managed Google Auth**\n- 3D editor: **Both** — upload STL/OBJ + simple in-browser editor (cube/sphere/cylinder, transform, color)\n- Payments: Stripe (test mode) with **3.5%** commission\n- File storage: **Emergent Object Storage** (yes)\n- Design: minimalist, **dark black + purple**, theme toggle for users\n\n## Architecture\n- **Backend**: FastAPI on 8001, MongoDB, single `/app/backend/server.py`.\n  - Auth: Emergent Google OAuth (`/api/auth/session`, `/api/auth/me`, `/api/auth/logout`).\n  - Roles: `is_seller`, `is_creator` (POST `/api/auth/become-seller`, `/api/auth/become-creator`).\n  - Storage: Emergent Object Storage via `emergentintegrations` (`/api/upload`, `/api/files/{path}`).\n  - Marketplace: `/api/listings`, `/api/listings/{id}`, `/api/seller/listings`.\n  - Designs (Thingiverse-style): `/api/designs`, `/api/designs/{id}`, `/api/seller/designs`.\n  - Payments: Stripe Checkout via `emergentintegrations.payments.stripe.checkout` (`/api/checkout/session`, `/api/checkout/status/{id}`, `/api/webhook/stripe`).\n- **Frontend**: React 19 + CRA + Tailwind + shadcn/ui.\n  - Routes: `/`, `/browse`, `/listing/:id`, `/designer`, `/designs`, `/dashboard`, `/create`, `/checkout/success`.\n  - 3D: vanilla **three.js** (in `useEffect`) — avoids visual-edits Babel plugin incompatibility with @react-three/fiber.\n  - Theme: dark default, optional light, controlled via `<ThemeToggle />`.\n  - Typography: Chivo (display), Work Sans (body), Space Mono (technical).\n\n## User Personas\n1. **Maker / Seller** — designs or sources 3D models, prints them at home, lists finished prints for sale.\n2. **Creator** — shares STL/scenes built in the in-browser designer with the community.\n3. **Buyer** — browses, previews 3D models, buys finished prints via Stripe.\n\n## Roles\n- Visitor — browse listings, view community designs.\n- Authenticated user — save designs, become creator/seller.\n- Creator (`is_creator`) — publishes designs to community.\n- Seller (`is_seller`) — publishes paid listings.\nA user may be both.\n\n## What's been implemented (2026-02)\n- Landing page (hero, three pillars, how-it-works, CTA).\n- Browse with search + category filter chips.\n- Listing detail with image gallery, 3D preview (STL/OBJ), Stripe buy flow, 3.5% fee breakdown.\n- In-browser 3D Designer (vanilla three.js): cube/sphere/cylinder primitives, position/rotation/scale via inputs and step buttons, color picker, OrbitControls, save to community.\n- Community designs page.\n- Create Listing flow: title/description/price/category, image upload, STL/OBJ upload, \"share design files\" toggle, live earnings preview (3.5% fee).\n- Seller dashboard: KPI tiles (listings/sales/revenue/fees), listings table, shared designs grid.\n- Emergent Google Auth with `/api/auth/session` + cookie + AuthCallback route handler.\n- Emergent Object Storage upload/download.\n- Stripe test-mode checkout + status polling + payment_transactions ledger.\n- **Become a Seller** and **Become a Creator** buttons in header; auto-promotion when posting a listing/design.\n- Dark + purple minimalist theme, with light theme available.\n- **[2026-02] Editor free-drag, pinch-zoom, right-click orbit**: Left-click drag on a shape now moves it freely along the ground plane (no need to grab TransformControls arrows). Two-finger pinch zooms (touch DOLLY_PAN). Right-click drag orbits and native context menu is suppressed. Fixed pre-existing three.js r169 TransformControls compat bug via `getHelper()`.\n- **[2026-02] Rigid mascot system fully removed** per user request. Deleted RigidMascot.jsx, RigidMascotTour.jsx, RigidWarningGate.jsx, sprite SVG, all imports/usages in App.js/Browse/Forums, mascot references in Terms (Section 5 renamed to \"Moderation & Enforcement\"), and .rigid-mascot-* CSS classes. Backend endpoints (/api/launch-tour/complete, /api/enforcement/acknowledge) left dormant.\n\n## Prioritized Backlog\n**P1**\n- Buyer order history page (`/orders`).\n- Listing edit + soft-delete.\n- Seller payout dashboard once Stripe Connect or manual payout is wired.\n- Designs detail page with remix/fork action.\n\n**P2**\n- Collaborators on designs (multi-user authorship).\n- Reviews & ratings on listings.\n- Shipping address + tracking number entry.\n- Search ranking by sales / recency hybrid.\n- Apple Sign-in (requires paid Apple Developer account).\n- Email notifications (Resend) for orders & purchases.\n\n## Next Action Items\n- Group chats UI (backend exists; wire multi-participant frontend).\n- Drag-handles on 3D objects to scale L/W/H visually (Tinkercad parity beyond current TransformControls scale mode).\n- Wire `/orders` page (buyer + seller view) using `payment_transactions`.\n- Add edit/delete on `/dashboard` listings.\n- Image lightbox on listing detail.\n- Hole/Group boolean cutting operations in 3D Designer.\n- Interactive sidebar hover animations (shapes jumping out of cart icon).\n\n\n---\n\n## Project README\n\n# Here are your Instructions\n\n\n---\n\n## Design System Guidelines\n\n# Print Cosmos — Design System Reference\n\n> This document is derived entirely from what already exists in the codebase.\n> Nothing here is aspirational. Every rule below is already the de-facto standard —\n> this document makes it explicit so future work stays consistent.\n\n---\n\n## 1. Typography\n\nThree fonts are loaded from Google Fonts (`index.css`). Each has a strict role.\n\n### Fonts\n\n| Token | Family | Role |\n|---|---|---|\n| `font-display` | Chivo | Page headings, card titles, dialog titles, prices |\n| `font-body` | Work Sans | Default body text — set on `html`/`body`, used implicitly everywhere |\n| `font-tech` | Space Mono | Labels, badges, buttons, metadata, all-caps UI chrome |\n\n### Type scale in use\n\n| Size | Class | Typical use |\n|---|---|---|\n| 9px | `text-[9px]` | Micro-labels, badge text, image counters |\n| 10px | `text-[10px]` | Section eyebrows, metadata rows, tab labels |\n| 12px | `text-xs` | Secondary body, button text, nav links |\n| 14px | `text-sm` | Primary body copy, form inputs |\n| 16px | `text-base` | Card titles, sub-headings |\n| 18px | `text-lg` | Minor headings |\n| 20px | `text-xl` | Section headings (e.g. dialog titles) |\n| 24px | `text-2xl` | Section headings, stat numbers |\n| 30px | `text-3xl` | Page sub-headings |\n| 36–48px | `text-4xl` / `text-5xl` | Hero headings |\n| 60px+ | `text-6xl` | Home hero only |\n\n### Heading style\n\nAll headings use `font-display` (Chivo) with `tracking-tighter` (`letter-spacing: -0.025em`)\nand `font-light` (weight 300) for large display sizes. Smaller headings use `font-medium` (500).\n\n```\n// Large hero\nfont-display text-4xl sm:text-5xl font-light tracking-tighter\n\n// Section heading\nfont-display text-2xl font-medium tracking-tight\n\n// Dialog / card title\nfont-display text-xl font-medium tracking-tight\n```\n\n### Tech label style\n\nThe small all-caps labels seen throughout the app follow one pattern:\n\n```\ntext-[10px] font-tech uppercase tracking-[0.2em] text-muted-foreground\n```\n\nEyebrow labels (above a heading) use slightly wider tracking:\n\n```\ntext-[10px] font-tech uppercase tracking-[0.3em] text-muted-foreground\n```\n\nThe leading `● ` dot in eyebrow labels uses `text-primary` to add a colour accent.\n\n---\n\n## 2. Colour Tokens\n\nDefined in `index.css` as CSS custom properties, consumed via Tailwind.\n\n| Token | Light | Dark | Use |\n|---|---|---|---|\n| `background` | white | `#080808` | Page background |\n| `foreground` | `#121212` | `#f5f5f5` | Default text |\n| `card` | white | `#0f0f0f` | Card surfaces |\n| `primary` | purple `270 91% 65%` | purple `270 91% 70%` | CTAs, active states, accents |\n| `accent` | light purple `265 84% 78%` | same | Secondary highlights |\n| `muted-foreground` | 40% grey | 55% grey | Metadata, placeholders |\n| `border` | 90% grey | 13% grey | All dividers and outlines |\n| `destructive` | red `0 84% 60%` | red `0 62% 50%` | Delete, report, error |\n\n**Never use raw hex values for these roles.** Use the token. The one exception is the\namber sale/highlight colour `#F59E0B` / `text-primary` (Tailwind `amber-500`) which\nappears in sale badges and the Bob/tent scene — it is intentional and consistent.\n\n---\n\n## 3. Buttons\n\nThe shared `Button` component (`components/ui/button.jsx`) uses `rounded-xl` as its\nbase corner radius. All size variants inherit this.\n\n### Variants\n\n| Variant | Background | Use |\n|---|---|---|\n| `default` | `bg-primary` | Primary CTA — buy, save, publish |\n| `outline` | transparent + `border-input` | Secondary actions — cancel, back, follow |\n| `destructive` | `bg-destructive` | Delete, report, unlist |\n| `ghost` | transparent | Toolbar actions, nav items |\n| `secondary` | `bg-secondary` | Tertiary, low-emphasis |\n| `link` | transparent + underline | Inline text links |\n\n### Sizes\n\n| Size | Height | Use |\n|---|---|---|\n| `sm` | `h-8` | Compact toolbar, top-bar actions |\n| `default` | `h-9` | Standard form buttons |\n| `lg` | `h-10` | Primary page CTAs (buy, checkout) |\n| `icon` | `h-9 w-9` | Square icon-only buttons |\n\n### Button text style\n\nAll button labels use `font-tech text-xs uppercase tracking-wider` — this is applied\nmanually at the call site, not baked into the component. Always apply it.\n\n---\n\n## 4. Cards\n\nCards use a consistent no-hard-border, shadow-based style:\n\n```\nrounded-2xl bg-card shadow-sm hover:shadow-lg transition-shadow\n```\n\n- Corner radius: `rounded-2xl` (16px) for cards, `rounded-xl` (12px) for inner elements\n- No explicit `border` on the card itself — the shadow provides depth\n- Hover lifts the shadow: `shadow-sm` → `shadow-lg`\n- Image inside a card: `group-hover:scale-105 transition-transform duration-500`\n\nThe `Card` component from `components/ui/card.jsx` uses `rounded-xl border bg-card shadow`\n(12px radius, with border). Prefer the manual pattern above for listing/product cards;\nuse the `Card` component for structured data panels (settings, specs, dialogs).\n\n---\n\n## 5. Spacing & Border Radius\n\n### Corner radius hierarchy\n\n| Radius | Tailwind | Use |\n|---|---|---|\n| `rounded-full` | 9999px | Pills, avatars, category filter chips, sky-mode toggle |\n| `rounded-2xl` | 16px | Cards, containers, search bar wrapper |\n| `rounded-xl` | 12px | Buttons, inputs, badges, inner card elements, dialogs |\n| `rounded-lg` | 8px | Not used — skip this step |\n| `rounded-md` | 6px | Not used — skip this step |\n\nThe CSS variable `--radius: 0.25rem` in the theme is the Radix/shadcn base — it is\noverridden at the component level everywhere. Do not use `rounded` or `rounded-sm`.\n\n### Page padding\n\n| Breakpoint | Horizontal padding |\n|---|---|\n| Mobile | `px-6` |\n| Tablet | `md:px-12` |\n| Desktop | `lg:px-24` |\n\nVertical section padding: `py-10` standard, `py-6` compact.\n\n---\n\n## 6. Icons\n\n**Library: `lucide-react`** — used exclusively throughout the app.\n\nStandard icon size: `h-4 w-4` (16px). Toolbar/compact: `h-3.5 w-3.5` (14px).\nLarge decorative: `h-8 w-8` or `h-10 w-10`.\n\n`strokeWidth` is left at the Lucide default (2) unless explicitly reduced to `1.5`\nfor decorative/large icons.\n\n### Custom-built icons (not from Lucide)\n\nThree components contain hand-drawn SVG art — do not replace these with Lucide equivalents:\n\n- `Bob.jsx` — the 3D-printed stick figure character (default, Pro cape, sleeping, lawn chair variants)\n- `WireframeCube.jsx` — rotating CSS 3D wireframe cube used in empty states\n- `EmptyConstellation.jsx` — blank sky with moon and scattered stars for empty states\n- `DaytimeScene.jsx` — sun, clouds, Earth SVG for the day-mode Browse background\n- `TentScene.jsx` — campfire tent scene with fireflies and grass\n\nBadge icons inside `UserBadges.jsx` are also inline SVG (the star/rising-creator shapes\nthat don't exist in Lucide).\n\n---\n\n## 7. Badge System\n\nDefined in `components/UserBadges.jsx`.\n\n### Two badge categories\n\n**Main badges** — earned by activity, shown inline next to a username:\n\n| Badge | Trigger |\n|---|---|\n| `platform_owner` | `user.is_platform_owner` |\n| `pro_subscriber` | `user.is_pro` |\n| `top_seller` | 50+ sales |\n| `verified_seller` | 5-star avg, 5–8 listings |\n| `community_star` | 10+ forum upvotes across 3–8 posts |\n| `featured_designer` | curated design |\n| `certified_service` | verified service + 4.5+ rating |\n| `top_designer` | design score ≥ 80 |\n| `rising_creator` | account < 90 days + high recent activity |\n\n**Milestone badges** — earned by tenure/sales, shown on profile only:\n`first_listing`, `first_sale`, `ten_sales`, `hundred_sales`, `year_one`, `year_three`, `year_five`\n\n### Display rules\n\n- Inline (next to a username in a list or card): max **3** badges shown, overflow shown as `+N`\n- Profile page: all badges shown, milestone badges rendered as 3D `MilestoneBadge3D` components\n- Badge size inline: 16px (`size={16}`)\n- `platform_owner` always renders first regardless of sort order\n- Tooltips on by default (`showTooltips={true}`), disable only in space-constrained contexts like `ListingStar`\n\n### Usage pattern\n\n```jsx\n<UserBadges\n  user={{ is_pro: item.seller_is_pro, is_platform_owner: item.seller_is_platform_owner }}\n  milestoneBadges={item.seller_milestone_badges}\n  maxInline={3}\n/>\n```\n\n---\n\n## 8. Motion Guidelines\n\n### The two animation tiers\n\n**Tier 1 — Ambient / background** (slow, continuous, non-interactive):\n- Starfield twinkle: `2–6s ease-in-out infinite` (randomised per star)\n- Bob idle wobble: 50ms interval, `Math.sin` oscillation, `0.1s ease-out` CSS transition\n- Fireflies: `1s ease-in-out infinite`\n- Tent glow: `2s ease-in-out infinite`\n- WireframeCube spin: `12s linear infinite`\n- Cloud drift: 50ms interval, continuous position increment\n- Sun/sky colour transitions: `duration-[2000ms]`\n\nThese should feel like the world breathing. Never make them faster.\n\n**Tier 2 — Interactive / feedback** (fast, triggered by user action):\n- Button hover/active: `transition-colors` (Tailwind default ~150ms)\n- Card hover shadow lift: `transition-shadow` (default ~150ms)\n- Card image zoom: `transition-transform duration-500`\n- Page entry: `rise-in` — `0.7s cubic-bezier(0.16, 1, 0.3, 1)` with staggered delays (0.08s per step)\n- Dialog/overlay appear: `fadeInUp` — implicit via Radix animation\n- Listing star hover scale: `transition-all duration-300`\n- Seller strip slide-up: `transition-all duration-200` (max-height + opacity)\n- Sky mode / space view opacity: `transition: opacity 0.6s`\n- Filament swatch hover: `180ms ease`\n- Vibrate alert (error): `vibrate-alert 260ms linear` × 3 iterations\n\n### Rules\n\n1. Background elements (stars, Bob, clouds, Earth) use Tier 1. Never put a `duration-150` on a star.\n2. User-triggered state changes use Tier 2. Never put a `12s` on a button.\n3. Page-level entry animations use `rise-in` with staggered `.rise-in-1` through `.rise-in-4` classes.\n4. Easing: interactive transitions use Tailwind defaults (ease-in-out). Entry animations use\n   `cubic-bezier(0.16, 1, 0.3, 1)` (fast out, slight overshoot — feels snappy without bouncing).\n5. Do not introduce new `@keyframes` without adding them to `index.css`. Do not define\n   animations inline in component styles unless they are parameterised (e.g. per-star twinkle phase).\n\n---\n\n## 9. Loading States\n\n### Current state\n\nLoading is currently handled with a boolean flag and either:\n- Rendering nothing (the component returns early or renders an empty container)\n- A plain text string: `\"Loading…\"` in `font-tech text-sm text-muted-foreground`\n\nThere is no shared loading component. The `Skeleton` component exists\n(`components/ui/skeleton.jsx` — `animate-pulse rounded-md bg-primary/10`) but is not\nused anywhere yet.\n\n### Standard to follow for new loading states\n\nLoading states should feel like the app's world, not a generic web pattern.\n\n**For content lists (cards, listings, search results):**\nUse 3–6 skeleton cards matching the shape of the real card:\n```jsx\n<div className=\"rounded-2xl bg-card shadow-sm animate-pulse\">\n  <div className=\"aspect-square bg-primary/10 rounded-t-2xl\" />\n  <div className=\"p-4 space-y-2\">\n    <div className=\"h-3 bg-primary/10 rounded-xl w-3/4\" />\n    <div className=\"h-2 bg-primary/10 rounded-xl w-1/2\" />\n  </div>\n</div>\n```\n\n**For full-page loads (Browse, ListingDetail):**\nShow the starfield background immediately (it renders from a seed, no API call needed),\nthen fade in content with `rise-in` once data arrives. The sky is never blank.\n\n**For inline/small loading (a single stat, a button action):**\nReplace the label with `\"…\"` in the same font/size. Do not show a spinner.\n\n**Never use:**\n- Generic CSS spinners\n- Third-party loading libraries\n- Skeleton shapes that don't match the real content shape\n\n---\n\n## 10. Empty States\n\n### Existing pattern — `EmptyConstellation`\n\n`components/EmptyConstellation.jsx` is the canonical empty state for the Discovery Clubs\nconstellation builder: black background, 5 faint random stars, a pale moon with craters,\nand a centred text message in `font-tech`.\n\n### Existing pattern — `WireframeCube` + text\n\nUsed in Browse's `EmptyState` function: the rotating wireframe cube above a heading and\na short description, with a CTA link. This is the standard for marketplace empty states.\n\n```jsx\n<div className=\"border border-dashed border-border rounded-2xl py-20 px-6 text-center flex flex-col items-center\">\n  <div className=\"mb-6 opacity-90\"><WireframeCube size={104} /></div>\n  <div className=\"text-xs font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3\">\n    Nothing here yet\n  </div>\n  <h3 className=\"font-display text-2xl font-bold mb-3\">{heading}</h3>\n  <p className=\"text-sm text-muted-foreground max-w-md mx-auto leading-relaxed mb-6\">\n    {description}\n  </p>\n  {cta}\n</div>\n```\n\n### Rules for new empty states\n\n1. **Always include a visual anchor** — either `WireframeCube` (marketplace/content contexts)\n   or `EmptyConstellation` (social/club/constellation contexts). Never just text.\n2. **Three-line structure:** eyebrow label → heading → one-sentence description → optional CTA.\n3. Use `border-dashed border-border` container to signal \"this space is waiting to be filled.\"\n4. The CTA (if present) should be a constructive action — \"Design your first print\", \"Join a club\" —\n   not just \"Go back.\"\n5. Empty search results are a special case: keep the starfield/sky visible behind the empty state\n   so the page doesn't feel dead. The empty state floats over the living background.\n\n### Contexts and which pattern to use\n\n| Context | Pattern |\n|---|---|\n| Empty cart | `WireframeCube` + \"Your cart is empty\" + Browse CTA |\n| No search results | `WireframeCube` + \"No prints match\" + clear-filter CTA |\n| No designs (Workshop) | `WireframeCube` + \"No projects yet\" (already implemented) |\n| No club constellation | `EmptyConstellation` (already implemented) |\n| No messages | Faint stars SVG + \"No conversations yet\" |\n| No orders | `WireframeCube` + \"No orders yet\" |\n\n---\n\n## 11. Quick Reference Cheatsheet\n\n```\nHeading:     font-display text-4xl font-light tracking-tighter\nSub-heading: font-display text-2xl font-medium tracking-tight\nEyebrow:     text-[10px] font-tech uppercase tracking-[0.3em] text-muted-foreground\nLabel:       text-[10px] font-tech uppercase tracking-[0.2em] text-muted-foreground\nBody:        text-sm (Work Sans, implicit)\nButton text: font-tech text-xs uppercase tracking-wider\n\nCard:        rounded-2xl bg-card shadow-sm hover:shadow-lg transition-shadow\nButton:      rounded-xl (all sizes)\nInput:       rounded-xl\nBadge/chip:  rounded-full\nDialog:      rounded-xl (Radix default)\n\nAmbient anim:     2s–12s, ease-in-out or linear\nInteractive anim: 150ms–500ms, ease-in-out or cubic-bezier(0.16,1,0.3,1)\nEntry anim:       rise-in (0.7s) with .rise-in-1 through .rise-in-4 stagger\n\nIcons:       lucide-react, h-4 w-4 default, strokeWidth 2 (1.5 for decorative)\nBadges:      <UserBadges maxInline={3} /> — never more than 3 inline\n```\n"
+}

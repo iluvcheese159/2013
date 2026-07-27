@@ -1,0 +1,260 @@
+import { useEffect, useState, useMemo } from "react";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { api, fileUrl } from "@/lib/api";
+import { Input } from "@/components/ui/input";
+import { Search, Share2, Plus } from "lucide-react";
+import { BRAND_NAME, SUPPORT_EMAIL } from "@/lib/branding";
+import BrandLogo from "@/components/BrandLogo";
+import WireframeCube from "@/components/WireframeCube";
+import SafeImage from "@/components/SafeImage";
+import SalePrice from "@/components/SalePrice";
+import UserBadges from "@/components/UserBadges";
+import StarfieldRenderer from "@/components/StarfieldRenderer";
+
+const CATEGORIES = ["All", "Decor", "Tools", "Toys", "Art", "Functional", "Other"];
+
+// Colors for listing stars - subtle variations
+const LISTING_COLORS = [
+  { r: 255, g: 250, b: 200 }, // Pale yellow
+  { r: 200, g: 220, b: 255 }, // Pale blue
+  { r: 255, g: 200, b: 200 }, // Pale red
+  { r: 255, g: 220, b: 180 }, // Pale orange
+];
+
+function getListingColor(listingId) {
+  const index = listingId % LISTING_COLORS.length;
+  return LISTING_COLORS[index];
+}
+
+function generateListingPositions(count, seed) {
+  const positions = [];
+  let seedValue = seed;
+  const random = () => {
+    seedValue = (seedValue * 9301 + 49297) % 233280;
+    return seedValue / 233280;
+  };
+
+  for (let i = 0; i < count; i++) {
+    positions.push({
+      x: random() * 100,
+      y: random() * 100,
+    });
+  }
+  return positions;
+}
+
+export default function Browse() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [items, setItems] = useState([]);
+  const [q, setQ] = useState("");
+  const [params] = useSearchParams();
+  const initialCat = CATEGORIES.includes(params.get("cat")) ? params.get("cat") : "All";
+  const [cat, setCat] = useState(initialCat);
+  const [loading, setLoading] = useState(true);
+  const [userCountry, setUserCountry] = useState(null);
+  
+  // Generate consistent positions for listing stars
+  const listingPositions = useMemo(() => generateListingPositions(500, Date.now()), []);
+
+  // Get user's country on component mount
+  useEffect(() => {
+    const getUserCountry = async () => {
+      try {
+        const r = await fetch("https://ipapi.co/json/");
+        const data = await r.json();
+        setUserCountry(data.country_code);
+      } catch (e) {
+        console.warn("Could not fetch user country:", e);
+      }
+    };
+    getUserCountry();
+  }, []);
+
+  useEffect(() => {
+    /* eslint-disable */
+    setLoading(true);
+    const params = {};
+    if (cat !== "All") params.category = cat;
+    if (q) params.q = q;
+    const t = setTimeout(() => {
+      api
+        .get("/listings", { params })
+        .then((r) => {
+          // Sort listings: user's country first, then international
+          const sorted = [...(r.data || [])].sort((a, b) => {
+            const aIsLocal = userCountry && a.seller_country === userCountry ? 0 : 1;
+            const bIsLocal = userCountry && b.seller_country === userCountry ? 0 : 1;
+            if (aIsLocal !== bIsLocal) return aIsLocal - bIsLocal;
+            // Secondary sort by creation date (newest first)
+            return new Date(b.created_at) - new Date(a.created_at);
+          });
+          setItems(sorted);
+        })
+        .catch(() => setItems([]))
+        .finally(() => setLoading(false));
+    }, 200);
+    return () => clearTimeout(t);
+    /* eslint-enable */
+  }, [q, cat, userCountry]);
+
+
+  return (
+    <div data-testid="browse-page" className="pt-14 min-h-screen relative bg-black">
+      {/* Starfield background */}
+      <StarfieldRenderer starCount={400} seed={Date.now()} className="fixed inset-0" />
+      
+      {/* Listing stars layer */}
+      <div className="fixed inset-0 pointer-events-none">
+        {!loading && items.map((item, index) => {
+          const position = listingPositions[index % listingPositions.length];
+          const color = getListingColor(item.listing_id);
+          const isFiltered = cat !== "All" && item.category !== cat;
+          
+          return (
+            <Link
+              key={item.listing_id}
+              to={`/listing/${item.listing_id}`}
+              data-testid={`listing-star-${item.listing_id}`}
+              className="absolute pointer-events-auto transition-all duration-300 hover:scale-150 hover:z-50"
+              style={{
+                left: `${position.x}%`,
+                top: `${position.y}%`,
+                opacity: isFiltered ? 0.2 : 1,
+                transform: isFiltered ? 'scale(0.5)' : 'scale(1)',
+              }}
+              title={item.title}
+            >
+              {/* Glow effect */}
+              <div 
+                className="absolute -inset-2 rounded-full blur-sm opacity-50"
+                style={{
+                  backgroundColor: `rgb(${color.r}, ${color.g}, ${color.b})`,
+                }}
+              />
+              {/* The star itself */}
+              <div
+                className="relative rounded-full"
+                style={{
+                  width: '8px',
+                  height: '8px',
+                  backgroundColor: `rgb(${color.r}, ${color.g}, ${color.b})`,
+                  boxShadow: `0 0 10px rgb(${color.r}, ${color.g}, ${color.b})`,
+                }}
+              />
+            </Link>
+          );
+        })}
+      </div>
+      
+      {/* Fixed floating search bar */}
+      <div className="fixed top-16 left-0 right-0 z-50 px-6 md:px-12 lg:px-24 py-4">
+        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row gap-4 items-stretch sm:items-center bg-black/40 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/60" />
+            <Input
+              data-testid="browse-search-input"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Search prints…"
+              className="pl-9 font-tech text-sm rounded-xl bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:bg-white/20"
+            />
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {CATEGORIES.map((c) => (
+              <button
+                key={c}
+                data-testid={`cat-${c.toLowerCase()}-btn`}
+                onClick={() => setCat(c)}
+                className={`px-3 py-1.5 text-[10px] font-tech uppercase tracking-[0.2em] border rounded-full transition-colors ${
+                  cat === c
+                    ? "border-white/60 text-white bg-white/10"
+                    : "border-white/20 text-white/60 hover:text-white hover:border-white/40"
+                }`}
+              >
+                {c}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+      
+      {/* Content placeholder */}
+      <div className="relative z-10 px-6 md:px-12 lg:px-24 py-32">
+        <div className="text-xs font-tech uppercase tracking-[0.3em] text-white/60 mb-3">
+          <span className="text-white">●</span> Marketplace
+        </div>
+        <h1 className="font-display text-4xl sm:text-5xl font-light tracking-tighter mb-6 text-white">
+          Printed by humans.
+        </h1>
+        <p className="text-white/70 text-sm">
+          Click on colored stars to view listings. Use the search bar and category filters above to narrow results.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function ListingCard({ item }) {
+  const cover = item.image_paths?.[0];
+  return (
+    <Link
+      to={`/listing/${item.listing_id}`}
+      data-testid={`listing-card-${item.listing_id}`}
+      className="group block rounded-2xl bg-card shadow-sm hover:shadow-lg transition-shadow"
+    >
+      <div className="aspect-square bg-secondary overflow-hidden relative rounded-t-2xl">
+        {cover ? (
+          <SafeImage src={fileUrl(cover)} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+        ) : (
+          <div className="flex items-center justify-center h-full text-muted-foreground font-tech text-xs">
+            NO IMAGE
+          </div>
+        )}
+        {item.share_design && (
+          <div className="absolute top-2 left-2 inline-flex items-center gap-1 px-2 py-1 bg-primary text-primary-foreground text-[9px] font-tech uppercase tracking-wider rounded-full">
+            <Share2 className="h-3 w-3" /> Open design
+          </div>
+        )}
+      </div>
+      <div className="p-4">
+        <div className="flex items-start justify-between gap-3 mb-1">
+          <h3 className="font-display text-base font-bold leading-tight">{item.title}</h3>
+          <div className="whitespace-nowrap">
+            <SalePrice
+              isOnSale={item.is_on_sale}
+              baseOriginalPrice={item.base_original_price ?? item.price}
+              activeSalePrice={item.active_sale_price}
+              saleClassName="text-sm"
+              baseClassName="text-xs"
+            />
+          </div>
+        </div>
+        <div className="text-[10px] font-tech uppercase tracking-[0.2em] text-muted-foreground">
+          by {item.seller_name} <UserBadges isPro={item.seller_is_pro} isPlatformOwner={item.seller_is_platform_owner} milestoneBadges={item.seller_milestone_badges} className="inline-flex align-middle ml-1" /> · {item.category}
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+function EmptyState() {
+  return (
+    <div className="border border-dashed border-border rounded-2xl py-20 px-6 text-center flex flex-col items-center">
+      <div className="mb-6 opacity-90">
+        <WireframeCube size={104} />
+      </div>
+      <div className="text-xs font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3">Nothing here yet</div>
+      <h3 className="font-display text-2xl font-bold mb-3">Be the first to list</h3>
+      <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed mb-6">
+        No listings match your filters yet. Try clearing the search box or adjusting the category chips above.
+      </p>
+      <Link to="/designer/new" data-testid="browse-empty-cta">
+        <span className="inline-flex items-center gap-2 h-10 px-5 rounded-full border border-primary bg-primary/10 hover:bg-primary/20 text-primary font-tech text-xs uppercase tracking-[0.2em] transition-colors">
+          <Plus className="h-3.5 w-3.5" /> Design your first print
+        </span>
+      </Link>
+    </div>
+  );
+}

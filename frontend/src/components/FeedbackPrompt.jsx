@@ -1,0 +1,96 @@
+import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Star } from "lucide-react";
+import { toast } from "sonner";
+
+const KEY = "pf_visits_v1";
+const DONE_KEY = "pf_feedback_done_v1";
+
+export default function FeedbackPrompt() {
+  const { user } = useAuth();
+  const [open, setOpen] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [note, setNote] = useState("");
+
+  useEffect(() => {
+    if (!user) return;
+    if (localStorage.getItem(DONE_KEY) === "1") return;
+    const v = parseInt(localStorage.getItem(KEY) || "0", 10) + 1;
+    localStorage.setItem(KEY, String(v));
+    if (v >= 5) setOpen(true);
+  }, [user]);
+
+  const submit = () => {
+    console.info("Print Cosmos feedback:", { rating, note, user: user?.email });
+    localStorage.setItem(DONE_KEY, "1");
+    toast.success("Thanks for the feedback!");
+    setOpen(false);
+  };
+
+  const later = () => {
+    localStorage.setItem(KEY, "0");
+    setOpen(false);
+  };
+
+  if (!open) return null;
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => { if (!o) setOpen(false); }}>
+      <DialogContent className="max-w-md" data-testid="feedback-modal">
+        <DialogHeader>
+          <DialogTitle className="font-display text-2xl font-medium tracking-tight">
+            How's Print Cosmos so far?
+          </DialogTitle>
+        </DialogHeader>
+        <p className="text-sm text-muted-foreground mt-1">
+          You've visited a few times — a quick rating and a sentence helps a lot.
+        </p>
+        <div className="flex gap-2 mt-4 mb-3">
+          {[1, 2, 3, 4, 5].map((s) => (
+            <button
+              key={s}
+              data-testid={`feedback-star-${s}`}
+              onClick={() => setRating(s)}
+              className="p-1 hover:scale-110 transition-transform"
+              aria-label={`${s} stars`}
+            >
+              <Star
+                className={`h-7 w-7 ${s <= rating ? "text-primary fill-primary" : "text-muted-foreground"}`}
+                strokeWidth={1.5}
+              />
+            </button>
+          ))}
+        </div>
+        <Textarea
+          data-testid="feedback-note"
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          placeholder="Anything you'd want — feature, bug, vibe check…"
+          rows={3}
+          className="font-tech text-sm rounded-xl"
+        />
+        <DialogFooter className="mt-4">
+          <Button
+            variant="outline"
+            data-testid="feedback-later"
+            onClick={later}
+            className="rounded-xl font-tech text-xs uppercase tracking-wider"
+          >
+            Later
+          </Button>
+          <Button
+            data-testid="feedback-submit"
+            onClick={submit}
+            disabled={rating === 0}
+            className="bg-primary hover:bg-primary/90 rounded-xl font-tech text-xs uppercase tracking-wider"
+          >
+            Send
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}

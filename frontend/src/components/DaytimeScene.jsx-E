@@ -1,0 +1,186 @@
+/* eslint-disable */
+import { useState, useEffect, useMemo } from "react";
+import { BobLawnChair } from "./Bob";
+
+// solarPhase: 0 = sunrise, 0.5 = solar noon, 1 = sunset
+// Returns sky gradient stops and sun properties derived from solar phase.
+function getSkyStyle(solarPhase) {
+  // Sunrise/sunset warmth: phase near 0 or 1 = warm orange/pink; near 0.5 = blue
+  const horizonProximity = 1 - Math.abs(solarPhase - 0.5) * 2; // 0 at horizon, 1 at noon
+
+  // Sky top: deep blue at noon, dark orange-purple at horizon
+  const topR = Math.round(20 + horizonProximity * 10);
+  const topG = Math.round(60 + horizonProximity * 80);
+  const topB = Math.round(140 + horizonProximity * 60);
+
+  // Sky mid: bright blue at noon, warm peach at horizon
+  const midR = Math.round(100 + (1 - horizonProximity) * 120);
+  const midG = Math.round(160 + (1 - horizonProximity) * 20);
+  const midB = Math.round(220 - (1 - horizonProximity) * 80);
+
+  // Horizon: pale yellow-white at noon, deep orange at sunrise/sunset
+  const horizR = Math.round(200 + (1 - horizonProximity) * 55);
+  const horizG = Math.round(220 - (1 - horizonProximity) * 80);
+  const horizB = Math.round(240 - (1 - horizonProximity) * 160);
+
+  return {
+    background: `linear-gradient(to bottom,
+      rgb(${topR},${topG},${topB}) 0%,
+      rgb(${midR},${midG},${midB}) 50%,
+      rgb(${horizR},${horizG},${horizB}) 85%,
+      #c8a96e 100%)`,
+  };
+}
+
+// Sun position: arc from left (sunrise) to right (sunset), height peaks at noon
+function getSunPosition(solarPhase) {
+  // Horizontal: 5% at sunrise → 95% at sunset
+  const x = 5 + solarPhase * 90;
+  // Vertical: arc — high at noon (10%), low at horizon (80%)
+  const arc = Math.sin(solarPhase * Math.PI); // 0→1→0
+  const y = 80 - arc * 65;
+  return { x, y };
+}
+
+// Sun color: warm orange at horizon, bright yellow-white at noon
+function getSunColor(solarPhase) {
+  const arc = Math.sin(solarPhase * Math.PI);
+  const r = 255;
+  const g = Math.round(160 + arc * 80);
+  const b = Math.round(arc * 60);
+  return `rgb(${r},${g},${b})`;
+}
+
+// Sun glow size: larger/softer near horizon (atmospheric scattering)
+function getSunGlow(solarPhase) {
+  const arc = Math.sin(solarPhase * Math.PI);
+  return { size: 60 + (1 - arc) * 40, opacity: 0.25 + (1 - arc) * 0.2 };
+}
+
+export default function DaytimeScene({ solarPhase = 0.5, isPro = false, onSkyClick, onSunClick }) {
+  const [cloudPhase, setCloudPhase] = useState(0);
+  const [grassPhase, setGrassPhase] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setCloudPhase((p) => p + 0.003);
+      setGrassPhase((p) => p + 0.04);
+    }, 50);
+    return () => clearInterval(id);
+  }, []);
+
+  const skyStyle = useMemo(() => getSkyStyle(solarPhase), [solarPhase]);
+  const sunPos = useMemo(() => getSunPosition(solarPhase), [solarPhase]);
+  const sunColor = useMemo(() => getSunColor(solarPhase), [solarPhase]);
+  const sunGlow = useMemo(() => getSunGlow(solarPhase), [solarPhase]);
+
+  return (
+    <>
+      {/* Sky background — clickable to enter space view; sun click is separate */}
+      <div
+        className="fixed inset-0 transition-all duration-[2000ms]"
+        style={{ ...skyStyle, cursor: onSkyClick ? 'pointer' : 'default', zIndex: 0 }}
+        onClick={onSkyClick}
+      />
+
+      {/* Sun — separate click target, stops propagation so it never triggers sky click */}
+      <div
+        className="fixed transition-all duration-[2000ms]"
+        style={{
+          left: `${sunPos.x}%`,
+          top: `${sunPos.y}%`,
+          transform: "translate(-50%, -50%)",
+          zIndex: 2,
+          cursor: onSunClick ? 'pointer' : 'default',
+        }}
+        onClick={(e) => { e.stopPropagation(); onSunClick?.(); }}
+      >
+        {/* Glow halo */}
+        <div
+          style={{
+            position: "absolute",
+            width: `${sunGlow.size * 2}px`,
+            height: `${sunGlow.size * 2}px`,
+            borderRadius: "50%",
+            background: `radial-gradient(circle, ${sunColor} 0%, transparent 70%)`,
+            opacity: sunGlow.opacity,
+            transform: "translate(-50%, -50%)",
+            top: "50%",
+            left: "50%",
+          }}
+        />
+        {/* Sun disc */}
+        <div
+          style={{
+            width: "40px",
+            height: "40px",
+            borderRadius: "50%",
+            backgroundColor: sunColor,
+            boxShadow: `0 0 30px 10px ${sunColor}`,
+            position: "relative",
+          }}
+        />
+      </div>
+
+      {/* Clouds — two drifting slowly */}
+      {[
+        { baseX: 15, y: 18, scale: 1.2, speed: 1 },
+        { baseX: 55, y: 12, scale: 0.9, speed: 0.6 },
+        { baseX: 78, y: 22, scale: 1.0, speed: 0.8 },
+      ].map((cloud, i) => {
+        const x = ((cloud.baseX + cloudPhase * cloud.speed * 8) % 110) - 10;
+        return (
+          <div
+            key={i}
+            className="fixed pointer-events-none"
+            style={{ left: `${x}%`, top: `${cloud.y}%`, transform: `scale(${cloud.scale})`, zIndex: 1, opacity: 0.85 }}
+          >
+            <svg width="120" height="50" viewBox="0 0 120 50">
+              <ellipse cx="60" cy="35" rx="50" ry="18" fill="white" opacity="0.9" />
+              <ellipse cx="40" cy="30" rx="28" ry="20" fill="white" opacity="0.95" />
+              <ellipse cx="75" cy="28" rx="24" ry="18" fill="white" opacity="0.9" />
+              <ellipse cx="55" cy="24" rx="20" ry="16" fill="white" />
+            </svg>
+          </div>
+        );
+      })}
+
+      {/* Ground strip */}
+      <div
+        className="fixed bottom-0 left-0 right-0 pointer-events-none"
+        style={{
+          height: "80px",
+          background: "linear-gradient(to bottom, #4ade80 0%, #16a34a 40%, #15803d 100%)",
+          zIndex: 2,
+        }}
+      />
+
+      {/* Bob in lawn chair — bottom-left, same position as tent */}
+      <div className="fixed bottom-16 left-6 z-20 pointer-events-none">
+        {/* Grass blades around chair */}
+        <svg
+          width="160"
+          height="40"
+          viewBox="0 0 160 40"
+          className="absolute bottom-0 left-0"
+          style={{ zIndex: 1 }}
+        >
+          {[...Array(14)].map((_, i) => {
+            const x = 8 + i * 11;
+            const h = 10 + Math.sin(grassPhase + i * 0.7) * 4;
+            return (
+              <path
+                key={i}
+                d={`M${x} 40 Q${x + Math.sin(grassPhase + i) * 3} ${40 - h} ${x} ${40 - h}`}
+                stroke="#22c55e"
+                strokeWidth="2"
+                fill="none"
+              />
+            );
+          })}
+        </svg>
+        <BobLawnChair isPro={isPro} />
+      </div>
+    </>
+  );
+}

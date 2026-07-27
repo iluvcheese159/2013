@@ -1,0 +1,87 @@
+/* eslint-disable */
+import { useState, useEffect } from "react";
+import { bobKnowledge } from "@/data/bobKnowledge";
+
+export default function Bob({ state = "idle", position = "tent", isWarning = false, onWarningComplete }) {
+  const [wobblePhase, setWobblePhase] = useState(0);
+
+  // Subtle idle animation
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setWobblePhase((prev) => prev + 0.1);
+    }, 50);
+    return () => clearInterval(interval);
+  }, []);
+
+  const wobble = Math.sin(wobblePhase) * 2;
+
+  return (
+    <div
+      className="relative"
+      style={{
+        transform: `rotate(${wobble}deg)`,
+        transition: "transform 0.1s ease-out",
+      }}
+    >
+      {/* Bob's body - cylindrical segments like 3D-printed parts */}
+      <svg width="60" height="100" viewBox="0 0 60 100">
+        {/* Head - cylindrical top segment */}
+        <ellipse cx="30" cy="15" rx="12" ry="14" fill="#e5e7eb" stroke="#9ca3af" strokeWidth="1" />
+        {/* Head top highlight (3D printed look) */}
+        <ellipse cx="26" cy="12" rx="4" ry="5" fill="#f3f4f6" opacity="0.6" />
+
+        {/* Neck - small cylinder */}
+        <rect x="26" y="28" width="8" height="8" fill="#d1d5db" stroke="#9ca3af" strokeWidth="1" />
+
+        {/* Body - main cylindrical segment */}
+        <rect x="20" y="35" width="20" height="30" fill="#e5e7eb" stroke="#9ca3af" strokeWidth="1" rx="2" />
+        {/* Body highlight */}
+        <rect x="22" y="37" width="6" height="26" fill="#f3f4f6" opacity="0.5" rx="1" />
+
+        {/* Arms - cylindrical segments */}
+        <rect
+          x="8" y="38"
+          width="10" height="6"
+          fill="#d1d5db" stroke="#9ca3af" strokeWidth="1" rx="2"
+          transform={`rotate(${wobble * 0.5} 13 41)`}
+        />
+        <rect
+          x="42" y="38"
+          width="10" height="6"
+          fill="#d1d5db" stroke="#9ca3af" strokeWidth="1" rx="2"
+          transform={`rotate(${-wobble * 0.5} 47 41)`}
+        />
+
+        {/* Legs - cylindrical segments */}
+        <rect x="22" y="64" width="8" height="25" fill="#d1d5db" stroke="#9ca3af" strokeWidth="1" rx="2" />
+        <rect x="30" y="64" width="8" height="25" fill="#d1d5db" stroke="#9ca3af" strokeWidth="1" rx="2" />
+
+        {/* Feet - small cylinders */}
+        <ellipse cx="26" cy="90" rx="6" ry="4" fill="#9ca3af" />
+        <ellipse cx="34" cy="90" rx="6" ry="4" fill="#9ca3af" />
+      </svg>
+    </div>
+  );
+}
+
+export function findBobResponse(message) {
+  if (!message || typeof message !== "string") {
+    return bobKnowledge.default_response.responses[0];
+  }
+
+  const lower = message.toLowerCase().trim();
+
+  // Check each knowledge category for keyword matches
+  for (const [category, data] of Object.entries(bobKnowledge)) {
+    if (!data.keywords || !data.responses) continue;
+    for (const keyword of data.keywords) {
+      if (lower.includes(keyword.toLowerCase())) {
+        return data.responses[Math.floor(Math.random() * data.responses.length)];
+      }
+    }
+  }
+
+  // Fallback to default response
+  const defaults = bobKnowledge.default_response.responses;
+  return defaults[Math.floor(Math.random() * defaults.length)];
+}

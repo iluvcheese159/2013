@@ -1,0 +1,47 @@
+import { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { api } from "@/lib/api";
+import { useAuth } from "@/contexts/AuthContext";
+import { BRAND_LOGO_URL, BRAND_NAME } from "@/lib/branding";
+
+export default function AuthCallback() {
+  const navigate = useNavigate();
+  const { setUser } = useAuth();
+  const hasProcessed = useRef(false);
+
+  useEffect(() => {
+    if (hasProcessed.current) return;
+    hasProcessed.current = true;
+    const hash = window.location.hash || "";
+    const params = new URLSearchParams(hash.replace(/^#/, ""));
+    const sessionId = params.get("session_id");
+    if (!sessionId) {
+      navigate("/", { replace: true });
+      return;
+    }
+    (async () => {
+      try {
+        const r = await api.post("/auth/session", { session_id: sessionId });
+        setUser(r.data.user);
+        // Clear hash and navigate
+        window.history.replaceState({}, "", "/dashboard");
+        navigate("/dashboard", { replace: true, state: { user: r.data.user } });
+      } catch (e) {
+        console.warn("Auth failed", e);
+        navigate("/", { replace: true });
+      }
+    })();
+  }, [navigate, setUser]);
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="text-center">
+        <img src={BRAND_LOGO_URL} alt={BRAND_NAME} className="h-20 w-auto object-contain mx-auto mb-6" />
+        <div className="text-xs font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3">
+          Authenticating
+        </div>
+        <div className="font-display text-3xl font-light">Print Cosmos</div>
+      </div>
+    </div>
+  );
+}

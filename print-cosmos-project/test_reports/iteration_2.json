@@ -1,0 +1,51 @@
+{
+  "summary": "Frontend-only regression test of RigidMascot bleed/overflow fix on Browse empty state, Forums empty state, and 3D Editor. Discovered CRITICAL issue: the sprite source image URL (pngtree.com) returns HTTP 403 to all clients (hotlink protection), so every RigidMascot instance renders as a completely blank/transparent box regardless of correct CSS. The user's reported bug ('cut off pictures / not in the box') is now presenting as 'no picture at all' — the mascot cell dimensions, overflow:hidden, backgroundSize (400% 200%) and backgroundPosition are all computed correctly, so the fix logic is sound; only the image asset never downloads. 3D Editor at /designer/new loads without THREE.Object3D/getHelper errors, canvas mounts (1020x796), context-menu default is prevented; regression passes.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "RigidMascot",
+        "issue": "Sprite image URL https://png.pngtree.com/png-clipart/20210612/ourmid/pngtree-cute-cartoon-dancing-stickman-png-image_3433866.jpg returns HTTP 403 Forbidden (pngtree hotlink protection, blocks ALL requests including with-referer, without-referer, and Mozilla User-Agent). Confirmed via curl AND via in-browser new Image() load (onerror fires). Result: [data-testid=\"rigid-mascot\"] renders as an empty box everywhere — Browse empty state, Forums empty state, RigidWarningGate, RigidMascotTour welcome + step mascots. The original 'bleed/cut-off' bug can NOT be visually verified because the sprite never paints.",
+        "selector": "[data-testid=\"rigid-mascot\"] .rigid-mascot-sprite",
+        "priority": "CRITICAL"
+      }
+    ],
+    "integration_issues": [
+      {
+        "flow": "External image hotlinking",
+        "issue": "pngtree.com serves 403 for all direct image requests. The app depends on this asset for every mascot render. No fallback img element or local copy is provided.",
+        "affected_selectors": ["[data-testid=\"rigid-mascot\"]", ".rigid-mascot-sprite"]
+      }
+    ],
+    "design_issues": [
+      {
+        "screen": "Browse and Forums empty states",
+        "issues": [
+          "Empty-state layout reserves ~84px vertical space for the mascot but shows a blank hole — hurts polish. Text 'No forum posts found in this section category…' references shrugging shoulders but no visual mascot is shown."
+        ]
+      }
+    ]
+  },
+  "test_report_links": ["/app/test_reports/screenshots/browse_mascot.jpg", "/app/test_reports/screenshots/browse_empty_scrolled.jpg", "/app/test_reports/screenshots/forums_mascot.jpg", "/app/test_reports/screenshots/editor.jpg"],
+  "action_items": [
+    "REPLACE the external pngtree URL with a locally-hosted sprite sheet. Download the sprite once and place it in /app/frontend/public/rigid-mascot-sprite.jpg (or /src/assets/), then set SPRITE_URL to a relative path like `/rigid-mascot-sprite.jpg` or an imported asset. pngtree.com blocks hotlinking by policy — no client-side fix will make the current URL load.",
+    "Add an <img> fallback / broken-image test in RigidMascot so future asset failures are visible during dev.",
+    "Consider preloading the sprite with <link rel=\"preload\" as=\"image\"> once hosted locally, so tour mascots pop in immediately.",
+    "Optional: Verify the local sprite sheet actually matches the 4-cols × 2-rows layout the code assumes (col/row indices in MASCOT_VARIANTS). Because the image never displayed, the code's cell-selection math (bgPos 100% 100% for cosmic-space-shrugger) could not be visually validated against an image."
+  ],
+  "critical_code_review_comments": [
+    "RigidMascot.jsx hardcodes a third-party CDN URL for a critical UI asset — should live in /public or /src/assets and be bundled/served by the app itself (same-origin, no hotlink risk, immutable across CDN policy changes).",
+    "RigidMascot.jsx has NO error handling if backgroundImage fails to load; consider using an <img onError> pattern in parallel or a CSS background fallback color/emoji so users see something meaningful.",
+    "The 3-arg IIFE around console.error is fine, but no runtime warning fires when the sprite fails — impossible to notice in QA without inspecting network tab.",
+    "Browse.jsx: URL param `?q=` is not read into the search state on mount (only `?cat=` is). The main-agent's test hint 'visit /browse?q=zzzzzznohits' therefore does NOT produce an empty state; had to type into the input to reproduce. Consider seeding state from useSearchParams.",
+    "RigidMascotTour.jsx: `data-testid=\"rigid-mascot-tour-mascot\"` wraps only the WELCOME mascot; the step mascot has no testid — inconsistent."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a (skipped per request)", "frontend": "Editor regression PASS; RigidMascot rendering FAIL (image 403)"},
+  "test_credentials": "None used. Launch tour step was NOT tested via authenticated user because it is redundant when RigidMascot itself is broken at the component level — fixing the sprite URL fixes both simultaneously (per review-request note: 'testing the Browse/Forums empty-state mascots is a sufficient regression signal').",
+  "seed_data_creation": "None.",
+  "retest_needed": true,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "After main agent moves the sprite sheet to a local /public path or /src/assets and updates SPRITE_URL in /app/frontend/src/components/RigidMascot.jsx, revisit: (1) /browse, type gibberish into [data-testid=browse-search-input] to force empty state, verify [data-testid=rigid-mascot] shows a single clean cell (compare to backgroundSize=400% 200% math), (2) /forums General Chat tab (empty by default), (3) sign in with a MongoDB-seeded user that has onboarded=true and launch_tour_completed=false to trigger RigidMascotTour and verify welcome+step mascots + confirm no inline 'transform: scale(1.8)' on [data-testid=rigid-mascot-tour-mascot], (4) any age-restricted content for RigidWarningGate. Editor regression already GREEN.",
+  "rca of the issue": "Root cause: /app/frontend/src/components/RigidMascot.jsx line 14 sets SPRITE_URL='https://png.pngtree.com/png-clipart/20210612/ourmid/pngtree-cute-cartoon-dancing-stickman-png-image_3433866.jpg'. Pngtree.com implements strict anti-hotlinking; every request (browser + server-side curl with/without Referer/User-Agent) returns HTTP 403 with a 101-byte text/html body. Reproduction: `curl -sI 'https://png.pngtree.com/...3433866.jpg'` → HTTP/2 403. Browser Image() constructor fires onerror. The new background-image sprite CSS technique introduced in this iteration is CORRECT (verified: shell 84x84 with overflow:hidden, sprite backgroundSize 400% 200%, backgroundPosition 100% 100% for cosmic-space-shrugger which matches col 3 / row 1) — but with a blank background-image, the container is just an empty div. Mitigation: (a) download the sprite JPG/PNG once and commit to /app/frontend/public/rigid-mascot-sprite.jpg, (b) change SPRITE_URL to '/rigid-mascot-sprite.jpg' (Create React App will serve it from public/ at the site root), (c) hard-reload to invalidate any cached 403 response."
+}

@@ -1,0 +1,149 @@
+/* eslint-disable */
+import { useEffect, useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { api } from "@/lib/api";
+import { AlertCircle, CheckCircle, XCircle } from "lucide-react";
+
+export default function WarningBanner() {
+  const { user } = useAuth();
+  const [isWarningVisible, setIsWarningVisible] = useState(false);
+  const [warningTime, setWarningTime] = useState(0);
+  const [warningData, setWarningData] = useState(null);
+  const [isResolving, setIsResolving] = useState(false);
+
+  // Check for active warning from enforcement system
+  useEffect(() => {
+    const checkForWarning = async () => {
+      if (!user || user.is_platform_owner) return;
+      
+      try {
+        const response = await api.get('/admin/user-status');
+        const userStatus = response.data;
+        
+        // Check if user has active enforcement status
+        if (userStatus.enforcement_status === 'Warned' && 
+            (!isWarningVisible || (Date.now() - warningTime) > 300000)) {
+          
+          setIsWarningVisible(true);
+          setWarningTime(Date.now());
+          setWarningData(userStatus);
+          
+          // Show warning for 8 seconds then auto-dismiss
+          const timer = setTimeout(() => {
+            setIsWarningVisible(false);
+          }, 8000);
+          
+          return () => clearTimeout(timer);
+        }
+      } catch (err) {
+        // Handle API errors gracefully
+        console.debug('Warning check failed:', err);
+      }
+    };
+
+    checkForWarning();
+  }, [user, warningTime]);
+
+  // Handle warning dismissal/acknowledgement
+  const handleAcknowledge = async () => {
+    if (!warningData || isResolving) return;
+    
+    setIsResolving(true);
+    
+    try {
+      await api.post('/admin/warnings/resolve', {
+        user_id: user.user_id
+      });
+      
+      // Update local state
+      setWarningData(prev => prev ? { ...prev, enforcement_status: 'Active', acknowledged: true } : null);
+      setIsWarningVisible(false);
+    } catch (err) {
+      console.error('Failed to resolve warning:', err);
+    } finally {
+      setIsResolving(false);
+    }
+  };
+
+  // Handle override - instantly dismiss warning without backend resolution
+  const handleOverride = () => {
+    if (!warningData) return;
+    // Override and immediately hide
+    setWarningData(null);
+    setIsWarningVisible(false);
+  };
+
+  if (!isWarningVisible || !warningData) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none bg-black bg-opacity-70">
+      <div className="relative max-w-lg w-full bg-white rounded-xl overflow-hidden shadow-xl mx-4">
+        <div className="relative flex items-start gap-4 p-6">
+          <div className="flex-shrink-0 w-16 h-16 rounded-full bg-yellow-500/30 flex items-center justify-center mr-4">
+            <AlertCircle className="w-8 h-8 text-yellow-600" />
+          </div>
+          
+          <div className="flex-1 min-h-32">
+            <div className="flex flex-col">
+              <h3 className="text-lg font-semibold text-yellow-800">System Alert</h3>
+              <p className="text-sm text-gray-600 break-words mt-1">
+                {warningData.warning_message || "Your account requires attention."}
+              </p>
+              
+              <div className="mt-4 flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="bg-gray-200 rounded-full h-2 flex items-center px-2">
+                    <div 
+                      className="bg-yellow-400 rounded-full h-full transition-all duration-300"
+                      style={{ width: '60%' }}
+                    ></div>
+                  </div>
+                </div>
+                
+                <div className="ml-4">
+                  <span className="text-sm font-medium text-white">
+                    Enforcement:{" "}
+                    {warningData.enforcement_status === 'Warned' ? (
+                      <span className="text-red-500">Warning Issued</span>
+                    ) : (
+                      <span className="text-green-300">Clear</span>
+                    )}
+                  </span>
+                  <span className="text-xs text-gray-500">
+                    {new Date().toLocaleTimeString()}
+                  </span>
+                </div>
+              </div>
+              
+              <div className="mt-4 text-sm text-gray-500">
+                {`The platform has issued you a warning due to: 
+                ${warningData.reason || 'policy violations detected'}. 
+                Please review and comply with platform guidelines. 
+                Ignoring warnings may result in account restrictions.`}
+              </div>
+              
+              <div className="mt-4 flex justify-between gap-2">
+                <span className="text-xs text-gray-400">
+                  Status: {warningData.enforcement_status === 'Warned' ? 'ACTIVE' : 'RESOLVED'}
+                </span>
+                <button
+                  onClick={handleOverride}
+                  className="flex items-center bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm font-medium shadow-sm"
+                >
+                  Override
+                </button>
+                <button
+                  onClick={handleAcknowledge}
+                  disabled={isResolving}
+                  className="flex items-center bg-yellow-600 hover:bg-yellow-700 disabled:bg-yellow-400 text-white px-4 py-2 rounded text-sm font-medium shadow-sm"
+                >
+                  {isResolving ? 'Processing...' : 'Acknowledge'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};

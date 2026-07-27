@@ -1,0 +1,48 @@
+/* Warning endpoints to be added to server.py */
+
+/* Get user enforcement status */
+@app.get("/admin/user-status")
+async def get_user_status(request: Request):
+    await require_platform_owner(request)  // Reuse existing auth
+    
+    user_id = request.state.user.get("user_id")
+    if not user_id:
+        raise HTTPException(status_code=400, detail="User ID not found")
+    
+    user = await db.users.find_one(
+        {"user_id": user_id},
+        {"_id": 0, "user_id": 1, "enforcement_status": 1, "warning_message": 1, "warning_reason": 1, "warning_timestamp": 1}
+    )
+    
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+        
+    return user
+
+/* Resolve/acknowledge warning */
+@app.post("/admin/warnings/resolve")
+async def resolve_warning(request: Request):
+    await require_platform_owner(request)  // Reuse existing auth
+    
+    body = await request.json()
+    user_id = body.get("user_id")
+    
+    if not user_id:
+        raise HTTPException(status_code=400, detail="User ID required")
+    
+    // Update user status from Warned to Active
+    result = await db.users.update_one(
+        {"user_id": user_id, "enforcement_status": "Warned"},
+        {
+            "$set": {
+                "enforcement_status": "Active",
+                "warning_acknowledged_at": datetime.now(timezone.utc),
+                "warning_resolved": True
+            }
+        }
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="No active warning found for user")
+    
+    return {"success": true, "message": "Warning acknowledged and resolved"}
