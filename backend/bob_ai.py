@@ -26,7 +26,7 @@ ROOT_DIR = Path(__file__).parent
 # ---------------------------------------------------------------------------
 SEARXNG_URL = os.environ.get("SEARXNG_URL", "")
 
-TRUSTED_SOURCES = [
+DEFAULT_TRUSTED_SOURCES = [
     "help.prusa3d.com",
     "wiki.bambulab.com",
     "ic3dprinters.com",
@@ -38,6 +38,12 @@ TRUSTED_SOURCES = [
     "reprap.org",
     "formlabs.com",
 ]
+
+TRUSTED_SOURCES = [
+    d.strip()
+    for d in os.environ.get("SEARXNG_ALLOWED_DOMAINS", "").split(",")
+    if d.strip()
+] or DEFAULT_TRUSTED_SOURCES
 
 
 # ---------------------------------------------------------------------------
@@ -98,7 +104,12 @@ def bob_search(query: str, num_results: int = 5) -> str:
         return ""
     try:
         import requests
-        resp = requests.get(SEARXNG_URL, params={
+        endpoint = SEARXNG_URL.rstrip("/")
+        # Accept either a full /search URL or just a SearX-NG base URL.
+        if not endpoint.endswith("/search"):
+            endpoint = f"{endpoint}/search"
+
+        resp = requests.get(endpoint, params={
             "q": query,
             "format": "json",
             "no_html": "1",

@@ -47,6 +47,9 @@ This is the official documentation for Print Cosmos, covering all features, tool
 
 ## Maintenance Resources
 
+### Bob AI Live Search
+- SearX-NG production setup: `docs/SEARXNG_RENDER_SETUP.md`
+
 ### How to Submit a Complaint
 1. Go to \/admin/safety-reports\
 2. Fill required fields

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { api, fileUrl } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -49,11 +49,7 @@ export default function PrintFailure() {
   const [uploading, setUploading] = useState(false);
   const [upvoting, setUpvoting] = useState(false);
 
-  useEffect(() => {
-    loadFailures();
-  }, [search, statusFilter, tagFilter]);
-
-  const loadFailures = async () => {
+  const loadFailures = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
@@ -68,7 +64,11 @@ export default function PrintFailure() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [search, statusFilter, tagFilter]);
+
+  useEffect(() => {
+    loadFailures();
+  }, [loadFailures]);
 
   const handleSearch = () => {
     loadFailures();

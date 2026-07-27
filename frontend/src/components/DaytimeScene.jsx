@@ -250,19 +250,25 @@ export default function DaytimeScene({ solarPhase = 0.5, isPro = false, onSkyCli
   return (
     <>
       <div
-        className="fixed inset-0 transition-all duration-[2000ms]"
-        style={{ background: skyStyle.background, cursor: onSkyClick ? 'pointer' : 'default', zIndex: 0 }}
+        className="fixed inset-0 transition-all"
+        style={{
+          background: skyStyle.background,
+          cursor: onSkyClick ? 'pointer' : 'default',
+          zIndex: 0,
+          transitionDuration: "2000ms",
+        }}
         onClick={onSkyClick}
       />
 
       <div
-        className="fixed transition-all duration-[2000ms]"
+        className="fixed transition-all"
         style={{
           left: `${sunPos.x}%`,
           top: `${sunPos.y}%`,
           transform: "translate(-50%, -50%)",
           zIndex: 2,
           cursor: onSunClick ? 'pointer' : 'default',
+          transitionDuration: "2000ms",
         }}
         onClick={(e) => { e.stopPropagation(); onSunClick?.(); }}
       >

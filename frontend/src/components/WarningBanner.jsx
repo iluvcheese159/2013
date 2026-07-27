@@ -40,7 +40,7 @@ export default function WarningBanner() {
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [user, warningTime]);
+  }, [user, warningTime, isWarningVisible]);
 
   const dismiss = () => {
     if (timerRef.current) clearTimeout(timerRef.current);

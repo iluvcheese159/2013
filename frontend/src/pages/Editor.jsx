@@ -324,6 +324,10 @@ function ThreeCanvas({
     lastActivityTime: Date.now(),
   });
 
+  // Intentional: this global key handler reads latest selection/clipboard/object state,
+  // while command callbacks are recreated often and would cause listener churn.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const mount = mountRef.current;
     if (!mount) return;
@@ -798,7 +802,7 @@ function ThreeCanvas({
         boxSelectState.element.parentNode.removeChild(boxSelectState.element);
       }
     };
-  }, [onObjectTransform, onSelect, sceneApiRef]);
+  }, [onObjectTransform, onSelect, sceneApiRef, onWorkplaneToggle, snap]);
 
   useEffect(() => {
     const s = stateRef.current;
@@ -1019,7 +1023,7 @@ export default function Editor() {
     if (routeId && routeId !== "new" && designId && !projectActionOpen) {
       setProjectActionOpen(true);
     }
-  }, [routeId, designId]);
+  }, [routeId, designId, projectActionOpen]);
 
   const applyTemplate = (template) => {
     const created = template.shapes.map((s) => ({
@@ -1379,6 +1383,7 @@ export default function Editor() {
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedIds, clipboard, objects]);
 
   const shapeList = SHAPE_LIBRARY[libraryTab] || [];

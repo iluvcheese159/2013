@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
@@ -25,11 +25,7 @@ export default function PolicyEditor() {
     order: 0
   });
 
-  useEffect(() => {
-    loadPolicy();
-  }, [policyType]);
-
-  const loadPolicy = async () => {
+  const loadPolicy = useCallback(async () => {
     try {
       const res = await api.get(`/api/owner/policies/${policyType}`);
       setPolicy(res.data);
@@ -38,7 +34,11 @@ export default function PolicyEditor() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [policyType]);
+
+  useEffect(() => {
+    loadPolicy();
+  }, [loadPolicy]);
 
   const handleAddRule = async () => {
     if (!newRule.title.trim() || !newRule.content.trim()) {

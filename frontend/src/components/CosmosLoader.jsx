@@ -13,6 +13,7 @@ export default function CosmosLoader({
 
   useEffect(() => {
     if (!isActive || !ref.current) return;
+    const mountNode = ref.current;
 
     // Scene setup
     const scene = new THREE.Scene();
@@ -29,7 +30,7 @@ export default function CosmosLoader({
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(size, size);
     renderer.setClearColor(0x000000, 0);
-    ref.current.appendChild(renderer.domElement);
+    mountNode.appendChild(renderer.domElement);
 
     // === Black hole (central singularity) ===
     const holeGeo = new THREE.SphereGeometry(0.08, 8, 8);
@@ -153,8 +154,8 @@ export default function CosmosLoader({
         renderer.dispose();
       }
 
-      if (ref.current && ref.current.firstChild) {
-        ref.current.removeChild(ref.current.firstChild);
+      if (mountNode && mountNode.firstChild) {
+        mountNode.removeChild(mountNode.firstChild);
       }
     };
   }, [isActive, size, color]);

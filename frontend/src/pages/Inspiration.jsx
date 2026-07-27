@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { api, fileUrl } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
@@ -46,8 +46,13 @@ export default function Inspiration() {
     }
   };
 
-  const next = () => { if (hasNext) setIndex((i) => i + 1); };
-  const prev = () => { if (hasPrev) setIndex((i) => i - 1); };
+  const next = useCallback(() => {
+    if (hasNext) setIndex((i) => i + 1);
+  }, [hasNext]);
+
+  const prev = useCallback(() => {
+    if (hasPrev) setIndex((i) => i - 1);
+  }, [hasPrev]);
 
   useEffect(() => {
     const onKey = (e) => {
@@ -56,7 +61,7 @@ export default function Inspiration() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [hasNext, hasPrev]);
+  }, [next, prev]);
 
   if (loading) {
     return (
