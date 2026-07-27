@@ -133,7 +133,7 @@ export default function FilamentCalculator() {
             <button onClick={calculate} disabled={loading} className="w-full rounded-xl font-tech text-xs uppercase tracking-wider py-3">
               {loading ? "Calculating..." : "Calculate Cost & Usage"}
             </button>
-          </CardFooter>
+          </CardContent>
         </Card>
 
         {result && (
@@ -183,7 +183,7 @@ export default function FilamentCalculator() {
                   </div>
                 </div>
               </div>
-            </CardFooter>
+            </CardContent>
           </Card>
         )}
       </div>

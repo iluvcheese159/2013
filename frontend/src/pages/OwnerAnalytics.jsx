@@ -495,29 +495,11 @@ export default function OwnerAnalytics() {
                         </Button>
                       </div>
                     </td>
-                  {refundRequests.map((req) => (
-                    <tr key={req.request_id} className="border-b border-border/60 hover:bg-secondary/30">
-                      <td className="px-4 py-2 font-tech text-[10px] truncate max-w-[120px]">{req.request_id.slice(0, 12)}...</td>
-                      <td className="px-4 py-2 font-tech text-[10px] truncate max-w-[100px]">{req.user_id?.slice(0, 12) || '—'}</td>
-                      <td className="px-4 py-2 font-tech">${Number(req.amount || 0).toFixed(2)}</td>
-                      <td className="px-4 py-2 text-muted-foreground truncate max-w-[200px]">{req.reason || '—'}</td>
-                      <td className="px-4 py-2 text-muted-foreground whitespace-nowrap">{req.created_at?.slice(0, 10)}</td>
-                      <td className="px-4 py-2">
-                        <div className="flex gap-1">
-                          <Button size="sm" variant="default" onClick={() => approveRefund(req.request_id)} disabled={refundLoading}>
-                            Approve
-                          </Button>
-                          <Button size="sm" variant="destructive" onClick={() => denyRefund(req.request_id)} disabled={refundLoading}>
-                            Deny
-                          </Button>
-                        </div>
-                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-          </div>
         )}
       </section>
 
@@ -559,9 +541,7 @@ export default function OwnerAnalytics() {
                       {user.role || 'user'}
                     </td>
                     <td className="px-4 py-2">
-                      <span className="px-2 py-0.5 rounded-full text-[9px] font-tech uppercase tracking-wider {"+
-                      (user.is_verified ? "bg-primary/10 text-primary" : "bg-gray-200")+
-                      "} text-[9px]">
+                      <span className={`px-2 py-0.5 rounded-full text-[9px] font-tech uppercase tracking-wider ${user.is_verified ? "bg-primary/10 text-primary" : "bg-gray-200"}`}>
                         {user.is_verified ? "Verified" : "Unverified"} 
                       </span>
                     </td>
@@ -594,10 +574,6 @@ export default function OwnerAnalytics() {
           <div className="px-4 py-6 text-xs font-tech text-muted-foreground">No users found.</div>
         )}
       </section>
-
-      {/* ── Notification Settings ────────────────────────────────────────────────── */}
-      <section className="mb-8">
-        <SectionLabel icon={Mail} title="Notification Settings" />
 
       {/* ── Support Messages / DMs ────────────────────────────────── */}
       <section className="mb-8">

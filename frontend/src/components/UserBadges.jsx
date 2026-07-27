@@ -226,7 +226,7 @@ const MILESTONE_SPECS = {
     render: () => <Zap className="h-5 w-5 text-green-400" strokeWidth={2} />,
     bg: "bg-gradient-to-br from-green-400 via-green-500 to-green-600",
   },
-  10_sales: {
+  "10_sales": {
     id: "10_sales",
     label: "10 Sales",
     description: "Reached 10 completed sales",
@@ -234,7 +234,7 @@ const MILESTONE_SPECS = {
     render: () => <Trophy className="h-5 w-5 text-amber-400" strokeWidth={2} />,
     bg: "bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600",
   },
-  100_sales: {
+  "100_sales": {
     id: "100_sales",
     label: "100 Sales",
     description: "Reached 100 completed sales",

@@ -581,7 +581,6 @@ export default function Dashboard() {
                   ))}
                 </div>
               </div>
-              </div>
 
               <div className="border border-border rounded-2xl p-3 space-y-3">
                 <label className="flex items-center gap-2 text-xs font-tech text-muted-foreground">

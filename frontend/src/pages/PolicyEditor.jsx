@@ -197,7 +197,7 @@ export default function PolicyEditor() {
 
             {/* Existing Rules List */}
             <div className="space-y-4">
-              {policy.rules?.map((rule, index) => (
+              {policy.rules?.length ? policy.rules.map((rule) => (
                 <div key={rule.rule_id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
                   {editingRuleId === rule.rule_id ? (
                     // Edit mode
@@ -244,38 +244,45 @@ export default function PolicyEditor() {
                   ) : (
                     // View mode
                     <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <div className="h-8 w-8 flex items-center justify-center bg-primary/10 rounded-full">
-                            <icons[rule.icon as keyof typeof icons] className="h-4 w-4 text-primary" />
-                          </div>
-                          <div>
-                            <h3 className="font-semibold">{rule.title}</h3>
-                            <p className="text-sm text-muted-foreground">Order: {rule.order}</p>
-                          </div>
-                        </div>
-                        <p className="text-sm text-foreground/90 leading-relaxed">{rule.content}</p>
-                      </div>
-                      <div className="flex items-end space-x-2">
-                        <Button 
-                          variant="secondary" 
-                          size="sm" 
-                          onClick={() => setEditingRuleId(rule.rule_id)}
-                        >
-                          Edit
-                        </Button>
-                        <Button 
-                          variant="destructive" 
-                          size="sm" 
-                          onClick={() => handleDeleteRule(rule.rule_id)}
-                        >
-                          Delete
-                        </Button>
-                      </div>
+                      {(() => {
+                        const RuleIcon = icons[rule.icon] || Shield;
+                        return (
+                          <>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-2">
+                                <div className="h-8 w-8 flex items-center justify-center bg-primary/10 rounded-full">
+                                  <RuleIcon className="h-4 w-4 text-primary" />
+                                </div>
+                                <div>
+                                  <h3 className="font-semibold">{rule.title}</h3>
+                                  <p className="text-sm text-muted-foreground">Order: {rule.order}</p>
+                                </div>
+                              </div>
+                              <p className="text-sm text-foreground/90 leading-relaxed">{rule.content}</p>
+                            </div>
+                            <div className="flex items-end space-x-2">
+                              <Button 
+                                variant="secondary" 
+                                size="sm" 
+                                onClick={() => setEditingRuleId(rule.rule_id)}
+                              >
+                                Edit
+                              </Button>
+                              <Button 
+                                variant="destructive" 
+                                size="sm" 
+                                onClick={() => handleDeleteRule(rule.rule_id)}
+                              >
+                                Delete
+                              </Button>
+                            </div>
+                          </>
+                        );
+                      })()}
                     </div>
                   )}
                 </div>
-              )) || <p className="text-center text-muted-foreground py-4">No rules found</p>
+              )) : <p className="text-center text-muted-foreground py-4">No rules found</p>}
             </div>
           </div>
         </div>
@@ -291,6 +298,4 @@ export default function PolicyEditor() {
       </div>
     </div>
   );
-}
-</parameter= -1;)
 }
