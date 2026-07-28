@@ -21,22 +21,20 @@ import MoonViewer from "@/components/MoonViewer";
 const CATEGORIES = ["All", "Decor", "Tools", "Toys", "Art", "Functional", "Other"];
 
 const SELLER_TYPE_COLORS = {
-  service:    { r: 180, g: 140, b: 255 },  // Purple — print services
-  designer:   { r: 100, g: 180, b: 255 },  // Blue — visual/3D designers
-  traditional:{ r: 240, g: 245, b: 255 },  // White — traditional sellers
-  finished:   { r: 240, g: 245, b: 230 },  // Soft warm — finished products
+  service:    { r: 180, g: 140, b: 255 },
+  designer:   { r: 100, g: 180, b: 255 },
+  traditional:{ r: 240, g: 245, b: 255 },
+  finished:   { r: 240, g: 245, b: 230 },
 };
 
-const PRO_COLOR = { r: 255, g: 215, b: 0 }; // Stardust Gold
+const PRO_COLOR = { r: 255, g: 215, b: 0 };
 
 function getListingColor(item) {
   const isPro = item.seller_is_pro === true;
   if (isPro) return PRO_COLOR;
-
   if (item.listing_type === "service") return SELLER_TYPE_COLORS.service;
   if (item.share_design) return SELLER_TYPE_COLORS.designer;
   if (item.listing_type === "product") return SELLER_TYPE_COLORS.traditional;
-
   return SELLER_TYPE_COLORS.traditional;
 }
 
@@ -59,12 +57,8 @@ function generateListingPositions(count, seed) {
     seedValue = (seedValue * 9301 + 49297) % 233280;
     return seedValue / 233280;
   };
-
   for (let i = 0; i < count; i++) {
-    positions.push({
-      x: random() * 100,
-      y: random() * 100,
-    });
+    positions.push({ x: random() * 100, y: random() * 100 });
   }
   return positions;
 }
@@ -80,35 +74,26 @@ export default function Browse() {
   const [printTimeFilter, setPrintTimeFilter] = useState("");
   const [loading, setLoading] = useState(true);
   const [userCountry, setUserCountry] = useState(null);
-  const [userCoords, setUserCoords] = useState(null); // { lat, lon } for Time mode
+  const [userCoords, setUserCoords] = useState(null);
   
-  // Bob state
   const [showMoonViewer, setShowMoonViewer] = useState(false);
-  const [bobState, setBobState] = useState("idle"); // idle, walking, introducing, in-tent
+  const [bobState, setBobState] = useState("idle");
   const [showSpeechBubble, setShowSpeechBubble] = useState(false);
   const [firstVisit, setFirstVisit] = useState(false);
   
-  // Two-finger swipe-right → Discovery Clubs
-  const twoFingerRef = useRef(null); // { startX, startY }
+  const twoFingerRef = useRef(null);
   const [starSeed] = useState(() => Date.now());
-
-  // Starfield pan — drag to explore the sky
   const [starOffset, setStarOffset] = useState({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
-  const panRef = useRef(null); // { startX, startY, baseX, baseY, pointerId }
+  const panRef = useRef(null);
   const pageRef = useRef(null);
-  // Day-mode: clicking the sky (not the sun) pulls back to outer space view
   const [spaceView, setSpaceView] = useState(false);
-
-  // Zoom level for listing-star reveal: accumulates from wheel events.
-  // zoomLevel >= 1 triggers card reveal. Clamped 0–3.
   const [zoomLevel, setZoomLevel] = useState(0);
   const zoomRef = useRef(0);
   const [activeAd, setActiveAd] = useState(null);
-  // Attach wheel listener on the page div (passive:false so we can prevent default scroll)
+
   const onWheel = (e) => {
-    // Only zoom when over the starfield area (not over UI panels)
-    if (e.target.closest('a, button, input, [data-nozoom]')) return;
+    if (e.target.closest("a, button, input, [data-nozoom]")) return;
     e.preventDefault();
     const delta = e.deltaY > 0 ? -0.3 : 0.3;
     zoomRef.current = Math.max(0, Math.min(3, zoomRef.current + delta));
@@ -116,10 +101,10 @@ export default function Browse() {
   };
 
   const onStarfieldPointerDown = (e) => {
-    if (e.target.closest('a, button, input')) return;
+    if (e.target.closest("a, button, input")) return;
     panRef.current = { startX: e.clientX, startY: e.clientY, baseX: starOffset.x, baseY: starOffset.y, pointerId: e.pointerId };
     setIsPanning(true);
-    try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* ignore */ }
+    try { e.currentTarget.setPointerCapture(e.pointerId); } catch (e) { /* ignore */ }
   };
 
   const onStarfieldPointerMove = (e) => {
@@ -135,29 +120,23 @@ export default function Browse() {
 
   const onStarfieldPointerUp = (e) => {
     if (!panRef.current) return;
-    try { e.currentTarget.releasePointerCapture(panRef.current.pointerId); } catch { /* ignore */ }
+    try { e.currentTarget.releasePointerCapture(panRef.current.pointerId); } catch (e) { /* ignore */ }
     panRef.current = null;
     setIsPanning(false);
   };
   
-  // Sky mode: 'night' | 'day' | 'time' — persisted across sessions
   const [skyMode, setSkyMode] = useState(() => {
-    try { return localStorage.getItem('pf_sky_mode') || 'night'; } catch { return 'night'; }
+    try { return localStorage.getItem("pf_sky_mode") || "night"; } catch (e) { return "night"; }
   });
   const saveSkyMode = (m) => {
     setSkyMode(m);
     setSpaceView(false);
-    try { localStorage.setItem('pf_sky_mode', m); } catch { /* ignore */ }
+    try { localStorage.setItem("pf_sky_mode", m); } catch (e) { /* ignore */ }
   };
 
-  // Derive whether it's currently daytime for Time mode.
-  // Uses a simple solar noon approximation: day = local hour between sunrise and sunset.
-  // Sunrise/sunset are estimated from latitude and day-of-year (Spencer formula, ±15 min accuracy).
-  // Returns { isDay, solarPhase } where solarPhase 0=sunrise, 0.5=noon, 1=sunset (only meaningful when isDay).
   const { isDay, solarPhase } = useMemo(() => {
-    if (skyMode === 'day') return { isDay: true, solarPhase: 0.5 };
-    if (skyMode === 'night') return { isDay: false, solarPhase: 0.5 };
-    // Time mode
+    if (skyMode === "day") return { isDay: true, solarPhase: 0.5 };
+    if (skyMode === "night") return { isDay: false, solarPhase: 0.5 };
     if (!userCoords) return { isDay: false, solarPhase: 0.5 };
     const { lat, lon } = userCoords;
     const now = new Date();
@@ -169,8 +148,8 @@ export default function Browse() {
       + 0.000907 * Math.sin(4 * Math.PI * dayOfYear / 365);
     const latRad = lat * Math.PI / 180;
     const cosH = -Math.tan(latRad) * Math.tan(decl);
-    if (cosH < -1) return { isDay: true, solarPhase: 0.5 };  // polar day
-    if (cosH > 1) return { isDay: false, solarPhase: 0.5 };  // polar night
+    if (cosH < -1) return { isDay: true, solarPhase: 0.5 };
+    if (cosH > 1) return { isDay: false, solarPhase: 0.5 };
     const H = Math.acos(cosH) * 180 / Math.PI;
     const B = 2 * Math.PI * (dayOfYear - 1) / 365;
     const eot = 229.18 * (0.000075 + 0.001868 * Math.cos(B) - 0.032077 * Math.sin(B)
@@ -184,11 +163,10 @@ export default function Browse() {
     return { isDay: nowUTC >= sunriseUTC && nowUTC <= sunsetUTC, solarPhase };
   }, [skyMode, userCoords]);
 
-  // Reset space view if day/night flips (Time mode crossing sunrise/sunset)
   useEffect(() => { if (!isDay) setSpaceView(false); }, [isDay]);
 
-  // Generate consistent positions for listing stars
   const listingPositions = useMemo(() => generateListingPositions(500, Date.now()), []);
+  
   useEffect(() => {
     try {
       const hasVisitedBrowse = localStorage.getItem("pf_browse_visited");
@@ -201,23 +179,15 @@ export default function Browse() {
     }
   }, []);
 
-  // Bob's first-visit introduction sequence
   useEffect(() => {
     if (firstVisit) {
-      // Start walking animation
       setBobState("walking");
-      
-      // After 2 seconds, Bob reaches center and introduces himself
       setTimeout(() => {
         setBobState("introducing");
         setShowSpeechBubble(true);
-        
-        // After 4 seconds, hide speech bubble and Bob walks to tent
         setTimeout(() => {
           setShowSpeechBubble(false);
           setBobState("walking");
-          
-          // After 2 more seconds, Bob enters tent
           setTimeout(() => {
             setBobState("in-tent");
           }, 2000);
@@ -226,7 +196,6 @@ export default function Browse() {
     }
   }, [firstVisit]);
 
-  // Two-finger swipe-right → Discovery Clubs
   const handleTouchStart = (e) => {
     if (e.touches.length === 2) {
       twoFingerRef.current = { startX: (e.touches[0].clientX + e.touches[1].clientX) / 2 };
@@ -248,7 +217,6 @@ export default function Browse() {
     twoFingerRef.current = null;
   };
 
-  // Get user's country on component mount
   useEffect(() => {
     const getUserCountry = async () => {
       try {
@@ -266,15 +234,14 @@ export default function Browse() {
   }, []);
 
   useEffect(() => {
-    /* eslint-disable */
     setLoading(true);
-    const params = {};
-    if (cat !== "All") params.category = cat;
-    if (q) params.q = q;
-    if (printTimeFilter) params.print_time = printTimeFilter;
+    const reqParams = {};
+    if (cat !== "All") reqParams.category = cat;
+    if (q) reqParams.q = q;
+    if (printTimeFilter) reqParams.print_time = printTimeFilter;
     const t = setTimeout(() => {
       api
-        .get("/listings", { params })
+        .get("/listings", { params: reqParams })
         .then((r) => {
           const sorted = [...(r.data || [])].sort((a, b) => {
             const aIsLocal = userCountry && a.seller_country === userCountry ? 0 : 1;
@@ -288,18 +255,17 @@ export default function Browse() {
         .finally(() => setLoading(false));
     }, 200);
     return () => clearTimeout(t);
-    /* eslint-enable */
   }, [q, cat, printTimeFilter, userCountry]);
 
   const surpriseMe = async () => {
     try {
       const r = await api.get("/listings/random");
       if (r.data?.listing_id) {
-        navigate(`/listing/${r.data.listing_id}`);
+        navigate("/listing/" + r.data.listing_id);
       } else {
         toast.error("No listings found");
       }
-    } catch {
+    } catch (e) {
       toast.error("Could not find a random listing");
     }
   };
@@ -311,6 +277,20 @@ export default function Browse() {
     }).catch(() => setActiveAd(null));
   }, []);
 
+  // Determine content text based on state
+  var contentTitle = loading ? "Loading the cosmos..." 
+    : items.length === 0 ? "No listings in " + cat
+    : cat === "All" ? "Explore the marketplace" 
+    : "Browse " + cat + " prints";
+
+  var contentDesc = loading 
+    ? "Scanning for " + (cat !== "All" ? cat.toLowerCase() : "all") + " listings in the marketplace."
+    : items.length === 0
+      ? "There are no listings matching this category yet. Try a different category or come back later \u2014 makers are adding new prints every day."
+      : "Found " + items.length + " listing" + (items.length !== 1 ? "s" : "") + (cat !== "All" ? " in " + cat.toLowerCase() : "") + ". Zoom in with the scroll wheel to reveal cards, then click a star to view details.";
+
+  var itemCountStr = (!loading && items.length > 0) ? (" \u00b7 " + items.length + " item" + (items.length !== 1 ? "s" : "")) : "";
+  var contentMeta = "Marketplace" + (cat !== "All" ? " \u00b7 " + cat : "") + itemCountStr;
 
   return (
     <div 
@@ -325,19 +305,16 @@ export default function Browse() {
       onPointerUp={onStarfieldPointerUp}
       onPointerCancel={onStarfieldPointerUp}
       onWheel={onWheel}
-      style={{ cursor: isPanning ? 'grabbing' : 'grab' }}
+      style={{ cursor: isPanning ? "grabbing" : "grab" }}
     >
-      {/* Starfield background — only shown in night/time-night mode */}
-      {!isDay && <StarfieldRenderer starCount={400} seed={starSeed} className="fixed inset-0" offset={starOffset} />}
-      {/* Daytime scene: sky, sun, clouds, Bob in lawn chair */}
-      {isDay && !spaceView && <DaytimeScene solarPhase={solarPhase} isPro={!!user?.is_pro} season={getSeason()} onSkyClick={() => setSpaceView(true)} onSunClick={() => {}} />}
+      {/* Starfield background */}
+      {!isDay && (<StarfieldRenderer starCount={400} seed={starSeed} className="fixed inset-0" offset={starOffset} />)}
+      {isDay && !spaceView && (<DaytimeScene solarPhase={solarPhase} isPro={!!user?.is_pro} season={getSeason()} onSkyClick={function() { setSpaceView(true); }} onSunClick={function() {}} />)}
 
-      {/* Space view overlay — shown when user clicks the day sky */}
+      {/* Space view overlay */}
       {isDay && spaceView && (
-        <div className="fixed inset-0" style={{ background: '#000008', zIndex: 0 }}>
-          {/* Stars (reuse background starfield) */}
+        <div className="fixed inset-0" style={{ background: "#000008", zIndex: 0 }}>
           <StarfieldRenderer starCount={400} seed={starSeed} className="absolute inset-0" />
-          {/* Earth — bottom-center, partially visible as if behind the viewer */}
           <div className="absolute bottom-0 left-1/2 -translate-x-1/2" style={{ zIndex: 1 }}>
             <svg width="520" height="220" viewBox="0 0 520 220">
               <defs>
@@ -351,52 +328,45 @@ export default function Browse() {
                   <rect x="0" y="0" width="520" height="220" />
                 </clipPath>
               </defs>
-              {/* Globe — only top portion visible */}
               <circle cx="260" cy="320" r="280" fill="url(#earthGrad)" clipPath="url(#earthClip)" />
-              {/* Atmosphere glow */}
               <circle cx="260" cy="320" r="292" fill="none" stroke="#60a5fa" strokeWidth="8" opacity="0.25" clipPath="url(#earthClip)" />
-              {/* Continent blobs */}
               <ellipse cx="180" cy="160" rx="38" ry="28" fill="#16a34a" opacity="0.7" clipPath="url(#earthClip)" />
               <ellipse cx="310" cy="140" rx="50" ry="22" fill="#15803d" opacity="0.65" clipPath="url(#earthClip)" />
               <ellipse cx="370" cy="175" rx="28" ry="18" fill="#166534" opacity="0.6" clipPath="url(#earthClip)" />
               <ellipse cx="140" cy="195" rx="22" ry="14" fill="#16a34a" opacity="0.55" clipPath="url(#earthClip)" />
-              {/* Cloud wisps */}
               <ellipse cx="230" cy="130" rx="45" ry="10" fill="white" opacity="0.18" clipPath="url(#earthClip)" />
               <ellipse cx="340" cy="155" rx="35" ry="8" fill="white" opacity="0.15" clipPath="url(#earthClip)" />
             </svg>
           </div>
-          {/* Sun — top-center, ahead of the viewer */}
           <div className="absolute top-8 left-1/2 -translate-x-1/2" style={{ zIndex: 1 }}>
             <div style={{
-              width: '70px', height: '70px', borderRadius: '50%',
-              background: 'radial-gradient(circle, #fff9c4 0%, #fde047 40%, #f59e0b 100%)',
-              boxShadow: '0 0 60px 30px rgba(253,224,71,0.4), 0 0 120px 60px rgba(245,158,11,0.15)',
+              width: "70px", height: "70px", borderRadius: "50%",
+              background: "radial-gradient(circle, #fff9c4 0%, #fde047 40%, #f59e0b 100%)",
+              boxShadow: "0 0 60px 30px rgba(253,224,71,0.4), 0 0 120px 60px rgba(245,158,11,0.15)",
             }} />
           </div>
-          {/* Back button */}
           <button
-            onClick={() => setSpaceView(false)}
+            onClick={function() { setSpaceView(false); }}
             className="absolute top-20 left-6 z-50 px-3 py-1.5 text-[10px] font-tech uppercase tracking-wider border border-white/30 text-white/70 rounded-full bg-black/40 hover:bg-black/60 hover:text-white transition-colors"
           >
-            ← Back to surface
+            {"\u2190"} Back to surface
           </button>
         </div>
       )}
       
-      {/* Listing stars layer — shown in night mode and in day space view.
-           zoomLevel >= 1 reveals title+image cards; zoom transform spreads stars apart. */}
+      {/* Listing stars layer */}
       <div
         className="fixed inset-0 pointer-events-none"
         style={{
           opacity: (!isDay || spaceView) ? 1 : 0,
-          transition: 'opacity 0.6s',
-          transform: `scale(${1 + zoomLevel * 0.4})`,
-          transformOrigin: 'center center',
+          transition: "opacity 0.6s",
+          transform: "scale(" + (1 + zoomLevel * 0.4) + ")",
+          transformOrigin: "center center",
         }}
       >
         {activeAd && !loading && (
           <Link
-            to={activeAd.target_type === "listing" ? `/listing/${activeAd.target_id}` : activeAd.target_type === "design" ? `/designs` : `/messages?tab=clubs`}
+            to={activeAd.target_type === "listing" ? "/listing/" + activeAd.target_id : activeAd.target_type === "design" ? "/designs" : "/messages?tab=clubs"}
             className="absolute top-4 left-1/2 -translate-x-1/2 z-40 pointer-events-auto"
             data-testid="sponsored-ad"
           >
@@ -404,17 +374,16 @@ export default function Browse() {
               <div className="text-[9px] font-tech uppercase tracking-[0.2em] text-accent mb-1">Sponsored</div>
               <div className="text-xs font-tech text-white/90 mb-1">{activeAd.blurb}</div>
               <div className="text-[10px] font-tech text-white/60">
-                by {activeAd.seller_name} · {activeAd.target_name || activeAd.target_type}
+                by {activeAd.seller_name} {"\u00B7"} {activeAd.target_name || activeAd.target_type}
               </div>
-            </div>
           </Link>
         )}
-        {!loading && items.map((item, index) => {
-          const position = listingPositions[index % listingPositions.length];
-          const color = getListingColor(item);
-          const ageDays = getListingAgeDays(item);
-          const ageBrightness = getListingAgeBrightness(ageDays);
-          const isFiltered = cat !== "All" && item.category !== cat;
+        {!loading && items.map(function(item, index) {
+          var position = listingPositions[index % listingPositions.length];
+          var color = getListingColor(item);
+          var ageDays = getListingAgeDays(item);
+          var ageBrightness = getListingAgeBrightness(ageDays);
+          var isFiltered = cat !== "All" && item.category !== cat;
           return (
             <ListingStar
               key={item.listing_id}
@@ -430,8 +399,6 @@ export default function Browse() {
         })}
       </div>
       
-            
-
       {/* Top search + filters */}
       <div data-nozoom className="fixed top-16 left-0 right-0 z-50 px-6 md:px-12 lg:px-24 py-4">
         <div className="max-w-4xl mx-auto flex flex-col sm:flex-row gap-4 items-stretch sm:items-center bg-black/40 backdrop-blur-md rounded-2xl p-4 border border-white/10">
@@ -440,26 +407,24 @@ export default function Browse() {
             <Input
               data-testid="browse-search-input"
               value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Search prints…"
+              onChange={function(e) { setQ(e.target.value); }}
+              placeholder="Search prints..."
               className="pl-9 font-tech text-sm rounded-xl bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:bg-white/20"
             />
           </div>
           <div className="flex flex-wrap gap-2">
-            {CATEGORIES.map((c) => (
-              <button
-                key={c}
-                data-testid={`cat-${c.toLowerCase()}-btn`}
-                onClick={() => setCat(c)}
-                className={`px-3 py-1.5 text-[10px] font-tech uppercase tracking-[0.2em] border rounded-full transition-colors ${
-                  cat === c
-                    ? "border-white/60 text-white bg-white/10"
-                    : "border-white/20 text-white/60 hover:text-white hover:border-white/40"
-                }`}
-              >
-                {c}
-              </button>
-            ))}
+            {CATEGORIES.map(function(c) {
+              return (
+                <button
+                  key={c}
+                  data-testid={"cat-" + c.toLowerCase() + "-btn"}
+                  onClick={function() { setCat(c); }}
+                  className={"px-3 py-1.5 text-[10px] font-tech uppercase tracking-[0.2em] border rounded-full transition-colors " + (cat === c ? "border-white/60 text-white bg-white/10" : "border-white/20 text-white/60 hover:text-white hover:border-white/40")}
+                >
+                  {c}
+                </button>
+              );
+            })}
             <button
               data-testid="surprise-me-btn"
               onClick={surpriseMe}
@@ -472,65 +437,63 @@ export default function Browse() {
             {[
               { value: "", label: "Any time" },
               { value: "under_1_hour", label: "Under 1 hour" },
-              { value: "1-4_hours", label: "1–4 hours" },
-              { value: "4-12_hours", label: "4–12 hours" },
-              { value: "12-24_hours", label: "12–24 hours" },
+              { value: "1-4_hours", label: "1-4 hours" },
+              { value: "4-12_hours", label: "4-12 hours" },
+              { value: "12-24_hours", label: "12-24 hours" },
               { value: "weekend", label: "Weekend project" },
-            ].map((opt) => (
-              <button
-                key={opt.value}
-                data-testid={`print-time-${opt.value || "any"}-btn`}
-                onClick={() => setPrintTimeFilter(opt.value)}
-                className={`px-3 py-1.5 text-[10px] font-tech uppercase tracking-[0.2em] border rounded-full transition-colors ${
-                  printTimeFilter === opt.value
-                    ? "border-white/60 text-white bg-white/10"
-                    : "border-white/20 text-white/60 hover:text-white hover:border-white/40"
-                }`}
-              >
-                {opt.label}
-              </button>
-            ))}
+            ].map(function(opt) {
+              return (
+                <button
+                  key={opt.value}
+                  data-testid={"print-time-" + (opt.value || "any") + "-btn"}
+                  onClick={function() { setPrintTimeFilter(opt.value); }}
+                  className={"px-3 py-1.5 text-[10px] font-tech uppercase tracking-[0.2em] border rounded-full transition-colors " + (printTimeFilter === opt.value ? "border-white/60 text-white bg-white/10" : "border-white/20 text-white/60 hover:text-white hover:border-white/40")}
+                >
+                  {opt.label}
+                </button>
+              );
+            })}
           </div>
           {/* Sky mode toggle */}
           <div className="flex items-center gap-1 border border-white/20 rounded-full p-1 shrink-0" title="Sky mode">
-            {[['night', '☾'], ['day', '☀️'], ['time', '🕒']].map(([mode, icon]) => (
-              <button
-                key={mode}
-                data-testid={`sky-mode-${mode}`}
-                onClick={() => saveSkyMode(mode)}
-                title={mode === 'night' ? 'Night (always)' : mode === 'day' ? 'Day (always)' : 'Time (follows your local time — uses coarse IP location, see Privacy Policy)'}
-                className={`w-8 h-7 rounded-full text-sm transition-colors ${
-                  skyMode === mode ? 'bg-white/20 text-white' : 'text-white/50 hover:text-white/80'
-                }`}
-              >
-                {icon}
-              </button>
-            ))}
+            {[["night", "\u263E"], ["day", "\u2600\uFE0F"], ["time", "\uD83D\uDD52"]].map(function(pair) {
+              var mode = pair[0];
+              var icon = pair[1];
+              return (
+                <button
+                  key={mode}
+                  data-testid={"sky-mode-" + mode}
+                  onClick={function() { saveSkyMode(mode); }}
+                  title={mode === "night" ? "Night (always)" : mode === "day" ? "Day (always)" : "Time (follows your local time)"}
+                  className={"w-8 h-7 rounded-full text-sm transition-colors " + (skyMode === mode ? "bg-white/20 text-white" : "text-white/50 hover:text-white/80")}
+                >
+                  {icon}
+                </button>
+              );
+            })}
           </div>
-        </div>
       </div>
       
-      {/* Content placeholder */}
+      {/* Dynamic content area */}
       <div className="relative z-10 px-6 md:px-12 lg:px-24 py-32">
         <div className="text-xs font-tech uppercase tracking-[0.3em] text-white/60 mb-3">
-          <span className="text-white">●</span> Marketplace
+          <span className="text-white">{"\u2022"}</span> {contentMeta}
         </div>
-        <h1 className="font-display text-4xl sm:text-5xl font-light tracking-tighter mb-6 text-white">
-          Printed by humans.
+        <h1 className={"font-display text-4xl sm:text-5xl font-light tracking-tighter mb-6 text-white" + (loading ? " animate-pulse" : "")}>
+          {contentTitle}
         </h1>
-        <p className="text-white/70 text-sm">
-          Click on colored stars to view listings. Use the search bar and category filters above to narrow results.
+        <p className={(loading ? "text-white/50" : "text-white/70") + " text-sm max-w-xl"}>
+          {contentDesc}
         </p>
       </div>
       
       {/* Bob and Tent Scene */}
       <div className="fixed bottom-0 left-0 right-0 pointer-events-none z-20">
-        {/* Bob walking/introducing — only during night mode (daytime has Bob in lawn chair via DaytimeScene) */}
         {!isDay && (bobState === "walking" || bobState === "introducing") && (
           <div 
             className="absolute bottom-20 pointer-events-auto"
             style={{
-              left: bobState === "walking" ? "50%" : "50%",
+              left: "50%",
               transform: "translateX(-50%)",
               animation: bobState === "walking" ? "walk 2s ease-out forwards" : "none",
             }}
@@ -539,62 +502,53 @@ export default function Browse() {
             {showSpeechBubble && (
               <div 
                 className="absolute -top-16 left-1/2 -translate-x-1/2 bg-white text-black text-xs px-4 py-3 rounded-xl whitespace-nowrap font-tech max-w-xs"
-                style={{
-                  animation: "fadeIn 0.5s ease-out",
-                }}
+                style={{ animation: "fadeIn 0.5s ease-out" }}
               >
-                Hi, I'm Bob! I'm an AI helper — ask me anything about Print Cosmos.
+                Hi, I&apos;m Bob! I&apos;m an AI helper -- ask me anything about Print Cosmos.
               </div>
             )}
           </div>
         )}
         
-        {/* Tent scene — only at night; daytime shows Bob in lawn chair instead */}
         {!isDay && (
           <div className="pointer-events-auto">
             <TentScene 
               bobInside={bobState === "in-tent"} 
-              onTentClick={() => console.info("Tent clicked")}
+              onTentClick={function() { console.info("Tent clicked"); }}
             />
           </div>
         )}
-      {/* ── Moon easter egg ── */}
-      {/* INTERNAL LORE: The moon is Steven's hideout. Clicking it opens a 360° viewer.
-           The green star elsewhere is a future mini-game entry point.
-           Steven and Bob are friends who got into an escalating game of tag.
-           John started the game with them and disappeared — the player helps
-           interview other stick-figure characters to find clues. */}
-      <button
-        onClick={() => setShowMoonViewer(true)}
-        className="fixed bottom-6 right-6 z-30 pointer-events-auto"
-        aria-label="View the moon"
-        title="View the moon"
-      >
-        <svg width="48" height="48" viewBox="0 0 48 48" className="drop-shadow-lg transition-transform hover:scale-110">
-          <circle cx="24" cy="24" r="20" fill="#e8e0d0" stroke="#c8c0b0" strokeWidth="1.5" />
-          <circle cx="18" cy="18" r="4" fill="#c8b8a0" opacity="0.6" />
-          <circle cx="30" cy="22" r="3" fill="#c8b8a0" opacity="0.5" />
-          <circle cx="22" cy="30" r="2.5" fill="#c8b8a0" opacity="0.4" />
-          <circle cx="32" cy="30" r="2" fill="#c8b8a0" opacity="0.3" />
-        </svg>
-      </button>
+      
+        <button
+          onClick={function() { setShowMoonViewer(true); }}
+          className="fixed bottom-6 right-6 z-30 pointer-events-auto"
+          aria-label="View the moon"
+          title="View the moon"
+        >
+          <svg width="48" height="48" viewBox="0 0 48 48" className="drop-shadow-lg transition-transform hover:scale-110">
+            <circle cx="24" cy="24" r="20" fill="#e8e0d0" stroke="#c8c0b0" strokeWidth="1.5" />
+            <circle cx="18" cy="18" r="4" fill="#c8b8a0" opacity="0.6" />
+            <circle cx="30" cy="22" r="3" fill="#c8b8a0" opacity="0.5" />
+            <circle cx="22" cy="30" r="2.5" fill="#c8b8a0" opacity="0.4" />
+            <circle cx="32" cy="30" r="2" fill="#c8b8a0" opacity="0.3" />
+          </svg>
+        </button>
 
-      <MoonViewer
-        isOpen={showMoonViewer}
-        onClose={() => setShowMoonViewer(false)}
-      />
-
+        <MoonViewer
+          isOpen={showMoonViewer}
+          onClose={function() { setShowMoonViewer(false); }}
+        />
       </div>
-    </div>
   );
 }
 
-function ListingCard({ item }) {
-  const cover = item.image_paths?.[0];
+function ListingCard(props) {
+  var item = props.item;
+  var cover = item.image_paths && item.image_paths.length > 0 ? item.image_paths[0] : null;
   return (
     <Link
-      to={`/listing/${item.listing_id}`}
-      data-testid={`listing-card-${item.listing_id}`}
+      to={"/listing/" + item.listing_id}
+      data-testid={"listing-card-" + item.listing_id}
       className="group block rounded-2xl bg-card shadow-sm hover:shadow-lg transition-shadow"
     >
       <div className="aspect-square bg-secondary overflow-hidden relative rounded-t-2xl">
@@ -617,17 +571,15 @@ function ListingCard({ item }) {
           <div className="whitespace-nowrap">
             <SalePrice
               isOnSale={item.is_on_sale}
-              baseOriginalPrice={item.base_original_price ?? item.price}
+              baseOriginalPrice={item.base_original_price != null ? item.base_original_price : item.price}
               activeSalePrice={item.active_sale_price}
               saleClassName="text-sm"
               baseClassName="text-xs"
             />
           </div>
-        </div>
         <div className="text-[10px] font-tech uppercase tracking-[0.2em] text-muted-foreground">
-          by {item.seller_name} <UserBadges isPro={item.seller_is_pro} isPlatformOwner={item.seller_is_platform_owner} milestoneBadges={item.seller_milestone_badges} className="inline-flex align-middle ml-1" /> · {item.category}
+          by {item.seller_name} <UserBadges isPro={item.seller_is_pro} isPlatformOwner={item.seller_is_platform_owner} milestoneBadges={item.seller_milestone_badges} className="inline-flex align-middle ml-1" /> {"\u00B7"} {item.category}
         </div>
-      </div>
     </Link>
   );
 }

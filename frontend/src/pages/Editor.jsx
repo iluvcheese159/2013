@@ -286,20 +286,22 @@ function makeGeometry(base) {
 }
 
 function getMouseButtons() {
-  return { LEFT: null, MIDDLE: THREE.MOUSE.PAN, RIGHT: THREE.MOUSE.ROTATE };
+  return { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN };
 }
 
-function createTextSprite(text) {
+function createTextSprite(text, color = "#f59e0b") {
+  const safeText = String(text ?? "").slice(0, 64);
   const canvas = document.createElement('canvas');
   const context = canvas.getContext('2d');
   canvas.width = 256;
   canvas.height = 128;
   context.font = 'bold 48px monospace';
-  context.fillStyle = 'rgba(245, 158, 11, 1)';
+  context.fillStyle = color;
   context.textAlign = 'center';
-  context.fillText(text, 128, 80);
+  context.fillText(safeText, 128, 80);
   const texture = new THREE.CanvasTexture(canvas);
-  const material = new THREE.SpriteMaterial({ map: texture, transparent: true });
+  texture.minFilter = THREE.LinearFilter;
+  const material = new THREE.SpriteMaterial({ map: texture, transparent: true, depthWrite: false });
   const sprite = new THREE.Sprite(material);
   sprite.scale.set(2, 1, 1);
   return sprite;
@@ -665,10 +667,13 @@ function ThreeCanvas({
             top: [0, dist, 0], bottom: [0, -dist, 0], iso: [dist, dist, dist],
           };
           const p = map[preset] || map.iso;
+          const wasDamping = s.controls.enableDamping;
+          s.controls.enableDamping = false;
           s.activeCamera.position.set(p[0], p[1], p[2]);
           s.controls.target.set(0, 0, 0);
           s.activeCamera.lookAt(0, 0, 0);
           s.controls.update();
+          s.controls.enableDamping = wasDamping;
         },
         zoomBy: (delta) => {
           const s = stateRef.current;
@@ -1460,12 +1465,12 @@ export default function Editor() {
         <div className="absolute left-3 top-16 z-20 w-40 rounded-xl border border-border bg-card/95 backdrop-blur p-2 space-y-2">
           <div className="text-[9px] font-tech uppercase tracking-[0.22em] text-muted-foreground">ViewCube</div>
           <div className="grid grid-cols-3 gap-1 text-[9px] font-tech uppercase tracking-wider">
-            <CubeBtn label="Top" onClick={() => sceneApiRef.current?.viewTo?.("top")} className="col-start-2" />
+            <CubeBtn label="Top" onClick={() => sceneApiRef.current?.viewTo?.("top")} />
             <CubeBtn label="Left" onClick={() => sceneApiRef.current?.viewTo?.("left")} />
             <CubeBtn label="Iso" onClick={() => sceneApiRef.current?.viewTo?.("iso")} />
             <CubeBtn label="Right" onClick={() => sceneApiRef.current?.viewTo?.("right")} />
-            <CubeBtn label="Front" onClick={() => sceneApiRef.current?.viewTo?.("front")} className="col-start-2" />
-            <CubeBtn label="Back" onClick={() => sceneApiRef.current?.viewTo?.("back")} className="col-start-2" />
+            <CubeBtn label="Front" onClick={() => sceneApiRef.current?.viewTo?.("front")} />
+            <CubeBtn label="Back" onClick={() => sceneApiRef.current?.viewTo?.("back")} />
           </div>
           <div className="grid grid-cols-2 gap-1">
             <OverlayBtn icon={Home} label="Home" onClick={() => sceneApiRef.current?.homeView?.()} />
@@ -1500,8 +1505,8 @@ export default function Editor() {
           {!libraryCollapsed && <div className="flex-1 overflow-y-auto p-3">
             <div className="grid grid-cols-2 gap-2">
               {shapeList.map((shape) => (
-                <button key={shape.key} draggable onDragStart={(e) => handleShapeDragStart(e, shape)} onClick={() => addShape(shape)}
-                  className={`h-20 border rounded-xl p-2 text-left hover:border-primary ${shape.proOnly && !user?.is_pro ? "opacity-45" : ""}`}>
+                <button key={shape.key} onClick={() => addShape(shape)}
+                  className={`h-20 border rounded-xl p-2 text-left hover:border-primary cursor-grab active:cursor-grabbing ${shape.proOnly && !user?.is_pro ? "opacity-45" : ""}`}>
                   <div className="flex items-center justify-between mb-2">
                     <ShapeIcon name={shape.base} />
                     {shape.hole ? <span className="text-[8px] font-tech text-cyan-400 uppercase tracking-wider">Hole</span> : null}

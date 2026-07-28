@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUI } from "@/contexts/UIContext";
 import { useCart } from "@/contexts/CartContext";
-import { Home, Hammer, Search, MessageSquare, ShoppingCart, Sparkles, PanelLeftClose, PanelLeftOpen, Tag, Rocket, BarChart3, ShieldAlert, Heart, Lightbulb, FolderOpen, LayoutGrid, AlertTriangle, Book, Calculator, BookOpen } from "lucide-react";
+import { Home, Hammer, Search, MessageSquare, ShoppingCart, Sparkles, PanelLeftClose, PanelLeftOpen, Tag, Rocket, BarChart3, ShieldAlert, FolderOpen, BookOpen } from "lucide-react";
 import { BRAND_NAME } from "@/lib/branding";
 import BrandLogo from "@/components/BrandLogo";
 
@@ -12,11 +12,7 @@ const NAV = [
   { to: "/browse", icon: Search, label: "Browse", testid: "side-browse" },
   { to: "/designer", icon: Hammer, label: "Design", testid: "side-design" },
   { to: "/forums", icon: Rocket, label: "Mission Control", testid: "side-forums" },
-  { to: "/inspiration", icon: Lightbulb, label: "Inspiration", testid: "side-inspiration" },
   { to: "/collections", icon: FolderOpen, label: "Collections", testid: "side-collections" },
-  { to: "/boards", icon: LayoutGrid, label: "Boards", testid: "side-boards", auth: true },
-  { to: "/print-failures", icon: AlertTriangle, label: "Print Failures", testid: "side-print-failures", auth: true },
-  { to: "/filament-calculator", icon: Calculator, label: "Filament Calculator", testid: "side-filament-calculator" },
   { to: "/messages", icon: MessageSquare, label: "Messages", testid: "side-messages", auth: true },
   { to: "/docs", icon: BookOpen, label: "Documentation", testid: "side-docs" },
 ];

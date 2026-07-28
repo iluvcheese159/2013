@@ -61,6 +61,7 @@ function AppShell() {
   const location = useLocation();
   const { openAuth, suspended, loading } = useAuth();
   const { sidebarCollapsed } = useUI();
+  const isIntro = location.pathname === "/intro";
 
   useEffect(() => {
     const h = (e) => openAuth(e.detail || "signin");
@@ -81,12 +82,22 @@ function AppShell() {
             LOADING
           </p>
         </div>
-      </div>
     );
   }
 
   if (suspended) {
     return <SuspendedPage />;
+  }
+
+  if (isIntro) {
+    return (
+      <div className="min-h-screen">
+        <Routes>
+          <Route path="/intro" element={<Intro />} />
+        </Routes>
+        <AuthModal />
+      </div>
+    );
   }
 
 return (
