@@ -82,6 +82,7 @@ function AppShell() {
             LOADING
           </p>
         </div>
+      </div>
     );
   }
 

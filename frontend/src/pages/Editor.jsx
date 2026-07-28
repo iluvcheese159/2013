@@ -310,7 +310,7 @@ function createTextSprite(text, color = "#f59e0b") {
 function ThreeCanvas({
   objects, selectedIds, onSelect, onObjectTransform, mode, snap,
   isPerspective, sceneApiRef, onDrop, onDragOver,
-  workplaneActive, onWorkplaneToggle, rulerActive, onRulerToggle,
+  workplaneActive, workplaneVisible, onWorkplaneToggle, rulerActive, onRulerToggle,
 }) {
   const mountRef = useRef(null);
   const stateRef = useRef({
@@ -511,7 +511,6 @@ function ThreeCanvas({
             wp.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), intersect.face.normal);
             wp.visible = true;
           }
-          onWorkplaneToggle?.(false);
         }
         return;
       }
@@ -639,10 +638,13 @@ function ThreeCanvas({
         stateRef,
         homeView: () => {
           const s = stateRef.current;
+          const wasDamping = s.controls.enableDamping;
+          s.controls.enableDamping = false;
           s.activeCamera.position.copy(s.defaultPos);
           s.controls.target.set(0, 0, 0);
           s.activeCamera.lookAt(0, 0, 0);
           s.controls.update();
+          s.controls.enableDamping = wasDamping;
         },
         fitInView: () => {
           const s = stateRef.current;
@@ -654,9 +656,12 @@ function ThreeCanvas({
           const size = box.getSize(new THREE.Vector3());
           const maxDim = Math.max(size.x, size.y, size.z) || 1;
           const distance = maxDim * 2.2;
+          const wasDamping = s.controls.enableDamping;
+          s.controls.enableDamping = false;
           s.activeCamera.position.set(center.x + distance, center.y + distance, center.z + distance);
           s.controls.target.copy(center);
           s.controls.update();
+          s.controls.enableDamping = wasDamping;
         },
         viewTo: (preset) => {
           const s = stateRef.current;
@@ -694,36 +699,53 @@ function ThreeCanvas({
           s.controls.object = dst;
           s.activeCamera = dst;
           s.transform.camera = dst;
+          const wasDamping = s.controls.enableDamping;
+          s.controls.enableDamping = false;
           s.controls.update();
+          s.controls.enableDamping = wasDamping;
         },
         importMeshFile: async (file) => {
-          const ext = file.name.split(".").pop()?.toLowerCase();
+          const originalName = file.name || "unknown";
+          const ext = originalName.split(".").pop()?.toLowerCase();
+          const allowedExts = ["stl", "obj", "ply", "gltf", "glb"];
+          if (!ext || !allowedExts.includes(ext)) {
+            throw new Error("Unsupported file type");
+          }
           const s = stateRef.current;
           let object = null;
-          if (ext === "stl") {
-            const buf = await file.arrayBuffer();
-            const geom = new STLLoader().parse(buf);
-            geom.computeVertexNormals();
-            object = new THREE.Mesh(geom, new THREE.MeshStandardMaterial({ color: 0x60a5fa, roughness: 0.45, metalness: 0.1 }));
-          } else if (ext === "obj") {
-            const txt = await file.text();
-            const root = new OBJLoader().parse(txt);
-            root.traverse((c) => { if (c.isMesh) c.material = new THREE.MeshStandardMaterial({ color: 0x60a5fa, roughness: 0.45, metalness: 0.1 }); });
-            object = root;
-          } else if (ext === "ply") {
-            const buf = await file.arrayBuffer();
-            const geom = new PLYLoader().parse(buf);
-            geom.computeVertexNormals();
-            object = new THREE.Mesh(geom, new THREE.MeshStandardMaterial({ color: 0x60a5fa, roughness: 0.45, metalness: 0.1 }));
-          } else if (ext === "gltf" || ext === "glb") {
-            const url = URL.createObjectURL(file);
-            object = await new Promise((resolve, reject) => { new GLTFLoader().load(url, (g) => resolve(g.scene), undefined, reject); });
-            URL.revokeObjectURL(url);
-          } else {
-            throw new Error("Unsupported mesh extension");
+          try {
+            if (ext === "stl") {
+              const buf = await file.arrayBuffer();
+              if (buf.byteLength > 50 * 1024 * 1024) throw new Error("File too large");
+              const geom = new STLLoader().parse(buf);
+              geom.computeVertexNormals();
+              object = new THREE.Mesh(geom, new THREE.MeshStandardMaterial({ color: 0x60a5fa, roughness: 0.45, metalness: 0.1 }));
+            } else if (ext === "obj") {
+              const txt = await file.text();
+              if (txt.length > 10 * 1024 * 1024) throw new Error("File too large");
+              const root = new OBJLoader().parse(txt);
+              root.traverse((c) => { if (c.isMesh) c.material = new THREE.MeshStandardMaterial({ color: 0x60a5fa, roughness: 0.45, metalness: 0.1 }); });
+              object = root;
+            } else if (ext === "ply") {
+              const buf = await file.arrayBuffer();
+              if (buf.byteLength > 50 * 1024 * 1024) throw new Error("File too large");
+              const geom = new PLYLoader().parse(buf);
+              geom.computeVertexNormals();
+              object = new THREE.Mesh(geom, new THREE.MeshStandardMaterial({ color: 0x60a5fa, roughness: 0.45, metalness: 0.1 }));
+            } else if (ext === "gltf" || ext === "glb") {
+              const url = URL.createObjectURL(file);
+              try {
+                object = await new Promise((resolve, reject) => { new GLTFLoader().load(url, (g) => resolve(g.scene), undefined, reject); });
+              } finally {
+                URL.revokeObjectURL(url);
+              }
+            }
+          } catch (err) {
+            throw new Error(`Failed to parse ${ext.toUpperCase()}: ${err.message}`);
           }
           const id = `imp_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
           object.userData.id = id;
+          object.userData.fileName = originalName;
           s.scene.add(object);
           s.imported.set(id, object);
           sceneApiRef.current?.fitInView?.();
@@ -736,7 +758,7 @@ function ThreeCanvas({
           if (format === "obj") return { content: new OBJExporter().parse(group), mime: "text/plain", ext: "obj", binary: false };
           if (format === "ply") return { content: new PLYExporter().parse(group, undefined, { binary: false }), mime: "application/octet-stream", ext: "ply", binary: false };
           if (format === "gltf") return new Promise((resolve) => { new GLTFExporter().parse(group, (gltf) => resolve({ content: JSON.stringify(gltf), mime: "model/gltf+json", ext: "gltf", binary: false })); });
-          if (format === "glb") return new Promise((resolve) => { new GLTFExporter().parse(group, (glb) => resolve({ content: glb, mime: "model/gltf-binary", ext: "glb", binary: true }), { binary: true }); });
+          if (format === "glb") return new Promise((resolve, reject) => { new GLTFExporter().parse(group, (glb) => resolve({ content: glb, mime: "model/gltf-binary", ext: "glb", binary: true }), { binary: true }, reject); });
           throw new Error("Unsupported export format");
         },
         getAllRenderable: () => Array.from(stateRef.current.meshes.values()).concat(Array.from(stateRef.current.imported.values())),
@@ -941,8 +963,8 @@ function ThreeCanvas({
     const s = stateRef.current;
     if (!s.workplane) return;
     s.workplaneActive = workplaneActive;
-    s.workplane.visible = workplaneActive;
-  }, [workplaneActive]);
+    s.workplane.visible = workplaneVisible;
+  }, [workplaneActive, workplaneVisible]);
   useEffect(() => {
     const s = stateRef.current;
     if (!s.rulerLine || !s.rulerTextSprite) return;
@@ -1004,7 +1026,20 @@ export default function Editor() {
   const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
   const [historyState, setHistoryState] = useState({ past: [], future: [] });
   const [workplaneActive, setWorkplaneActive] = useState(false);
+  const [workplaneVisible, setWorkplaneVisible] = useState(false);
   const [rulerActive, setRulerActive] = useState(false);
+
+  const toggleWorkplane = () => {
+    setWorkplaneActive((v) => {
+      const next = !v;
+      if (next) {
+        setWorkplaneVisible(true);
+      } else {
+        setWorkplaneVisible(false);
+      }
+      return next;
+    });
+  };
   const [projectActionOpen, setProjectActionOpen] = useState(false);
   const [untitledCount, setUntitledCount] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -1108,10 +1143,23 @@ export default function Editor() {
       return;
     }
     const id = idCounter.current++;
+    const s = sceneApiRef.current?.stateRef?.current;
+    let finalPosition = position;
+    
+    if (!finalPosition && s?.workplane?.visible) {
+      const wp = s.workplane;
+      const localPos = new THREE.Vector3(0, 0.5, 0);
+      localPos.applyQuaternion(wp.quaternion);
+      localPos.add(wp.position);
+      finalPosition = [localPos.x, localPos.y, localPos.z];
+    } else if (!finalPosition) {
+      finalPosition = [snap, 0.5, snap];
+    }
+    
     const next = {
       id, key: shapeDef.key, label: shapeDef.label, base: shapeDef.base,
       hole: !!shapeDef.hole,
-      position: position || [snap, 0.5, snap],
+      position: finalPosition,
       rotation: [0, 0, 0], scale: [1, 1, 1],
       color: shapeDef.hole ? HOLE_COLOR : DEFAULT_COLOR,
     };
@@ -1332,8 +1380,11 @@ export default function Editor() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${(title || "print_cosmos_design").replace(/\s+/g, "_")}.${file.ext}`;
+      const safeTitle = (title || "print_cosmos_design").replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, 64);
+      a.download = `${safeTitle}.${file.ext}`;
+      document.body.appendChild(a);
       a.click();
+      document.body.removeChild(a);
       URL.revokeObjectURL(url);
       toast.success(`${format.toUpperCase()} exported`);
     } catch { toast.error("Export failed"); }
@@ -1351,9 +1402,11 @@ export default function Editor() {
 
   const sendTo = async () => {
     if (!designId) { toast.info("Save your design before sharing"); return; }
-    await navigator.clipboard.writeText(`${window.location.origin}/designer/${designId}`);
-    toast.success("Share link copied");
-    setShareDialogOpen(false);
+    try {
+      await navigator.clipboard.writeText(`${window.location.origin}/designer/${designId}`);
+      toast.success("Share link copied");
+      setShareDialogOpen(false);
+    } catch { toast.error("Could not copy link"); }
   };
 
   useEffect(() => {
@@ -1371,7 +1424,7 @@ export default function Editor() {
       if (e.key.toLowerCase() === "f") { e.preventDefault(); sceneApiRef.current?.fitInView?.(); return; }
       if (mod && e.shiftKey && e.key.toLowerCase() === "h") { e.preventDefault(); showAllHidden(); return; }
       if (mod && e.key.toLowerCase() === "h" && !e.shiftKey) { e.preventDefault(); hideSelected(); return; }
-      if (e.key.toLowerCase() === "w" && !mod) { setWorkplaneActive((v) => !v); return; }
+      if (e.key.toLowerCase() === "w" && !mod) { toggleWorkplane(); return; }
       if (e.key.toLowerCase() === "r" && !mod && !e.shiftKey) { setMode("rotate"); return; }
       if (e.key.toLowerCase() === "s" && !mod) { setMode("scale"); return; }
       if (e.key.toLowerCase() === "b" && !mod) { setMode("translate"); return; }
@@ -1536,7 +1589,7 @@ export default function Editor() {
               <button onClick={() => setMirrorOverlayOpen((v) => !v)} className="h-7 border border-border rounded-xl text-[9px] font-tech uppercase tracking-wider inline-flex items-center justify-center gap-1 hover:border-primary"><FlipHorizontal className="h-3 w-3" /> Mirror (M)</button>
             </div>
             <div className="grid grid-cols-2 gap-1">
-              <button onClick={() => setWorkplaneActive((v) => !v)} className={`h-7 border rounded-xl text-[9px] font-tech uppercase tracking-wider inline-flex items-center justify-center gap-1 hover:border-primary ${workplaneActive ? "border-primary text-primary" : "border-border"}`}><Grid3X3 className="h-3 w-3" /> Workplane (W)</button>
+              <button onClick={toggleWorkplane} className={`h-7 border rounded-xl text-[9px] font-tech uppercase tracking-wider inline-flex items-center justify-center gap-1 hover:border-primary ${workplaneActive ? "border-primary text-primary" : "border-border"}`}><Grid3X3 className="h-3 w-3" /> Workplane (W)</button>
               <button onClick={() => setRulerActive((v) => !v)} className={`h-7 border rounded-xl text-[9px] font-tech uppercase tracking-wider inline-flex items-center justify-center gap-1 hover:border-primary ${rulerActive ? "border-primary text-primary" : "border-border"}`}><Ruler className="h-3 w-3" /> Ruler (⇧R)</button>
             </div>
             <div className="flex items-center gap-2">
@@ -1595,7 +1648,7 @@ export default function Editor() {
             onObjectTransform={updateShapeFromTransform} mode={mode} snap={snap}
             isPerspective={isPerspective} sceneApiRef={sceneApiRef}
             onDrop={handleCanvasDrop} onDragOver={handleCanvasDragOver}
-            workplaneActive={workplaneActive} onWorkplaneToggle={setWorkplaneActive}
+            workplaneActive={workplaneActive} workplaneVisible={workplaneVisible} onWorkplaneToggle={toggleWorkplane}
             rulerActive={rulerActive} onRulerToggle={setRulerActive}
           />
         </div>
@@ -1642,7 +1695,7 @@ export default function Editor() {
         )}
 
         {/* Workplane hint */}
-        {workplaneActive && (
+        {workplaneVisible && (
           <div className="absolute left-1/2 bottom-12 -translate-x-1/2 z-30 border border-border bg-card rounded-xl px-3 py-2 text-[10px] font-tech uppercase tracking-wider">
             Workplane Active (W) — Click a face to place
           </div>
