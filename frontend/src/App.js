@@ -30,7 +30,6 @@ import NewListing from "@/pages/NewListing";
 import CheckoutSuccess from "@/pages/CheckoutSuccess";
 import Designs from "@/pages/Designs";
 import Forums from "@/pages/Forums";
-import OwnerAnalytics from "@/pages/OwnerAnalytics";
 import OwnerControlHub from "@/pages/OwnerControlHub";
 import MyDesigns from "@/pages/MyDesigns";
 import Messages from "@/pages/Messages";
@@ -117,7 +116,6 @@ function AppShell() {
              <Route path="/designer/:id" element={<Editor />} />
              <Route path="/designs" element={<Designs />} />
              <Route path="/forums" element={<Forums />} />
-             <Route path="/owner/analytics" element={<OwnerAnalytics />} />
              <Route path="/owner/control" element={<OwnerControlHub />} />
              <Route path="/my-designs" element={<MyDesigns />} />
              <Route path="/messages" element={<Messages />} />

@@ -117,16 +117,17 @@
     "landing": "Hero section with abstract 3D image, large Chivo heading. Explains 'Design. Print. Sell.' Three-column features section.",
     "browse_marketplace": "Bento grid of cards showing 3D objects. Each card has image, title, price, seller avatar, and 'Share Design' badge if applicable.",
     "product_detail": "Left side: large image/3D viewer. Right side: Title, price, Add to Cart (Stripe), Seller info, 'Download Design Files' button if shared.",
-    "editor_tinkercad": "3-pane layout: Left panel (primitive shapes), Middle (3D Canvas with grid helper), Right (Properties: XYZ, Scale, Color). Top bar for Save/Export.",
+    "editor_workshop": "3-pane layout: Left panel (primitive shapes), Middle (3D Canvas with grid helper), Right (Properties: XYZ, Scale, Color). Top bar for Save/Export.",
     "seller_dashboard": "Table view of listings. Columns: Item Name, Price, Sales, Status. Top right: 'Create Listing' CTA.",
     "create_listing": "Form to upload STL/Images. Inputs for Name, Price, Description. Toggle switch: 'Share Design Files with Community'. Small text: '3.5% commission will be taken on sale'."
   },
-  "instructions_to_main_agent": [
+"instructions_to_main_agent": [
     "Use standard tailwind light/dark mode (dark: classes) relying on CSS variables mapped to the colors provided.",
     "Include data-testid attributes on all interactive elements.",
-    "Use @react-three/fiber and @react-three/drei for the 3D editor and product preview components.",
+    "Use Three.js for the 3D editor and product preview components.",
     "Ensure the Editor UI overrides generic styles to feel like a CAD/Control room (use Space Mono for coordinate inputs).",
     "For typography, import Chivo, Work Sans, and Space Mono from Google Fonts.",
-    "Use pure HTML/Tailwind for Landing/Marketing sections, and Shadcn UI (Buttons, Inputs, Cards, Tables, Switches) for Dashboard/Editor."
+    "Use pure HTML/Tailwind for Landing/Marketing sections, and Shadcn UI (Buttons, Inputs, Cards, Tables, Switches) for Dashboard/Editor.",
+    "Build the designer with: workplane grid, snap-to-grid, corner handles, ruler/measurement, shape library drag-and-drop, color/material picker, import/export."
   ]
 }

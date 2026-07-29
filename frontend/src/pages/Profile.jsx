@@ -645,7 +645,7 @@ export default function Profile() {
               data-testid="profile-social-links-input"
               value={socialLinks}
               onChange={(e) => setSocialLinks(e.target.value)}
-              placeholder="Twitter: https://twitter.com/yourhandle&#10;Instagram: https://instagram.com/yourhandle&#10;Thingiverse: https://thingiverse.com/yourprofile"
+              placeholder="Twitter: https://twitter.com/yourhandle&#10;Instagram: https://instagram.com/yourhandle&#10;Website: https://yoursite.com"
               rows={4}
               className="font-tech text-sm rounded-xl"
             />

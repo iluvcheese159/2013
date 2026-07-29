@@ -54,6 +54,14 @@ export default function Forums() {
     loadHistory();
   }, [user?.user_id]);
 
+  // Auto-refresh posts every 30 seconds for automatic interactions
+  useEffect(() => {
+    const interval = setInterval(() => {
+      loadPosts();
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [section]);
+
   const vote = async (postId, direction) => {
     if (!user) return openAuth("signin");
     try {
@@ -128,7 +136,7 @@ export default function Forums() {
         <div className="flex items-start justify-between gap-4">
           <div>
             <div className="text-xs font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3"><span className="text-primary">●</span> Mission Control</div>
-            <h1 className="font-display text-4xl sm:text-5xl font-light tracking-tighter">Reddit-style mission control.</h1>
+            <h1 className="font-display text-4xl sm:text-5xl font-light tracking-tighter">NASA Mission Control.</h1>
           </div>
           <Button onClick={() => setCreateOpen(true)} className="rounded-xl font-tech text-xs uppercase tracking-wider">
             <Plus className="h-3.5 w-3.5 mr-1" /> Create Thread
@@ -161,7 +169,7 @@ export default function Forums() {
           <button
             key={post.post_id}
             onClick={() => openDetail(post)}
-            className={`text-left border rounded-xl bg-card overflow-hidden hover:border-primary transition-colors ${post.is_pinned_by_admin ? "border-[#F59E0B]/60" : "border-border"}`}
+            className={`text-left border rounded-xl bg-card overflow-hidden hover:border-primary transition-colors mission-control-glow ${post.is_pinned_by_admin ? "border-[#00FFC8]/60" : "border-border/40"}`}
           >
             <div className="flex">
               <div className="w-14 border-r border-border p-2 flex flex-col items-center gap-2">
@@ -218,8 +226,8 @@ export default function Forums() {
             <button onClick={() => setCreateTab("link")} className={`px-3 py-1.5 rounded-xl text-xs font-tech uppercase tracking-wider border ${createTab === "link" ? "border-primary text-primary" : "border-border text-muted-foreground"}`}>Link Post</button>
           </div>
           <div className="space-y-3">
-            <Input value={form.title} onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))} placeholder="Thread title" />
-            <select value={form.section_category} onChange={(e) => setForm((p) => ({ ...p, section_category: e.target.value }))} className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm">
+            <Input value={form.title} onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))} placeholder="Thread title" className="border-cyan-500/30 focus:border-cyan-400" />
+            <select value={form.section_category} onChange={(e) => setForm((p) => ({ ...p, section_category: e.target.value }))} className="w-full h-10 rounded-xl border border-cyan-500/30 bg-background px-3 text-sm focus:border-cyan-400">
               {SECTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
             </select>
             <Textarea rows={6} value={form.body_content} onChange={(e) => setForm((p) => ({ ...p, body_content: e.target.value }))} placeholder="Post body" />
@@ -268,7 +276,7 @@ export default function Forums() {
 // A textarea that shows a user-tag autocomplete dropdown when the user types @.
 function MentionTextarea({ value, onChange, placeholder, rows = 3 }) {
   const [suggestions, setSuggestions] = useState([]);
-  const [mentionQuery, setMentionQuery] = useState(null); // null = not in mention mode
+  const [mentionQuery, setMentionQuery] = useState(null);
   const [mentionStart, setMentionStart] = useState(0);
   const textareaRef = useRef(null);
   const debounceRef = useRef(null);
@@ -277,7 +285,6 @@ function MentionTextarea({ value, onChange, placeholder, rows = 3 }) {
     const val = e.target.value;
     onChange(val);
     const cursor = e.target.selectionStart;
-    // Find the @ token immediately before the cursor
     const before = val.slice(0, cursor);
     const match = before.match(/@([A-Za-z0-9_]*)$/);
     if (match) {

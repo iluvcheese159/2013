@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUI } from "@/contexts/UIContext";
 import { useCart } from "@/contexts/CartContext";
-import { Home, Hammer, Search, MessageSquare, ShoppingCart, Sparkles, PanelLeftClose, PanelLeftOpen, Tag, Rocket, BarChart3, ShieldAlert, FolderOpen, BookOpen } from "lucide-react";
+import { Home, Hammer, Search, MessageSquare, ShoppingCart, Sparkles, PanelLeftClose, PanelLeftOpen, Tag, Rocket, ShieldAlert, FolderOpen, BookOpen } from "lucide-react";
 import { BRAND_NAME } from "@/lib/branding";
 import BrandLogo from "@/components/BrandLogo";
 
@@ -18,7 +18,6 @@ const NAV = [
 ];
 
 const OWNER_NAV = [
-  { to: "/owner/analytics", icon: BarChart3, label: "Owner Analytics", testid: "side-owner-analytics", auth: true },
   { to: "/owner/control", icon: ShieldAlert, label: "Owner Control", testid: "side-owner-control", auth: true },
 ];
 
