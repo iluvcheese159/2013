@@ -3612,7 +3612,11 @@ async def root():
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', 'http://localhost:3000').split(','),
+    allow_origins=[
+        "https://print-cosmos-client.onrender.com",
+        "http://localhost:3000",
+        "http://localhost:5173",
+    ],
     allow_methods=["*"],
     allow_headers=["*"],
 )

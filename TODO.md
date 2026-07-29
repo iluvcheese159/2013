@@ -1,23 +1,36 @@
-# Implementation Plan
+# Intro.jsx Rewrite - Progress Tracker
 
-## Step 1: Sidebar.jsx — Reduce Categories
-- [x] Remove Inspiration, Filament Calculator, Print Failures from NAV
-- [x] Merge Boards into Collections
+## ✅ Completed
 
-## Step 2: App.js — Hide Sidebar/TopBar During Intro
-- [x] Check route for `/intro` and conditionally hide sidebar/topbar
+### Files Created/Edited:
+- [x] `frontend/src/components/IntroBob.jsx` - Bob stick figure SVG (circle head, line body, no face, based on reference image 2)
+- [x] `frontend/src/components/CampfireScene.jsx` - Campfire scene with Bob on log, tent, trees, fireflies, animated flames
+- [x] `frontend/src/pages/Intro.jsx` - Complete rewrite with 5-scene immersive intro
+- [x] `frontend/src/index.css` - Added `fadeOut` keyframe animation
 
-## Step 3: index.css — Add New Keyframes
-- [x] Add scroll-zoom, campfire-glow, float, and other animation keyframes
+### Features Implemented:
+- [x] **Scene 0**: Campsite - Bob sitting on log next to campfire, tent behind, tree silhouettes, fireflies, dense starry sky
+- [x] **Scene 1**: Camera shift up - trees at bottom, stars filling screen (camera-drift animation)
+- [x] **Scene 2**: Star zoom phase - 6 clickable/scrollable stars representing each facet
+- [x] **Scene 3**: Benefit display - zoom into star, show block text with space background, star halos, blurred backdrop
+- [x] **Scene 4**: UI emergence - sidebar slides in from left, top bar from top, logo + auth buttons
+- [x] **Milky Way**: Dense star generation with Milky Way band at 45°, color temperature variation
+- [x] **Sky Dome**: CSS perspective-based spherical sky effect
+- [x] **Auto-advance**: Benefits auto-advance after 8 seconds if no scroll
+- [x] **Bob intro overlay**: Bob appears after sign up/sign in with multi-step welcome speech
+- [x] **Skip button**: Always available in top-right corner
+- [x] **6 Facets**: Browse, Design Workshop, Sell Marketplace, Hyperspace, Community, Tools
 
-## Step 4: Intro.jsx — Complete Redesign
-- [x] Scene 1: Forest campfire with tree silhouettes, tent, Bob, campfire
-- [x] Scene 2: Camera drifts to sky with tree silhouettes at bottom
-- [x] Scene 3: Scroll-to-zoom on benefits stars with rich content
-- [x] Scene 4: Logo appears with buttons, sidebar/topbar emerge
+## 📋 Build Status
 
-## Step 5: Browse.jsx — Fix Category Loading & Sky Aesthetic
-- [x] Add tree silhouettes at bottom
-- [x] Fix category filter to properly load/display
-- [x] Match the night sky aesthetic from intro
+### ✅ Build: Compiles successfully (0 warnings)
 
+### Testing:
+- [ ] Test intro flow in browser
+- [ ] Verify Bob appears after sign up/sign in
+- [ ] Verify no layout issues with sidebar/topbar hidden
+- [ ] Verify scroll behavior works correctly
+- [ ] Verify auto-advance works
+- [ ] Verify star click navigation works
+- [ ] Verify skip button works
+- [ ] Verify final scene UI emergence animations

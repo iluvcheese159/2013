@@ -101,62 +101,62 @@ function AppShell() {
     );
   }
 
-return (
-     <div className="min-h-screen">
-       <Sidebar />
-       <TopBar />
-       <div className={`transition-all ${sidebarCollapsed ? "pl-0" : "pl-16 md:pl-20"}`}>
-         <Routes>
-           <Route path="/" element={<HomeOrIntro />} />
-           <Route path="/intro" element={<Intro />} />
-           <Route path="/docs" element={<Docs />} />
-           <Route path="/browse" element={<Browse />} />
-           <Route path="/listing/:id" element={<ListingDetail />} />
-           <Route path="/designer" element={<DesignWorkshop />} />
-           <Route path="/designer/new" element={<Editor />} />
-           <Route path="/designer/:id" element={<Editor />} />
-           <Route path="/designs" element={<Designs />} />
-           <Route path="/forums" element={<Forums />} />
-           <Route path="/owner/analytics" element={<OwnerAnalytics />} />
-           <Route path="/owner/control" element={<OwnerControlHub />} />
-           <Route path="/my-designs" element={<MyDesigns />} />
-           <Route path="/messages" element={<Messages />} />
-           <Route path="/messages/:otherId" element={<Messages />} />
-           <Route path="/profile" element={<Profile />} />
-           <Route path="/profile/:userId" element={<Profile />} />
-           <Route path="/pro" element={<Pro />} />
-           <Route path="/pro/success" element={<Pro />} />
-           <Route path="/cart" element={<Cart />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/privacy" element={<Privacy />} />
-            <Route path="/owner/policy/terms" element={<PolicyEditor policyType="terms" />} />
-            <Route path="/owner/policy/privacy" element={<PolicyEditor policyType="privacy" />} />
-           <Route path="/dashboard" element={<Dashboard />} />
-           <Route path="/seller/orders" element={<SellerOrders />} />
-           <Route path="/seller/orders/:transactionId" element={<SellerOrderDetail />} />
-           <Route path="/purchases" element={<Purchases />} />
-           <Route path="/create" element={<CreateListing />} />
-           <Route path="/new-listing" element={<NewListing />} />
-           <Route path="/checkout/success" element={<CheckoutSuccess />} />
-           <Route path="/inspiration" element={<Inspiration />} />
-           <Route path="/wishlists" element={<Wishlists />} />
-           <Route path="/compare" element={<Compare />} />
-           <Route path="/collections" element={<Collections />} />
-           <Route path="/collections/:id" element={<CollectionDetail />} />
-           <Route path="/boards" element={<Boards />} />
-            <Route path="/print-failures" element={<PrintFailure />} />
-            <Route path="/filament-calculator" element={<FilamentCalculator />} />
-           <Route path="*" element={<HomeOrIntro />} />
-         </Routes>
-       </div>
-       <Footer />
-<AuthModal />
-        <Onboarding />
-        <FeedbackPrompt />
-        <BobSectionPopupProvider />
-     </div>
-   );
-}
+  return (
+       <div className="min-h-screen">
+         <Sidebar />
+         <TopBar />
+         <div className={`transition-all ${sidebarCollapsed ? "pl-0" : "pl-16 md:pl-20"}`}>
+           <Routes>
+             <Route path="/" element={<HomeOrIntro />} />
+             <Route path="/intro" element={<Intro />} />
+             <Route path="/docs" element={<Docs />} />
+             <Route path="/browse" element={<Browse />} />
+             <Route path="/listing/:id" element={<ListingDetail />} />
+             <Route path="/designer" element={<DesignWorkshop />} />
+             <Route path="/designer/new" element={<Editor />} />
+             <Route path="/designer/:id" element={<Editor />} />
+             <Route path="/designs" element={<Designs />} />
+             <Route path="/forums" element={<Forums />} />
+             <Route path="/owner/analytics" element={<OwnerAnalytics />} />
+             <Route path="/owner/control" element={<OwnerControlHub />} />
+             <Route path="/my-designs" element={<MyDesigns />} />
+             <Route path="/messages" element={<Messages />} />
+             <Route path="/messages/:otherId" element={<Messages />} />
+             <Route path="/profile" element={<Profile />} />
+             <Route path="/profile/:userId" element={<Profile />} />
+             <Route path="/pro" element={<Pro />} />
+             <Route path="/pro/success" element={<Pro />} />
+             <Route path="/cart" element={<Cart />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/owner/policy/terms" element={<PolicyEditor policyType="terms" />} />
+              <Route path="/owner/policy/privacy" element={<PolicyEditor policyType="privacy" />} />
+             <Route path="/dashboard" element={<Dashboard />} />
+             <Route path="/seller/orders" element={<SellerOrders />} />
+             <Route path="/seller/orders/:transactionId" element={<SellerOrderDetail />} />
+             <Route path="/purchases" element={<Purchases />} />
+             <Route path="/create" element={<CreateListing />} />
+             <Route path="/new-listing" element={<NewListing />} />
+             <Route path="/checkout/success" element={<CheckoutSuccess />} />
+             <Route path="/inspiration" element={<Inspiration />} />
+             <Route path="/wishlists" element={<Wishlists />} />
+             <Route path="/compare" element={<Compare />} />
+             <Route path="/collections" element={<Collections />} />
+             <Route path="/collections/:id" element={<CollectionDetail />} />
+             <Route path="/boards" element={<Boards />} />
+              <Route path="/print-failures" element={<PrintFailure />} />
+              <Route path="/filament-calculator" element={<FilamentCalculator />} />
+             <Route path="*" element={<HomeOrIntro />} />
+           </Routes>
+         </div>
+         <Footer />
+  <AuthModal />
+         <Onboarding />
+         <FeedbackPrompt />
+         <BobSectionPopupProvider />
+      </div>
+    );
+ }
 
 function ThemeBoot() {
   useEffect(() => {
