@@ -212,6 +212,70 @@
     100% { opacity: 1; transform: translateY(0); }
 }
 
+/* ── Auto-Ambient Interactions ── */
+@keyframes ambient-drift {
+    0%   { transform: translate(0, 0); }
+    25%  { transform: translate(3px, -2px); }
+    50%  { transform: translate(-2px, 3px); }
+    75%  { transform: translate(2px, -1px); }
+    100% { transform: translate(0, 0); }
+}
+
+@keyframes auto-float {
+    0%, 100% { transform: translateY(0) scale(1); }
+    33% { transform: translateY(-4px) scale(1.02); }
+    66% { transform: translateY(2px) scale(0.98); }
+}
+
+@keyframes auto-glow-pulse {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.15); }
+}
+
+@keyframes scan-line {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100vh); }
+}
+
+@keyframes meteor {
+    0%   { transform: translate(-100px, -100px) rotate(45deg); opacity: 1; }
+    20%  { opacity: 1; }
+    100% { transform: translate(calc(100vw + 100px), calc(100vh + 100px)) rotate(45deg); opacity: 0; }
+}
+
+@keyframes auto-highlight {
+    0%, 100% { opacity: 0.6; filter: brightness(0.8); }
+    50% { opacity: 1; filter: brightness(1.2); }
+}
+
+@keyframes ripple-fade {
+    0% { transform: scale(1); opacity: 0.4; }
+    100% { transform: scale(3); opacity: 0; }
+}
+
+@keyframes bob-wander {
+    0%   { transform: translateX(0) translateY(0); }
+    20%  { transform: translateX(20px) translateY(-5px); }
+    40%  { transform: translateX(-10px) translateY(3px); }
+    60%  { transform: translateX(15px) translateY(-2px); }
+    80%  { transform: translateX(-20px) translateY(5px); }
+    100% { transform: translateX(0) translateY(0); }
+}
+
+/* Ambient auto-animation classes */
+.ambient-drift {
+    animation: ambient-drift 8s ease-in-out infinite;
+}
+.auto-float {
+    animation: auto-float 6s ease-in-out infinite;
+}
+.auto-glow-pulse {
+    animation: auto-glow-pulse 4s ease-in-out infinite;
+}
+.auto-highlight {
+    animation: auto-highlight 5s ease-in-out infinite;
+}
+
 /* Mission Control CRT Glow Effect */
 .mission-control-glow {
     position: relative;
@@ -221,6 +285,7 @@
         0 0 40px rgba(0, 255, 200, 0.1),
         inset 0 0 20px rgba(0, 255, 200, 0.05);
     border: 1px solid rgba(0, 255, 200, 0.2);
+    animation: auto-glow-pulse 6s ease-in-out infinite;
 }
 
 .mission-control-glow::before {
