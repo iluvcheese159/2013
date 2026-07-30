@@ -344,8 +344,8 @@ export default function DaytimeScene({ solarPhase = 0.5, isPro = false, onSkyCli
 
       {season === "winter" && (
         <>
-          <Snow-coveredEvergreen x={15} y={200} />
-          <Snow-coveredEvergreen x={340} y={195} />
+          <SnowCoveredEvergreen x={15} y={200} />
+          <SnowCoveredEvergreen x={340} y={195} />
           {/* Snow-covered tent */}
           <g transform="translate(460, 200)" style={{ zIndex: 2 }}>
             <path d="M-40 0 L0 -50 L40 0 Z" fill="#3a3a4a" stroke="#2a2a3a" strokeWidth="1" />
@@ -366,8 +366,8 @@ export default function DaytimeScene({ solarPhase = 0.5, isPro = false, onSkyCli
 
       {season === "spring" && (
         <>
-          <Snow-coveredEvergreen x={10} y={195} />
-          <Snow-coveredEvergreen x={330} y={190} />
+          <SnowCoveredEvergreen x={10} y={195} />
+          <SnowCoveredEvergreen x={330} y={190} />
           {/* Flowers */}
           {[50, 120, 200, 280, 380, 450, 530].map((fx, i) => (
             <g key={i} transform={`translate(${fx}, 230)`}>
@@ -382,8 +382,8 @@ export default function DaytimeScene({ solarPhase = 0.5, isPro = false, onSkyCli
 
       {season === "fall" && (
         <>
-          <Snow-coveredEvergreen x={15} y={198} />
-          <Snow-coveredEvergreen x={340} y={193} />
+          <SnowCoveredEvergreen x={15} y={198} />
+          <SnowCoveredEvergreen x={340} y={193} />
           {/* Fallen leaves */}
           {Array.from({ length: 15 }, (_, i) => (
             <Leaf key={i} x={20 + i * 40} y={200 + Math.sin(i) * 30} delay={i * 0.3} />

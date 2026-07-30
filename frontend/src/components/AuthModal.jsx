@@ -42,8 +42,6 @@ export default function AuthModal() {
     }
   };
 
-  const appleNotice = () => toast.info("Apple Sign-in coming soon — requires Apple Developer registration.");
-
   return (
     <Dialog open={open} onOpenChange={(v) => !v && close()}>
       <DialogContent className="max-w-md p-0 overflow-hidden rounded-lg border-border" data-testid="auth-modal">
@@ -121,14 +119,6 @@ export default function AuthModal() {
             >
               <GoogleIcon /> Google
             </Button>
-            <Button
-              data-testid="auth-apple-btn"
-              variant="outline"
-              onClick={appleNotice}
-              className="w-full rounded-xl font-tech text-xs uppercase tracking-wider border-border"
-            >
-              <AppleIcon /> Apple
-            </Button>
           </div>
 
           <div className="text-xs font-tech text-center text-muted-foreground mt-6">
@@ -169,10 +159,3 @@ function GoogleIcon() {
   );
 }
 
-function AppleIcon() {
-  return (
-    <svg className="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M17.05 12.04c-.03-3.16 2.58-4.68 2.7-4.75-1.47-2.15-3.76-2.45-4.58-2.48-1.94-.2-3.81 1.15-4.8 1.15s-2.52-1.12-4.15-1.09c-2.13.03-4.1 1.24-5.2 3.15-2.22 3.85-.57 9.55 1.59 12.69 1.06 1.53 2.32 3.25 3.97 3.19 1.6-.06 2.2-1.03 4.13-1.03s2.48 1.03 4.17.99c1.72-.03 2.81-1.55 3.86-3.09 1.21-1.77 1.71-3.49 1.74-3.58-.04-.02-3.33-1.28-3.36-5.06zM14 3.43c.88-1.06 1.46-2.54 1.3-4.01-1.26.05-2.78.84-3.69 1.9-.81.94-1.52 2.45-1.33 3.9 1.41.11 2.84-.72 3.72-1.79z"/>
-    </svg>
-  );
-}

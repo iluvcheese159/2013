@@ -1,8 +1,8 @@
 import "@/App.css";
 import "@/index.css";
+import { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import Footer from "@/components/Footer";
-import { useEffect } from "react";
 import { Toaster } from "sonner";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { UIProvider, useUI } from "@/contexts/UIContext";
@@ -51,8 +51,21 @@ import Privacy from "@/pages/Privacy";
 import PolicyEditor from "@/pages/PolicyEditor";
 
 function HomeOrIntro() {
-  const seen = typeof window !== "undefined" && localStorage.getItem("pf_intro_seen") === "1";
-  if (!seen) return <Navigate to="/intro" replace />;
+  const [checking, setChecking] = useState(true);
+  const [showIntro, setShowIntro] = useState(false);
+
+  useEffect(() => {
+    try {
+      const seen = localStorage.getItem("pf_intro_seen") === "1";
+      setShowIntro(!seen);
+    } catch {
+      setShowIntro(true);
+    }
+    setChecking(false);
+  }, []);
+
+  if (checking) return null;
+  if (showIntro) return <Navigate to="/intro" replace />;
   return <Home />;
 }
 

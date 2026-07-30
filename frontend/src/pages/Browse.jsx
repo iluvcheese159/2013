@@ -479,8 +479,9 @@ function useStarfieldControls(pageRef) {
       const delta = e.deltaY > 0 ? -0.3 : 0.3;
       zoomRef.current = Math.max(0, Math.min(3, zoomRef.current + delta));
       setZoomLevel(zoomRef.current);
+      markUserInteraction();
     }
-  }, [pageRef]);
+  }, [pageRef, markUserInteraction]);
 
   const onStarfieldPointerDown = useCallback((e) => {
     if (e.target.closest("a, button, input")) return;
@@ -492,8 +493,9 @@ function useStarfieldControls(pageRef) {
       pointerId: e.pointerId,
     };
     setIsPanning(true);
+    markUserInteraction();
     try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* ignore */ }
-  }, [starOffset]);
+  }, [starOffset, markUserInteraction]);
 
   const onStarfieldPointerMove = useCallback((e) => {
     if (!panRef.current) return;
@@ -517,6 +519,63 @@ function useStarfieldControls(pageRef) {
     starOffset, zoomLevel, isPanning,
     onWheel, onStarfieldPointerDown, onStarfieldPointerMove, onStarfieldPointerUp,
   };
+}
+
+/**
+ * Hook for ambient auto-interactions — the page feels alive without user input.
+ * Drives gentle auto-zoom breathing, auto-pan drift, and periodic highlight pulses.
+ */
+function useAmbientInteractions(starOffset, setStarOffset, zoomLevel, setZoomLevel) {
+  const timeRef = useRef(0);
+  const frameRef = useRef(null);
+  const isUserInteractingRef = useRef(false);
+  const userInactiveTimerRef = useRef(null);
+
+  // Track user interaction to pause auto-effects momentarily
+  const markUserInteraction = useCallback(() => {
+    isUserInteractingRef.current = true;
+    clearTimeout(userInactiveTimerRef.current);
+    userInactiveTimerRef.current = setTimeout(() => {
+      isUserInteractingRef.current = false;
+    }, 3000);
+  }, []);
+
+  useEffect(() => {
+    let lastTime = 0;
+    const animate = (time) => {
+      const dt = lastTime ? (time - lastTime) / 1000 : 0;
+      lastTime = time;
+      timeRef.current += dt;
+
+      if (!isUserInteractingRef.current) {
+        const t = timeRef.current;
+
+        // Auto-zoom breathing: slowly oscillate between 0 and 0.8 over ~12 seconds
+        const breatheZoom = (Math.sin(t * 0.5) * 0.5 + 0.5) * 0.8;
+        // Blend with current user-set zoom: if user hasn't touched zoom, use auto
+        // We track if user has ever scrolled — if zoomRef is 0, use auto
+        if (zoomLevel < 0.01) {
+          setZoomLevel(breatheZoom);
+        }
+
+        // Auto-pan drift: gentle circular motion over ~30 seconds
+        const driftRadius = 30;
+        const driftSpeed = 0.2;
+        const driftX = Math.sin(t * driftSpeed) * driftRadius;
+        const driftY = Math.cos(t * driftSpeed * 0.7) * driftRadius;
+        setStarOffset({ x: driftX, y: driftY });
+      }
+
+      frameRef.current = requestAnimationFrame(animate);
+    };
+    frameRef.current = requestAnimationFrame(animate);
+    return () => {
+      if (frameRef.current) cancelAnimationFrame(frameRef.current);
+      clearTimeout(userInactiveTimerRef.current);
+    };
+  }, [zoomLevel, setZoomLevel, setStarOffset]);
+
+  return { markUserInteraction };
 }
 
 // ====================================================================
@@ -550,6 +609,9 @@ export default function Browse() {
     starOffset, zoomLevel, isPanning,
     onWheel, onStarfieldPointerDown, onStarfieldPointerMove, onStarfieldPointerUp,
   } = useStarfieldControls(pageRef);
+
+  // Ambient auto-interactions — the page breathes and drifts on its own
+  const { markUserInteraction } = useAmbientInteractions(starOffset, setStarOffset, zoomLevel, setZoomLevel);
 
   // --- Derived Data ---
   const listingPositions = useMemo(() => generateListingPositions(500, starSeed), [starSeed]);
@@ -623,6 +685,8 @@ export default function Browse() {
   // --- Render Listing Stars ---
   const renderListingStars = () => {
     if (loading) return null;
+    // Use a smooth reveal: dots show immediately, cards fade in as zoomLevel approaches 1+
+    const revealProgress = Math.max(0, Math.min(1, (zoomLevel - 0.3) / 0.7));
     return items.map((item, index) => {
       const position = listingPositions[index % listingPositions.length];
       const color = getListingColor(item);
@@ -758,8 +822,6 @@ export default function Browse() {
         style={{
           opacity: (!isDay || spaceView) ? 1 : 0,
           transition: "opacity 0.6s",
-          transform: "scale(" + (1 + zoomLevel * 0.4) + ")",
-          transformOrigin: "center center",
         }}
       >
         <SponsoredAd ad={activeAd} loading={loading} />
