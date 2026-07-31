@@ -66,11 +66,11 @@ export default function FilamentCalculator() {
       <div className="border-b border-border px-6 md:px-12 lg:px-24 py-10">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
-            <div className="text-[10px] font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3">
+            <div className="text-[10px] font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3 rise-in">
               <span className="text-primary">●</span> Filament Calculator
             </div>
-            <h1 className="font-display text-4xl sm:text-5xl font-light tracking-tighter">Estimate your print costs.</h1>
-            <p className="text-sm text-muted-foreground mt-3 max-w-xl">
+            <h1 className="font-display text-4xl sm:text-5xl font-light tracking-tighter rise-in rise-in-1">Estimate your print costs.</h1>
+            <p className="text-sm text-muted-foreground mt-3 max-w-xl rise-in rise-in-2">
               Calculate material usage, print time, and cost before you start printing. Get accurate estimates based on your model volume and print settings.
             </p>
           </div>
@@ -78,7 +78,7 @@ export default function FilamentCalculator() {
       </div>
 
       <div className="px-6 md:px-12 lg:px-24 py-10 space-y-8">
-        <Card className="w-full max-w-xl mx-auto">
+        <Card className="w-full max-w-xl mx-auto rise-in rise-in-2 auto-float">
           <CardHeader className="pb-4">
             <Calculator className="h-5 w-5 mb-2" />
             <CardTitle className="font-display text-2xl">Filament Usage & Cost Calculator</CardTitle>
@@ -130,14 +130,14 @@ export default function FilamentCalculator() {
               </div>
             </div>
 
-            <button onClick={calculate} disabled={loading} className="w-full rounded-xl font-tech text-xs uppercase tracking-wider py-3">
+            <button onClick={calculate} disabled={loading} className="w-full rounded-xl font-tech text-xs uppercase tracking-wider py-3 auto-glow-pulse">
               {loading ? "Calculating..." : "Calculate Cost & Usage"}
             </button>
           </CardContent>
         </Card>
 
         {result && (
-          <Card className="w-full max-w-xl mx-auto">
+          <Card className="w-full max-w-xl mx-auto rise-in rise-in-3 auto-glow-pulse">
             <CardHeader className="pb-4">
               <Activity className="h-5 w-5 mb-2" />
               <CardTitle className="font-display text-2xl">Calculation Results</CardTitle>

@@ -74,24 +74,24 @@ export default function Cart() {
   };
 
   return (
-    <div data-testid="cart-page" className="pt-20 min-h-screen px-6 md:px-12 py-16 max-w-3xl">
-      <button onClick={() => navigate(-1)} className="text-xs font-tech uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground inline-flex items-center gap-2 mb-6">
+      <div data-testid="cart-page" className="pt-20 min-h-screen px-6 md:px-12 py-16 max-w-3xl">
+      <button onClick={() => navigate(-1)} className="text-xs font-tech uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground inline-flex items-center gap-2 mb-6 rise-in">
         <ArrowLeft className="h-3 w-3" /> Back
       </button>
-      <div className="text-[10px] font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3">
+      <div className="text-[10px] font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3 rise-in-1">
         <span className="text-primary">●</span> Cart
       </div>
-      <h1 className="font-display text-4xl sm:text-5xl font-light tracking-tighter mb-8">Your cart</h1>
+      <h1 className="font-display text-4xl sm:text-5xl font-light tracking-tighter mb-8 rise-in-2">Your cart</h1>
 
       {items.length === 0 ? (
-        <div className="border border-dashed border-border rounded-2xl py-20 text-center">
+        <div className="border border-dashed border-border rounded-2xl py-20 text-center auto-glow-pulse">
           <ShoppingCart className="h-8 w-8 mx-auto mb-4 text-muted-foreground" strokeWidth={1.5} />
           <p className="text-sm text-muted-foreground mb-4">Nothing here yet. Browse the marketplace and add prints.</p>
           <Link to="/browse"><Button className="bg-primary hover:bg-primary/90 rounded-xl font-tech text-xs uppercase tracking-wider">Browse listings</Button></Link>
         </div>
       ) : (
         <>
-          <div className="space-y-3 mb-8">
+          <div className="space-y-3 mb-8 auto-float">
             {items.map((it) => (
               <div key={it.listing_id} data-testid={`cart-item-${it.listing_id}`} className="flex items-center gap-4 p-3 rounded-2xl bg-card shadow-sm">
                 <label className="flex items-center gap-3">
@@ -126,7 +126,7 @@ export default function Cart() {
               </div>
             ))}
           </div>
-          <div className="rounded-2xl p-5 mb-4 bg-card shadow-sm">
+          <div className="rounded-2xl p-5 mb-4 bg-card shadow-sm auto-glow-pulse">
             <div className="mb-4">
               <div className="text-[10px] font-tech uppercase tracking-[0.2em] text-muted-foreground mb-2">Payment method</div>
               <div className="space-y-2">
@@ -193,7 +193,7 @@ export default function Cart() {
               <Button data-testid="cart-checkout-selected-btn" onClick={checkoutSelected} className="rounded-xl font-tech text-xs uppercase tracking-wider bg-primary hover:bg-primary/90">Checkout selected</Button>
             </div>
           </div>
-          <div className="rounded-2xl p-5 flex items-baseline justify-between mb-4 bg-card shadow-sm">
+          <div className="rounded-2xl p-5 flex items-baseline justify-between mb-4 bg-card shadow-sm auto-float">
             <div>
               <div className="text-[10px] font-tech uppercase tracking-[0.2em] text-muted-foreground">Cart subtotal</div>
               <div className="text-[10px] font-tech text-muted-foreground">Platform fee 3.5% of price + shipping: ${fee.toFixed(2)}</div>

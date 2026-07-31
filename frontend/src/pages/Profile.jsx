@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { api, fileUrl } from "@/lib/api";
@@ -54,6 +54,25 @@ export default function Profile() {
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [kycBusy, setKycBusy] = useState(false);
   const [termsBusy, setTermsBusy] = useState(false);
+
+  // Ambient animation refs
+  const pageRef = useRef(null);
+  const timeRef = useRef(0);
+  const frameRef = useRef(null);
+
+  // Ambient auto-pulse for page elements
+  useEffect(() => {
+    let lastTime = 0;
+    const animate = (time) => {
+      lastTime = time;
+      timeRef.current = time / 1000;
+      frameRef.current = requestAnimationFrame(animate);
+    };
+    frameRef.current = requestAnimationFrame(animate);
+    return () => {
+      if (frameRef.current) cancelAnimationFrame(frameRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     if (user) {
@@ -132,7 +151,7 @@ export default function Profile() {
           </div>
         ) : (
           <>
-            <div className="flex items-center gap-4 mb-8">
+            <div className="flex items-center gap-4 mb-8 rise-in">
               <Avatar className="h-20 w-20 border border-border">
                 <AvatarImage src={publicProfile.picture} alt={publicProfile.name} />
                 <AvatarFallback>{publicProfile.name?.[0] || "U"}</AvatarFallback>
@@ -231,7 +250,7 @@ export default function Profile() {
             </div>
 
             {/* Instagram-style tabs */}
-            <div className="flex border-b border-border mb-6" data-testid="profile-tabs">
+            <div className="flex border-b border-border mb-6 rise-in" data-testid="profile-tabs" style={{ animationDelay: "0.1s" }}>
               <button
                 onClick={() => setProfileTab("listings")}
                 data-testid="profile-tab-listings"
@@ -264,12 +283,13 @@ export default function Profile() {
             {profileTab === "listings" ? (
               publicListings.length ? (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-1 sm:gap-2">
-                  {publicListings.map((listing) => (
+                  {publicListings.map((listing, i) => (
                     <Link
                       key={listing.listing_id}
                       to={`/listing/${listing.listing_id}`}
                       data-testid={`profile-listing-${listing.listing_id}`}
-                      className="relative aspect-square bg-secondary overflow-hidden rounded-xl group block"
+                      className="relative aspect-square bg-secondary overflow-hidden rounded-xl group block rise-in"
+                      style={{ animationDelay: `${0.05 * (i % 8)}s` }}
                     >
                       {listing.image_paths?.[0] ? (
                         <SafeImage src={fileUrl(listing.image_paths[0])} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
@@ -293,12 +313,13 @@ export default function Profile() {
                 <div className="text-sm text-muted-foreground text-center py-16 font-tech uppercase tracking-wider">No public collections yet</div>
               ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-1 sm:gap-2">
-                  {profileCollections.map((col) => (
+                  {profileCollections.map((col, i) => (
                     <Link
                       key={col.collection_id}
                       to={`/collections/${col.collection_id}`}
                       data-testid={`profile-collection-${col.collection_id}`}
-                      className="relative aspect-square bg-secondary overflow-hidden rounded-xl group block flex items-center justify-center border border-border hover:border-primary/60 transition-colors"
+                      className="relative aspect-square bg-secondary overflow-hidden rounded-xl group block flex items-center justify-center border border-border hover:border-primary/60 transition-colors rise-in"
+                      style={{ animationDelay: `${0.05 * (i % 8)}s` }}
                       title={col.name}
                     >
                       <div className="text-center px-4">
@@ -430,12 +451,12 @@ export default function Profile() {
   return (
     <div data-testid="profile-page" className="pt-20 min-h-screen">
       <div className="px-6 md:px-12 py-10 max-w-3xl">
-        <div className="text-[10px] font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3">
+        <div className="text-[10px] font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3 rise-in">
           <span className="text-primary">●</span> Profile
         </div>
-        <h1 className="font-display text-4xl font-medium tracking-tighter mb-10">Edit your profile</h1>
+        <h1 className="font-display text-4xl font-medium tracking-tighter mb-10 rise-in rise-in-1">Edit your profile</h1>
 
-        <div className="border border-border rounded-xl p-5 mb-8 bg-card">
+        <div className="border border-border rounded-xl p-5 mb-8 bg-card auto-glow-pulse">
           <div className="flex items-center justify-between gap-3 mb-4">
             <div>
               <div className="font-display text-2xl font-medium tracking-tight">Seller Bank Verification</div>
@@ -482,8 +503,8 @@ export default function Profile() {
           </div>
         </div>
 
-        <div className="flex items-center gap-6 mb-10 pb-10 border-b border-border">
-          <Avatar className="h-24 w-24 border-2 border-border">
+        <div className="flex items-center gap-6 mb-10 pb-10 border-b border-border rise-in rise-in-2">
+          <Avatar className="h-24 w-24 border-2 border-border auto-float">
             <AvatarImage src={picture} alt={name} />
             <AvatarFallback className="bg-secondary text-2xl">{name?.[0]?.toUpperCase() || "U"}</AvatarFallback>
           </Avatar>
@@ -501,7 +522,7 @@ export default function Profile() {
           )}
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-6 rise-in-4">
           <Field label="Name">
             <Input data-testid="profile-name-input" value={name} onChange={(e) => setName(e.target.value)} className="font-tech rounded-xl" />
           </Field>
@@ -631,7 +652,7 @@ export default function Profile() {
                 className="font-tech rounded-xl"
               />
             </Field>
-          <Field label="Skills (comma separated)">
+          <Field label="Skills (comma separated)" className="rise-in">
             <Input
               data-testid="profile-skills-input"
               value={skills}
@@ -657,7 +678,7 @@ export default function Profile() {
             data-testid="profile-save-btn"
             onClick={save}
             disabled={saving}
-            className="bg-primary hover:bg-primary/90 rounded-xl font-tech text-xs uppercase tracking-wider"
+            className="bg-primary hover:bg-primary/90 rounded-xl font-tech text-xs uppercase tracking-wider auto-glow-pulse"
           >
             {saving ? "Saving…" : "Save changes"}
           </Button>
@@ -693,7 +714,7 @@ function BadgesTab({ profile }) {
   return (
     <>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-        {earned.map((b) => {
+        {earned.map((b, i) => {
           const Icon = b.icon;
           return (
             <button
@@ -702,7 +723,8 @@ function BadgesTab({ profile }) {
               disabled={b.static}
               onClick={() => !b.static && setOpen3D(b.id)}
               data-testid={`profile-badge-${b.id}`}
-              className={`flex flex-col items-center gap-2 rounded-2xl bg-card shadow-sm p-5 text-center ${!b.static ? "hover:shadow-lg transition-shadow cursor-pointer" : "cursor-default"}`}
+              className={`flex flex-col items-center gap-2 rounded-2xl bg-card shadow-sm p-5 text-center auto-float ${!b.static ? "hover:shadow-lg transition-shadow cursor-pointer" : "cursor-default"}`}
+              style={{ animationDelay: `${0.1 * (i % 8)}s` }}
             >
               <Icon className={`h-8 w-8 ${b.color}`} fill={b.static ? "none" : "currentColor"} strokeWidth={1.3} />
               <div className="text-[10px] font-tech uppercase tracking-wider text-muted-foreground">{b.label}</div>

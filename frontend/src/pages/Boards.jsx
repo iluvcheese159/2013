@@ -47,7 +47,7 @@ export default function Boards() {
   };
 
   const Card = ({ board, showOwner = false }) => (
-    <div key={board.board_id} className="border border-border rounded-2xl p-5 bg-card hover:border-primary/50 transition-colors">
+    <div key={board.board_id} className="border border-border rounded-2xl p-5 bg-card hover:border-primary/50 transition-colors auto-float">
       <div className="flex items-start justify-between gap-3 mb-2">
         <div>
           <h3 className="font-display text-lg font-medium leading-tight">{board.title}</h3>

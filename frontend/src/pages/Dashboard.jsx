@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { api, fileUrl } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
@@ -15,6 +15,24 @@ import SalePrice from "@/components/SalePrice";
 import SafeImage from "@/components/SafeImage";
 
 export default function Dashboard() {
+  // Ambient animation refs
+  const pageRef = useRef(null);
+  const timeRef = useRef(0);
+  const frameRef = useRef(null);
+
+  // Ambient auto-pulse for page elements
+  useEffect(() => {
+    let lastTime = 0;
+    const animate = (time) => {
+      lastTime = time;
+      timeRef.current = time / 1000;
+      frameRef.current = requestAnimationFrame(animate);
+    };
+    frameRef.current = requestAnimationFrame(animate);
+    return () => {
+      if (frameRef.current) cancelAnimationFrame(frameRef.current);
+    };
+  }, []);
   const { user, openAuth } = useAuth();
   const [listings, setListings] = useState([]);
   const [designs, setDesigns] = useState([]);
@@ -206,15 +224,15 @@ export default function Dashboard() {
 
   return (
     <div data-testid="dashboard-page" className="pt-14 min-h-screen">
-      <div className="border-b border-border px-6 md:px-12 lg:px-24 py-10">
-        <div className="text-xs font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3">
+      <div className="border-b border-border px-6 md:px-12 lg:px-24 py-10" ref={pageRef}>
+        <div className="text-xs font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3 rise-in">
           <span className="text-primary">●</span> Dashboard
         </div>
         <div className="flex flex-wrap items-end justify-between gap-4">
-          <h1 className="font-display text-4xl sm:text-5xl font-light tracking-tighter">
+          <h1 className="font-display text-4xl sm:text-5xl font-light tracking-tighter rise-in rise-in-1">
             Hi, {user.name.split(" ")[0]}.
           </h1>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 rise-in rise-in-2">
             {user.is_seller && (
               <Link to="/seller/orders">
                 <Button className="rounded-xl font-tech text-xs uppercase tracking-wider">Orders</Button>
@@ -226,7 +244,7 @@ export default function Dashboard() {
               </Button>
             )}
             <Link to="/create">
-            <Button data-testid="create-listing-btn" className="bg-primary hover:bg-primary/90 rounded-xl font-tech text-xs uppercase tracking-wider">
+            <Button data-testid="create-listing-btn" className="bg-primary hover:bg-primary/90 rounded-xl font-tech text-xs uppercase tracking-wider auto-glow-pulse">
               <Plus className="h-4 w-4 mr-2" /> New listing
             </Button>
             </Link>
@@ -267,16 +285,16 @@ export default function Dashboard() {
         )}
       </div>
 
-      <div className="px-6 md:px-12 lg:px-24 py-10 grid grid-cols-1 md:grid-cols-4 gap-px bg-border border border-border rounded-2xl overflow-hidden mb-10">
-        <StatBox icon={Package} label="Active listings" value={listings.length} />
-        <StatBox icon={ShoppingBag} label="Total sales" value={listings.reduce((a, l) => a + l.sales_count, 0)} />
-        <StatBox icon={DollarSign} label="Gross revenue" value={`$${revenue.toFixed(2)}`} />
-        <StatBox icon={Eye} label="Platform fees" value={`$${fees.toFixed(2)}`} />
+      <div className="px-6 md:px-12 lg:px-24 py-10 grid grid-cols-1 md:grid-cols-4 gap-px bg-border border border-border rounded-2xl overflow-hidden mb-10 auto-float">
+        <StatBox icon={Package} label="Active listings" value={listings.length} index={0} />
+        <StatBox icon={ShoppingBag} label="Total sales" value={listings.reduce((a, l) => a + l.sales_count, 0)} index={1} />
+        <StatBox icon={DollarSign} label="Gross revenue" value={`$${revenue.toFixed(2)}`} index={2} />
+        <StatBox icon={Eye} label="Platform fees" value={`$${fees.toFixed(2)}`} index={3} />
       </div>
 
       {user.is_seller && (
         <div className="px-6 md:px-12 lg:px-24 mb-10">
-          <div id="subscription-club-panel" className="border border-border rounded-2xl p-5 bg-card">
+          <div id="subscription-club-panel" className="border border-border rounded-2xl p-5 bg-card rise-in rise-in-3 auto-glow-pulse">
             <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
               <div>
                 <h2 className="font-display text-2xl font-light tracking-tight">Store Subscription Club</h2>
@@ -335,7 +353,7 @@ export default function Dashboard() {
       )}
 
       <div className="px-6 md:px-12 lg:px-24 pb-16">
-        <h2 className="font-display text-2xl font-bold mb-6">Your listings</h2>
+        <h2 className="font-display text-2xl font-bold mb-6 rise-in rise-in-3">Your listings</h2>
         {listings.length === 0 ? (
           <div className="border border-dashed border-border rounded-2xl py-16 text-center">
             <p className="text-sm text-muted-foreground mb-4">You haven&apos;t listed anything yet.</p>
@@ -346,9 +364,9 @@ export default function Dashboard() {
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-            {listings.map((l) => (
-              <div key={l.listing_id} data-testid={`my-listing-${l.listing_id}`} className="rounded-2xl bg-card overflow-hidden shadow-sm hover:shadow-lg transition-shadow">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 auto-float">
+            {listings.map((l, i) => (
+              <div key={l.listing_id} data-testid={`my-listing-${l.listing_id}`} className="rounded-2xl bg-card overflow-hidden shadow-sm hover:shadow-lg transition-shadow rise-in" style={{ animationDelay: `${0.05 * (i % 9)}s` }}>
                 <Link to={`/listing/${l.listing_id}`} className="block">
                   <div className="aspect-[4/3] bg-secondary border-b border-border overflow-hidden">
                     {l.image_paths?.[0] && <SafeImage src={fileUrl(l.image_paths[0])} alt="" className="w-full h-full object-cover" />}
@@ -629,9 +647,9 @@ export default function Dashboard() {
   );
 }
 
-function StatBox({ icon: Icon, label, value }) {
+function StatBox({ icon: Icon, label, value, index = 0 }) {
   return (
-    <div className="bg-card p-6">
+    <div className="bg-card p-6 auto-float" style={{ animationDelay: `${0.15 * index}s` }}>
       <Icon className="h-4 w-4 text-muted-foreground mb-3" strokeWidth={1.5} />
       <div className="font-display text-2xl font-light tracking-tighter">{value}</div>
       <div className="text-[10px] font-tech uppercase tracking-[0.2em] text-muted-foreground mt-1">{label}</div>

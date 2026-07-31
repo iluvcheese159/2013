@@ -135,14 +135,14 @@ export default function Forums() {
       <div className="border-b border-border px-6 md:px-12 lg:px-24 py-8">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <div className="text-xs font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3"><span className="text-primary">●</span> Mission Control</div>
-            <h1 className="font-display text-4xl sm:text-5xl font-light tracking-tighter">NASA Mission Control.</h1>
+            <div className="text-xs font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3 rise-in"><span className="text-primary">●</span> Mission Control</div>
+            <h1 className="font-display text-4xl sm:text-5xl font-light tracking-tighter rise-in-1">NASA Mission Control.</h1>
           </div>
-          <Button onClick={() => setCreateOpen(true)} className="rounded-xl font-tech text-xs uppercase tracking-wider">
+          <Button onClick={() => setCreateOpen(true)} className="rounded-xl font-tech text-xs uppercase tracking-wider rise-in-2 auto-glow-pulse">
             <Plus className="h-3.5 w-3.5 mr-1" /> Create Thread
           </Button>
         </div>
-        <div className="mt-5 flex flex-wrap gap-2">
+        <div className="mt-5 flex flex-wrap gap-2 rise-in-3">
           {SECTIONS.map((s) => (
             <button
               key={s}
@@ -157,19 +157,19 @@ export default function Forums() {
 
       <div className="px-6 md:px-12 lg:px-24 py-8 grid grid-cols-1 gap-3">
         {posts.length === 0 ? (
-          <div className="border border-dashed border-border rounded-2xl px-6 py-10 text-center flex flex-col items-center">
-            <div className="mb-6 opacity-90">
+          <div className="border border-dashed border-border rounded-2xl px-6 py-10 text-center flex flex-col items-center rise-in">
+            <div className="mb-6 opacity-90 auto-float">
               <WireframeCube size={88} />
             </div>
             <p className="max-w-xl text-sm text-muted-foreground leading-relaxed">
               No forum posts found in this section yet. Be the first to start a thread.
             </p>
           </div>
-        ) : posts.map((post) => (
+        ) : posts.map((post, idx) => (
           <button
             key={post.post_id}
             onClick={() => openDetail(post)}
-            className={`text-left border rounded-xl bg-card overflow-hidden hover:border-primary transition-colors mission-control-glow ${post.is_pinned_by_admin ? "border-[#00FFC8]/60" : "border-border/40"}`}
+            className={`text-left border rounded-xl bg-card overflow-hidden hover:border-primary transition-colors mission-control-glow rise-in rise-in-${Math.min(idx + 1, 4)} ${post.is_pinned_by_admin ? "border-[#00FFC8]/60" : "border-border/40"}`}
           >
             <div className="flex">
               <div className="w-14 border-r border-border p-2 flex flex-col items-center gap-2">
@@ -206,8 +206,8 @@ export default function Forums() {
       <div className="px-6 md:px-12 lg:px-24 pb-20">
         <div className="text-[10px] font-tech uppercase tracking-wider text-muted-foreground mb-2">Most Recently Viewed Forums</div>
         <div className="flex gap-3 overflow-x-auto pb-2">
-          {history.map((h) => (
-            <button key={`${h.post?.post_id}-${h.viewed_at}`} onClick={() => h.post && openDetail(h.post)} className="shrink-0 w-72 border border-border rounded-xl p-3 text-left hover:border-primary">
+          {history.map((h, idx) => (
+            <button key={`${h.post?.post_id}-${h.viewed_at}`} onClick={() => h.post && openDetail(h.post)} className={`shrink-0 w-72 border border-border rounded-xl p-3 text-left hover:border-primary transition-all duration-300 hover:shadow-lg rise-in rise-in-${Math.min(idx + 1, 4)}`}>
               <div className="text-[10px] font-tech uppercase tracking-wider text-muted-foreground mb-1">{h.post?.section_category}</div>
               <div className="font-medium truncate">{h.post?.title}</div>
             </button>
@@ -216,7 +216,7 @@ export default function Forums() {
       </div>
 
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl auto-glow-pulse">
           <DialogHeader>
             <DialogTitle className="font-display text-2xl">Create Mission Control Thread</DialogTitle>
           </DialogHeader>
@@ -242,7 +242,7 @@ export default function Forums() {
       </Dialog>
 
       <Dialog open={!!detailPost} onOpenChange={(v) => !v && setDetailPost(null)}>
-        <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto mission-control-glow">
+        <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto mission-control-glow auto-glow-pulse">
           {detailPost && (
             <div>
               <div className="text-[10px] font-tech uppercase tracking-wider text-muted-foreground mb-1">{detailPost.section_category}</div>
@@ -324,14 +324,14 @@ function MentionTextarea({ value, onChange, placeholder, rows = 3 }) {
         placeholder={placeholder}
         className="font-tech text-sm rounded-xl"
       />
-      {suggestions.length > 0 && mentionQuery !== null && (
-        <div className="absolute bottom-full left-0 mb-1 w-56 bg-card border border-border rounded-xl shadow-lg overflow-hidden z-50">
+          {suggestions.length > 0 && mentionQuery !== null && (
+        <div className="absolute bottom-full left-0 mb-1 w-56 bg-card border border-border rounded-xl shadow-lg overflow-hidden z-50 rise-in">
           {suggestions.map((u) => (
             <button
               key={u.user_id}
               type="button"
               onMouseDown={(e) => { e.preventDefault(); pickSuggestion(u.user_tag); }}
-              className="w-full text-left px-3 py-2 text-xs font-tech hover:bg-secondary flex items-center gap-2"
+              className="w-full text-left px-3 py-2 text-xs font-tech hover:bg-secondary flex items-center gap-2 transition-colors"
             >
               <span className="text-muted-foreground">@</span>
               <span className="text-foreground">{u.user_tag}</span>
@@ -360,7 +360,7 @@ function buildTree(comments) {
 
 function CommentNode({ node, depth, onVote, onReply }) {
   return (
-    <div className="rounded-xl p-3 bg-card shadow-sm" style={{ marginLeft: `${Math.min(depth * 20, 120)}px` }}>
+    <div className="rounded-xl p-3 bg-card shadow-sm ambient-drift" style={{ marginLeft: `${Math.min(depth * 20, 120)}px` }}>
       <div className="text-xs font-tech text-muted-foreground mb-1">{node.author_name}</div>
       <div className="text-sm mb-2 whitespace-pre-line">{node.body}</div>
       <div className="flex items-center gap-2 text-[10px] font-tech uppercase tracking-wider text-muted-foreground">

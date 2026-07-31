@@ -392,7 +392,7 @@ export default function ListingDetail() {
       
       {/* Content layer */}
       <div className="relative z-10">
-        <div className="px-6 md:px-12 lg:px-24 py-6 border-b border-border bg-black/20 backdrop-blur-sm">
+        <div className="px-6 md:px-12 lg:px-24 py-6 border-b border-border bg-black/20 backdrop-blur-sm rise-in">
           <button onClick={() => navigate(-1)} className="text-xs font-tech uppercase tracking-[0.2em] text-white/60 hover:text-white inline-flex items-center gap-2">
             <ArrowLeft className="h-3 w-3" /> Back
           </button>
@@ -400,8 +400,8 @@ export default function ListingDetail() {
 
       <div className="px-6 md:px-12 lg:px-24 py-10 grid lg:grid-cols-2 gap-10">
         {/* Left — media */}
-        <div>
-          <div className="aspect-square bg-secondary border border-border rounded-xl overflow-hidden relative group">
+        <div className="rise-in rise-in-1">
+          <div className="aspect-square bg-secondary border border-border rounded-xl overflow-hidden relative group auto-float">
             {item.is_on_sale && (
               <div className="absolute left-2 top-2 z-10 px-2 py-1 rounded-xl bg-[#F59E0B] text-black text-[9px] font-tech uppercase tracking-wider">
                 COSMIC SALE EVENT
@@ -465,7 +465,7 @@ export default function ListingDetail() {
         </div>
 
         {/* Right — summary + buy */}
-        <div>
+        <div className="rise-in rise-in-2">
           <div className="text-[10px] font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3">
             {item.category}
             {item.listing_type === "service" && <span className="ml-2 px-2 py-0.5 bg-accent/10 text-accent rounded-xl">Service</span>}
@@ -474,7 +474,7 @@ export default function ListingDetail() {
               <span key={tag} className="ml-2 px-2 py-0.5 bg-primary/10 text-primary border border-primary/20 rounded-xl">✓ {tag}</span>
             ))}
           </div>
-          <h1 className="font-display text-3xl sm:text-4xl font-light tracking-tighter mb-2">{item.title}</h1>
+          <h1 className="font-display text-3xl sm:text-4xl font-light tracking-tighter mb-2 rise-in">{item.title}</h1>
           <div className="flex flex-wrap items-center gap-2 mb-3 text-[10px] font-tech">
             <Stars value={item.rating_avg || 0} />
             <span className="text-muted-foreground">{item.rating_avg?.toFixed(1) || "0.0"}</span>
@@ -551,7 +551,7 @@ export default function ListingDetail() {
             </div>
           )}
 
-          <div className="border border-border rounded-xl p-6 mb-6">
+          <div className="border border-border rounded-xl p-6 mb-6 auto-glow-pulse">
             <div className="flex items-baseline justify-between mb-4">
               <div className="text-[10px] font-tech uppercase tracking-[0.2em] text-muted-foreground">Price</div>
               <div className="font-display text-4xl font-light tracking-tighter text-primary">
@@ -624,7 +624,7 @@ export default function ListingDetail() {
               onClick={handleBuy}
               disabled={busy}
               size="lg"
-              className="w-full bg-primary hover:bg-primary/90 rounded-xl font-tech uppercase tracking-wider mb-2"
+              className="w-full bg-primary hover:bg-primary/90 rounded-xl font-tech uppercase tracking-wider mb-2 auto-glow-pulse"
             >
               {busy ? "Redirecting…" : "Buy now"}
             </Button>
@@ -853,7 +853,7 @@ export default function ListingDetail() {
           )}
 
           {/* Save, Like, Share actions */}
-          <div className="flex items-center justify-center gap-3 pt-2 border-t border-border">
+          <div className="flex items-center justify-center gap-3 pt-2 border-t border-border auto-float">
             <button
               onClick={toggleSave}
               disabled={!user}
@@ -931,7 +931,7 @@ export default function ListingDetail() {
       </div>
 
       {/* Thingiverse-style tabs */}
-      <div className="px-6 md:px-12 lg:px-24 border-t border-border">
+      <div className="px-6 md:px-12 lg:px-24 border-t border-border rise-in rise-in-3">
         <div className="flex gap-1 overflow-x-auto -mx-1 px-1">
           {TABS.map((t) => {
             const active = tab === t.id;
@@ -956,7 +956,7 @@ export default function ListingDetail() {
         </div>
       </div>
 
-      <div className="px-6 md:px-12 lg:px-24 py-10 min-h-[320px]">
+      <div className="px-6 md:px-12 lg:px-24 py-10 min-h-[320px] ambient-drift">
         {tab === "details" && <DetailsPanel item={item} />}
         {tab === "files" && <FilesPanel item={item} />}
         {tab === "comments" && (

@@ -204,16 +204,16 @@ export default function PrintFailure() {
       <div className="border-b border-border px-6 md:px-12 lg:px-24 py-10">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
-            <div className="text-[10px] font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3">
+            <div className="text-[10px] font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3 rise-in">
               <span className="text-primary">●</span> Print Failure Database
             </div>
-            <h1 className="font-display text-4xl sm:text-5xl font-light tracking-tighter">Learn from failures.</h1>
-            <p className="text-sm text-muted-foreground mt-3 max-w-xl">
+            <h1 className="font-display text-4xl sm:text-5xl font-light tracking-tighter rise-in rise-in-1">Learn from failures.</h1>
+            <p className="text-sm text-muted-foreground mt-3 max-w-xl rise-in rise-in-2">
               Upload your failed prints, search for solutions, and help others avoid the same mistakes.
             </p>
           </div>
           {user && (
-            <Button onClick={() => setCreateOpen(true)} className="rounded-xl font-tech text-xs uppercase tracking-wider">
+            <Button onClick={() => setCreateOpen(true)} className="rounded-xl font-tech text-xs uppercase tracking-wider rise-in rise-in-3 auto-glow-pulse">
               <Plus className="h-3.5 w-3.5 mr-2" /> Report failure
             </Button>
           )}
@@ -224,7 +224,7 @@ export default function PrintFailure() {
         {loading ? (
           <div className="text-center py-16 text-muted-foreground font-tech text-sm">Loading failures...</div>
         ) : failures.length === 0 ? (
-          <div className="border border-dashed border-border rounded-2xl py-16 text-center">
+          <div className="border border-dashed border-border rounded-2xl py-16 text-center ambient-drift">
             <AlertTriangle className="h-10 w-10 mx-auto mb-4 text-muted-foreground" strokeWidth={1.5} />
             <h3 className="font-display text-2xl font-light mb-2">No failures found</h3>
             <p className="text-sm text-muted-foreground">Be the first to report a failed print.</p>
@@ -232,7 +232,7 @@ export default function PrintFailure() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {failures.map((f) => (
-              <div key={f.failure_id} className={cardClass} onClick={() => openDetail(f)}>
+              <div key={f.failure_id} className={cardClass + " auto-float"} style={{ animationDelay: `${(f.failure_id || 0) % 5 * 0.15}s` }} onClick={() => openDetail(f)}>
                 <div className="flex items-start justify-between gap-3 mb-2">
                   <h3 className="font-display text-base font-medium leading-tight line-clamp-2">
                     {f.title}

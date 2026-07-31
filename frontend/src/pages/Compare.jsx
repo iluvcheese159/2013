@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useSearchParams, Link } from "react-router-dom";
+import { useSearchParams, Link, useNavigate } from "react-router-dom";
 import { api, fileUrl } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import SafeImage from "@/components/SafeImage";
 const EMPTY = { title: "", category: "", print_time: "", price: "", listing_type: "", available_filament_colors: [], description: "", seller_name: "", image_paths: [] };
 
 export default function Compare() {
+  const navigate = useNavigate();
   const [params] = useSearchParams();
   const ids = [params.get("a"), params.get("b"), params.get("c")].filter(Boolean);
   const [items, setItems] = useState([EMPTY, EMPTY, EMPTY]);
@@ -36,15 +37,15 @@ export default function Compare() {
     <div data-testid="compare-page" className="pt-14 min-h-screen px-6 md:px-12 lg:px-24 py-10">
       <div className="flex items-center justify-between gap-4 mb-8">
         <div>
-          <div className="text-[10px] font-tech uppercase tracking-[0.3em] text-muted-foreground mb-2">Compare</div>
-          <h1 className="font-display text-3xl font-light tracking-tighter">Model comparison</h1>
+          <div className="text-[10px] font-tech uppercase tracking-[0.3em] text-muted-foreground mb-2 rise-in">Compare</div>
+          <h1 className="font-display text-3xl font-light tracking-tighter rise-in rise-in-1">Model comparison</h1>
         </div>
-        <Button variant="outline" onClick={() => navigate(-1)} className="rounded-xl font-tech text-xs uppercase tracking-wider">
+        <Button variant="outline" onClick={() => navigate(-1)} className="rounded-xl font-tech text-xs uppercase tracking-wider rise-in rise-in-2">
           <ArrowLeft className="h-4 w-4 mr-2" /> Back
         </Button>
       </div>
 
-      <div className="mb-8 p-4 border border-border rounded-xl bg-card">
+      <div className="mb-8 p-4 border border-border rounded-xl bg-card rise-in rise-in-2 auto-glow-pulse">
         <div className="text-[10px] font-tech uppercase tracking-[0.2em] text-muted-foreground mb-2">Compare up to 3 listings by ID</div>
         <div className="flex gap-2">
           <Input
@@ -62,7 +63,7 @@ export default function Compare() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {items.map((item, idx) => (
-            <div key={idx} className="border border-border rounded-xl overflow-hidden bg-card">
+            <div key={idx} className="border border-border rounded-xl overflow-hidden bg-card auto-float" style={{ animationDelay: `${idx * 0.15}s` }}>
               {item.image_paths?.[0] ? (
                 <SafeImage src={fileUrl(item.image_paths[0])} alt={item.title} className="w-full aspect-square object-cover" />
               ) : (

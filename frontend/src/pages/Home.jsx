@@ -120,27 +120,27 @@ export default function Home() {
   return (
     <div data-testid="home-page" className="pt-14 min-h-screen">
       {/* Starry hero section */}
-      <section className="relative min-h-[60vh] bg-black">
+      <section className="relative min-h-[60vh] bg-black auto-glow-pulse">
         <StarryBackground 
           starCount={starCount} 
           variationSeed={backgroundSeed}
           className="absolute inset-0"
         />
         <div className="relative z-10 px-6 md:px-12 py-20 flex flex-col items-center justify-center min-h-[60vh] text-center">
-          <div className="text-[10px] font-tech uppercase tracking-[0.3em] text-white/60 mb-4">
+          <div className="text-[10px] font-tech uppercase tracking-[0.3em] text-white/60 mb-4 rise-in rise-in-1">
             <span>●</span> {greeting}
           </div>
-          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-light tracking-tighter leading-[0.95] max-w-3xl text-white mb-6">
+          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-light tracking-tighter leading-[0.95] max-w-3xl text-white mb-6 rise-in rise-in-2">
             {quote}
           </h1>
-          <p className="text-sm max-w-xl leading-relaxed text-white/70 mb-8">
+          <p className="text-sm max-w-xl leading-relaxed text-white/70 mb-8 rise-in rise-in-3">
             Design what you imagine, print what you create, and share it with makers everywhere.
           </p>
-          <div className="flex gap-3 flex-wrap justify-center">
+          <div className="flex gap-3 flex-wrap justify-center rise-in rise-in-4">
             <button
               data-testid="hero-design-btn"
               onClick={() => navigate("/designer")}
-              className="px-6 py-2.5 bg-white hover:bg-white/90 text-black rounded-xl font-tech text-xs uppercase tracking-wider inline-flex items-center gap-2"
+              className="px-6 py-2.5 bg-white hover:bg-white/90 text-black rounded-xl font-tech text-xs uppercase tracking-wider inline-flex items-center gap-2 auto-glow-pulse"
             >
               <Hammer className="h-3.5 w-3.5" /> Start designing
             </button>
@@ -165,7 +165,7 @@ export default function Home() {
       </section>
 
       {/* Category ribbon */}
-      <div className="border-b border-border bg-card/40">
+      <div className="border-b border-border bg-card/40 rise-in">
         <div className="px-6 md:px-12 py-3 flex items-center gap-2 overflow-x-auto">
           <button
             data-testid="ribbon-all"
@@ -204,10 +204,10 @@ export default function Home() {
       </div>
 
       {/* Featured listing + community stat */}
-      <section className="px-6 md:px-12 py-10">
+      <section className="px-6 md:px-12 py-10 auto-glow-pulse">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
           {featured ? (
-            <Link to={`/listing/${featured.listing_id}`} data-testid="featured-listing-card" className="block rounded-2xl bg-card overflow-hidden group shadow-sm hover:shadow-lg transition-shadow">
+            <Link to={`/listing/${featured.listing_id}`} data-testid="featured-listing-card" className="block rounded-2xl bg-card overflow-hidden group shadow-sm hover:shadow-lg transition-shadow auto-float">
               <div className="aspect-square bg-secondary border-b border-border overflow-hidden">
                 {featured.image_paths?.[0] ? (
                   <SafeImage src={fileUrl(featured.image_paths[0])} alt={featured.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -248,7 +248,8 @@ export default function Home() {
           <Link
             to="/designs"
             data-testid="designs-stat-card"
-            className="block rounded-2xl bg-card p-5 shadow-sm hover:shadow-lg transition-shadow group"
+            className="block rounded-2xl bg-card p-5 shadow-sm hover:shadow-lg transition-shadow group auto-float"
+            style={{ animationDelay: "0.5s" }}
           >
             <div className="flex items-center justify-between mb-2">
               <Share2 className="h-5 w-5 text-primary" strokeWidth={1.5} />
@@ -315,7 +316,7 @@ export default function Home() {
       </section>
 
       {/* Category rows */}
-      {CATEGORIES.map((c) => {
+      {CATEGORIES.map((c, idx) => {
         const items = byCategory(c.name);
         if (!items.length) return null;
         return (
@@ -324,6 +325,7 @@ export default function Home() {
             title={c.name === "Decor" ? "Top in Decor" : c.name === "Tools" ? "Useful tools, 3D-printed" : `In ${c.name}`}
             onSeeAll={() => navigate(`/browse?cat=${c.name}`)}
             testid={`section-${c.name.toLowerCase()}`}
+            idx={idx}
           >
             <ProductRow items={items} />
           </Section>
@@ -333,8 +335,8 @@ export default function Home() {
       {/* Empty state when no listings at all */}
       {!loading && listings.length === 0 && (
         <section className="px-6 md:px-12 py-12">
-          <div className="border border-dashed border-border rounded-2xl py-16 px-8 text-center max-w-2xl mx-auto">
-            <Box className="h-10 w-10 mx-auto mb-4 text-muted-foreground" strokeWidth={1.2} />
+          <div className="border border-dashed border-border rounded-2xl py-16 px-8 text-center max-w-2xl mx-auto rise-in">
+            <Box className="h-10 w-10 mx-auto mb-4 text-muted-foreground strokeWidth={1.2} auto-float" />
             <h2 className="font-display text-2xl font-medium tracking-tight mb-3">The market opens with you</h2>
             <p className="text-sm text-muted-foreground mb-6 max-w-md mx-auto">
               No one's posted a print yet. List your first item and you'll be the storefront on this page.
@@ -342,7 +344,7 @@ export default function Home() {
             <button
               onClick={() => user ? navigate("/create") : openAuth("signup")}
               data-testid="home-empty-cta"
-              className="px-6 py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl font-tech text-xs uppercase tracking-wider"
+              className="px-6 py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl font-tech text-xs uppercase tracking-wider auto-glow-pulse"
             >
               {user ? "List your first print" : "Sign up to sell"}
             </button>
@@ -353,7 +355,7 @@ export default function Home() {
       {user && (
         <section className="px-6 md:px-12 py-8">
           <div className="max-w-2xl">
-            <div className="text-[10px] font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3">Your feed</div>
+            <div className="text-[10px] font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3 rise-in">Your feed</div>
             <ActivityFeed />
           </div>
         </section>
@@ -377,10 +379,11 @@ export default function Home() {
   );
 }
 
-function Section({ title, onSeeAll, children, testid }) {
+function Section({ title, onSeeAll, children, testid, idx = 0 }) {
+  const delayClass = `rise-in-${Math.min((idx % 4) + 1, 4)}`;
   return (
     <section data-testid={testid} className="px-6 md:px-12 py-8">
-      <div className="flex items-end justify-between mb-4">
+      <div className={`flex items-end justify-between mb-4 rise-in ${delayClass}`}>
         <h2 className="font-display text-xl md:text-2xl font-medium tracking-tight">{title}</h2>
         <button onClick={onSeeAll} className="text-[10px] font-tech uppercase tracking-[0.2em] text-muted-foreground hover:text-primary inline-flex items-center gap-1">
           See all <ChevronRight className="h-3 w-3" />
@@ -406,7 +409,7 @@ function ProductCard({ item }) {
     <Link
       to={`/listing/${item.listing_id}`}
       data-testid={`home-card-${item.listing_id}`}
-      className="snap-start shrink-0 w-44 group block rounded-2xl bg-card shadow-sm hover:shadow-lg transition-shadow"
+      className="snap-start shrink-0 w-44 group block rounded-2xl bg-card shadow-sm hover:shadow-lg transition-shadow auto-float"
     >
       <div className="aspect-square bg-secondary overflow-hidden relative rounded-t-2xl">
         {item.image_paths?.[0] ? (
@@ -466,7 +469,7 @@ function Tile({ kicker, title, body, cta, onClick, icon, accent = "bg-primary/10
     <button
       onClick={onClick}
       data-testid={testid}
-      className="text-left rounded-2xl bg-card p-5 shadow-sm hover:shadow-lg transition-shadow group"
+      className="text-left rounded-2xl bg-card p-5 shadow-sm hover:shadow-lg transition-shadow group auto-float"
     >
       <div className={`inline-flex items-center justify-center h-10 w-10 rounded-xl mb-3 ${accent}`}>{icon}</div>
       <div className="text-[9px] font-tech uppercase tracking-[0.2em] text-muted-foreground mb-1">{kicker}</div>

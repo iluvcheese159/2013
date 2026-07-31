@@ -57,8 +57,8 @@ export default function Collections() {
     }
   };
 
-  const Card = ({ col, showOwner = false }) => (
-    <div key={col.collection_id} className="border border-border rounded-2xl p-5 bg-card hover:border-primary/50 transition-colors">
+  const Card = ({ col, showOwner = false, index = 0 }) => (
+    <div key={col.collection_id} className="border border-border rounded-2xl p-5 bg-card hover:border-primary/50 transition-colors auto-float" style={{ animationDelay: `${0.12 * (index % 8)}s` }}>
       <div className="flex items-start justify-between gap-3 mb-2">
         <div>
           <h3 className="font-display text-lg font-medium leading-tight">{col.name}</h3>
@@ -91,16 +91,16 @@ export default function Collections() {
       <div className="border-b border-border px-6 md:px-12 lg:px-24 py-10">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
-            <div className="text-[10px] font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3">
+            <div className="text-[10px] font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3 rise-in">
               <span className="text-primary">●</span> Collections
             </div>
-            <h1 className="font-display text-4xl sm:text-5xl font-light tracking-tighter">Curated picks.</h1>
-            <p className="text-sm text-muted-foreground mt-3 max-w-xl">
+            <h1 className="font-display text-4xl sm:text-5xl font-light tracking-tighter rise-in rise-in-1">Curated picks.</h1>
+            <p className="text-sm text-muted-foreground mt-3 max-w-xl rise-in rise-in-2">
               Create public collections of listings you love. Follow other makers’ collections for inspiration.
             </p>
           </div>
           {user && (
-            <Button onClick={() => setCreateOpen(true)} className="rounded-xl font-tech text-xs uppercase tracking-wider">
+            <Button onClick={() => setCreateOpen(true)} className="rounded-xl font-tech text-xs uppercase tracking-wider rise-in rise-in-3 auto-glow-pulse">
               <Plus className="h-3.5 w-3.5 mr-2" /> New collection
             </Button>
           )}
@@ -110,32 +110,32 @@ export default function Collections() {
       <div className="px-6 md:px-12 lg:px-24 py-10 space-y-10">
         {user && (
           <section>
-            <h2 className="font-display text-xl font-medium mb-4">Your collections</h2>
+            <h2 className="font-display text-xl font-medium mb-4 rise-in">Your collections</h2>
             {myCollections.length === 0 ? (
-              <div className="border border-dashed border-border rounded-2xl py-16 text-center">
+              <div className="border border-dashed border-border rounded-2xl py-16 text-center ambient-drift">
                 <FolderOpen className="h-10 w-10 mx-auto mb-4 text-muted-foreground" strokeWidth={1.5} />
                 <h3 className="font-display text-2xl font-light mb-2">No collections yet</h3>
                 <p className="text-sm text-muted-foreground">Create your first collection and start curating.</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {myCollections.map((c) => Card({ col: c, showOwner: false }))}
+                {myCollections.map((c, i) => Card({ col: c, showOwner: false, index: i }))}
               </div>
             )}
           </section>
         )}
 
         <section>
-          <h2 className="font-display text-xl font-medium mb-4">Discover collections</h2>
+          <h2 className="font-display text-xl font-medium mb-4 rise-in rise-in-1">Discover collections</h2>
           {publicCollections.length === 0 ? (
-            <div className="border border-dashed border-border rounded-2xl py-16 text-center">
+            <div className="border border-dashed border-border rounded-2xl py-16 text-center ambient-drift">
               <Users className="h-10 w-10 mx-auto mb-4 text-muted-foreground" strokeWidth={1.5} />
               <h3 className="font-display text-2xl font-light mb-2">No public collections yet</h3>
               <p className="text-sm text-muted-foreground">Be the first to share a curated list.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {publicCollections.map((c) => Card({ col: c, showOwner: true }))}
+              {publicCollections.map((c, i) => Card({ col: c, showOwner: true, index: i }))}
             </div>
           )}
         </section>

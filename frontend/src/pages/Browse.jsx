@@ -194,9 +194,9 @@ function computeSolarPhase(skyMode, userCoords) {
 /**
  * Tree silhouettes at the bottom of the night sky (matching intro aesthetic).
  */
-function TreeSilhouettes() {
-  return (
-    <div className="fixed bottom-0 left-0 right-0 pointer-events-none z-10" style={{ height: "120px" }}>
+  function TreeSilhouettes() {
+    return (
+      <div className="fixed bottom-0 left-0 right-0 pointer-events-none z-10 ambient-drift" style={{ height: "120px" }}>
       <svg viewBox="0 0 100 120" preserveAspectRatio="xMidYMax meet" className="w-full h-full" opacity="0.5">
         {TREE_SILHOUETTES.map((tree, i) => (
           <g key={i} transform={`translate(${tree.x}, 0) scale(${tree.scale})`}>
@@ -462,7 +462,7 @@ function useBobFirstVisit() {
 /**
  * Hook to manage starfield panning and zooming.
  */
-function useStarfieldControls(pageRef) {
+function useStarfieldControls(pageRef, onUserInteractionRef = { current: () => {} }) {
   const [starOffset, setStarOffset] = useState({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(0);
@@ -479,9 +479,9 @@ function useStarfieldControls(pageRef) {
       const delta = e.deltaY > 0 ? -0.3 : 0.3;
       zoomRef.current = Math.max(0, Math.min(3, zoomRef.current + delta));
       setZoomLevel(zoomRef.current);
-      markUserInteraction();
+      onUserInteractionRef.current();
     }
-  }, [pageRef, markUserInteraction]);
+  }, [pageRef, onUserInteractionRef]);
 
   const onStarfieldPointerDown = useCallback((e) => {
     if (e.target.closest("a, button, input")) return;
@@ -493,9 +493,9 @@ function useStarfieldControls(pageRef) {
       pointerId: e.pointerId,
     };
     setIsPanning(true);
-    markUserInteraction();
+    onUserInteractionRef.current();
     try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* ignore */ }
-  }, [starOffset, markUserInteraction]);
+  }, [starOffset, onUserInteractionRef]);
 
   const onStarfieldPointerMove = useCallback((e) => {
     if (!panRef.current) return;
@@ -515,8 +515,8 @@ function useStarfieldControls(pageRef) {
     setIsPanning(false);
   }, []);
 
-  return {
-    starOffset, zoomLevel, isPanning,
+return {
+    starOffset, zoomLevel, isPanning, setZoomLevel, setStarOffset,
     onWheel, onStarfieldPointerDown, onStarfieldPointerMove, onStarfieldPointerUp,
   };
 }
@@ -605,13 +605,21 @@ export default function Browse() {
   const { userCountry, userCoords } = useUserLocation();
   const { skyMode, saveSkyMode, isDay, solarPhase, spaceView, setSpaceView } = useSkyMode(userCoords);
   const { bobState, showSpeechBubble } = useBobFirstVisit();
+
+  // Create a stable ref to wire user-interaction tracking between hooks
+  const markUserInteractionRef = useRef(() => {});
+
+  // Starfield controls — manage pan/zoom state (runs first to provide state)
   const {
     starOffset, zoomLevel, isPanning,
     onWheel, onStarfieldPointerDown, onStarfieldPointerMove, onStarfieldPointerUp,
-  } = useStarfieldControls(pageRef);
+  } = useStarfieldControls(pageRef, markUserInteractionRef);
 
-  // Ambient auto-interactions — the page breathes and drifts on its own
+  // Ambient auto-interactions — the page breathes and drifts on its own (uses starOffset/zoomLevel from above)
   const { markUserInteraction } = useAmbientInteractions(starOffset, setStarOffset, zoomLevel, setZoomLevel);
+
+  // Wire the real markUserInteraction into the ref so starfield controls call the latest version
+  markUserInteractionRef.current = markUserInteraction;
 
   // --- Derived Data ---
   const listingPositions = useMemo(() => generateListingPositions(500, starSeed), [starSeed]);
@@ -711,21 +719,21 @@ export default function Browse() {
   // --- Render Content Section ---
   const renderContentSection = () => {
     if (!loading && items.length === 0) {
-      return (
-        <div className="relative z-10 px-6 md:px-12 lg:px-24 py-32 pointer-events-auto">
-          <EmptyState cat={cat} />
-        </div>
-      );
-    }
     return (
+      <div className="relative z-10 px-6 md:px-12 lg:px-24 py-32 pointer-events-auto">
+        <EmptyState cat={cat} />
+      </div>
+    );
+  }
+  return (
       <div className="relative z-10 px-6 md:px-12 lg:px-24 py-32 pointer-events-none">
-        <div className="text-xs font-tech uppercase tracking-[0.3em] text-white/60 mb-3">
+        <div className="text-xs font-tech uppercase tracking-[0.3em] text-white/60 mb-3 rise-in rise-in-1">
           <span className="text-white">\u2022</span> {contentMeta}
         </div>
-        <h1 className={"font-display text-4xl sm:text-5xl font-light tracking-tighter mb-6 text-white" + (loading ? " animate-pulse" : "")}>
+        <h1 className={"font-display text-4xl sm:text-5xl font-light tracking-tighter mb-6 text-white rise-in rise-in-2" + (loading ? " animate-pulse" : "")}>
           {contentTitle}
         </h1>
-        <p className={(loading ? "text-white/50" : "text-white/70") + " text-sm max-w-xl"}>
+        <p className={(loading ? "text-white/50" : "text-white/70") + " text-sm max-w-xl rise-in rise-in-3"}>
           {contentDesc}
         </p>
       </div>
@@ -833,7 +841,7 @@ export default function Browse() {
 
       {/* ----- SEARCH BAR (Fixed top, no-zoom) ----- */}
       <div data-nozoom className="fixed top-16 left-0 right-0 z-50 px-6 md:px-12 lg:px-24 py-4">
-        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row gap-4 items-stretch sm:items-center bg-black/40 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row gap-4 items-stretch sm:items-center bg-black/40 backdrop-blur-md rounded-2xl p-4 border border-white/10 auto-float">
           {/* Search Input */}
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/60" />
@@ -856,7 +864,7 @@ export default function Browse() {
                 className={
                   "px-3 py-1.5 text-[10px] font-tech uppercase tracking-[0.2em] border rounded-full transition-colors " +
                   (cat === c
-                    ? "border-white/60 text-white bg-white/10"
+                    ? "border-white/60 text-white bg-white/10 auto-glow-pulse"
                     : "border-white/20 text-white/60 hover:text-white hover:border-white/40")
                 }
               >
@@ -882,7 +890,7 @@ export default function Browse() {
                 className={
                   "px-3 py-1.5 text-[10px] font-tech uppercase tracking-[0.2em] border rounded-full transition-colors " +
                   (printTimeFilter === opt.value
-                    ? "border-white/60 text-white bg-white/10"
+                    ? "border-white/60 text-white bg-white/10 auto-glow-pulse"
                     : "border-white/20 text-white/60 hover:text-white hover:border-white/40")
                 }
               >

@@ -1,35 +1,57 @@
-# Implementation Plan - COMPLETED
+# Interactive Animations - Progress Tracker
 
-## Issues Fixed
+## Phase 1: Browse.jsx ✅
+- [ ] Add `rise-in` to content title, metadata, description
+- [ ] Add `auto-float` to search bar container
+- [ ] Add `auto-glow-pulse` to active category buttons
+- [ ] Add `ambient-drift` to tree silhouettes
+- [ ] Add `fade-in-up` staggered to content section elements
 
-### 1. Remove Apple Sign-in ✅
-- Removed Apple button JSX from `AuthModal.jsx`
-- Removed `appleNotice` function
-- Removed `AppleIcon` component
+## Phase 2: Home.jsx
+- [ ] Add `rise-in` to hero section h1, sub-text, CTAs (staggered)
+- [ ] Add `auto-float` to featured listing card and stat card
+- [ ] Add `ambient-drift` to category ribbon and discovery tiles
+- [ ] Add `fade-in-up` animations to sections
 
-### 2. Fix Browse.jsx Crash (`TypeError: n is not a function`) ✅
-- Fixed `Snow-coveredEvergreen` → `SnowCoveredEvergreen` in `DaytimeScene.jsx` (3 occurrences)
-- The hyphenated JSX was being parsed as a subtraction expression, causing `Snow` to be undefined
+## Phase 3: Forums.jsx
+- [ ] Add `rise-in` to heading, description, section buttons
+- [ ] Add `auto-float` to forum post cards
+- [ ] Add `auto-glow-pulse` to active mission-control-glow cards
+- [ ] Add `fade-in-up` staggered to post list
 
-### 3. Fix Star Instability (disappearing/reappearing) ✅
-- Removed `transform: scale()` from star field container in `Browse.jsx` (caused position shifts)
-- Rewrote `ListingStar.jsx` to render both dot and card layers simultaneously with smooth opacity transitions instead of hard conditional rendering
-- Added `transition-opacity duration-500` for smooth fade between dot and card states
+## Phase 4: Profile.jsx
+- [ ] Add `rise-in` to profile heading, avatar, tabs
+- [ ] Add `auto-float` to listing grid, collections grid, badges grid
+- [ ] Add `ambient-drift` to profile detail sections
+- [ ] Add `fade-in-up` to form fields
 
-### 4. Fix Intro/Bob Not Showing ✅
-- Rewrote `HomeOrIntro` in `App.js` to use proper `useState`/`useEffect` pattern
-- Added loading state to prevent flash of wrong content
-- Fixed duplicate `useEffect` import
+## Phase 5: Cart.jsx
+- [ ] Add `rise-in` to heading
+- [ ] Add `auto-float` to cart items
+- [ ] Add `ambient-drift` to checkout summary cards
 
-### 5. Fix Design Function Instability ✅
-- Star zoom/click interaction now uses smooth opacity transitions instead of hard toggles
-- Both dot and card layers are always rendered, just faded in/out
-- Removed scale transform that was causing position shifts during zoom
+## Phase 6: Dashboard.jsx
+- [ ] Add `rise-in` to dashboard heading and stat boxes
+- [ ] Add `auto-float` to stat boxes grid
+- [ ] Add `fade-in-up` to listing cards
+- [ ] Add `auto-glow-pulse` to CTAs
 
-### 6. Ambient Auto-Interactions (NEW) ✅
-- **Auto-zoom breathing**: Stars slowly zoom in/out on their own (~12s cycle)
-- **Auto-pan drift**: Starfield gently drifts in a circular motion (~30s cycle)
-- **Auto-star pulses**: Each star gets a periodic glow boost every 8-16 seconds
-- **Smart pause**: Auto-effects pause for 3 seconds when user interacts (scroll, pan, click)
-- **File**: `frontend/src/pages/Browse.jsx` — Added `useAmbientInteractions` hook
-- **File**: `frontend/src/components/ListingStar.jsx` — Added `ambientPulse` state with staggered timing per star
+## Phase 7: ListingDetail.jsx
+- [ ] Add `rise-in` to listing title, metadata, price section
+- [ ] Add `auto-float` to image gallery, tabs
+- [ ] Add `ambient-drift` to comments/recipes sections
+- [ ] Add `fade-in-up` to tab content panels
+
+## Phase 8: Designs.jsx, Collections.jsx, Boards.jsx, Wishlists.jsx
+- [ ] Add `rise-in` to headings
+- [ ] Add `auto-float` to grid containers
+- [ ] Add `ambient-drift` to empty states
+- [ ] Add `fade-in-up` to card items
+
+## Phase 9: Messages.jsx, Inspiration.jsx, Pro.jsx
+- [ ] Add `rise-in` to headings
+- [ ] Add `auto-float` to message threads, club cards, perk cards
+- [ ] Add `ambient-drift` to sidebar elements
+
+## Phase 10: Additional pages (PrintFailure.jsx, Compare.jsx, etc.)
+- [ ] Read and apply similar animation patterns
