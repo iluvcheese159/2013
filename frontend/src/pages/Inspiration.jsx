@@ -117,11 +117,11 @@ export default function Inspiration() {
       </div>
 
       <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10">
-        <div className="max-w-xl">
+        <div className="max-w-xl rise-in">
           <div className="text-[10px] font-tech uppercase tracking-[0.3em] text-white/60 mb-2">
             {isListing ? "Listing" : "Open Design"} · {subtitle}
           </div>
-          <h2 className="font-display text-3xl md:text-5xl font-light tracking-tighter leading-[0.95] mb-4">{title}</h2>
+          <h2 className="font-display text-3xl md:text-5xl font-light tracking-tighter leading-[0.95] mb-4 auto-glow-pulse">{title}</h2>
           <div className="flex items-center gap-3">
             <Button onClick={toggleFavorite} variant="outline" className={`rounded-xl font-tech text-xs uppercase tracking-wider border-white/20 ${favorites[key] ? "bg-white text-black border-white" : "text-white hover:bg-white/10"}`}>
               <Heart className={`h-4 w-4 mr-2 ${favorites[key] ? "fill-current" : ""}`} /> {favorites[key] ? "Saved" : "Save"}

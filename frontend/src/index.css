@@ -262,6 +262,151 @@
     100% { transform: translateX(0) translateY(0); }
 }
 
+/* ── Meteor / Shooting Stars ── */
+@keyframes meteor-shower {
+    0%   { transform: translateX(-10vw) translateY(-10vh) rotate(35deg); opacity: 0; }
+    5%   { opacity: 0.8; }
+    15%  { opacity: 0.8; }
+    25%  { opacity: 0; }
+    100% { transform: translateX(110vw) translateY(110vh) rotate(35deg); opacity: 0; }
+}
+
+@keyframes meteor-tail {
+    0%   { width: 0; opacity: 0; }
+    5%   { width: 120px; opacity: 0.7; }
+    15%  { width: 120px; opacity: 0.3; }
+    25%  { width: 0; opacity: 0; }
+    100% { width: 0; opacity: 0; }
+}
+
+/* ── Mouse Parallax ── */
+@keyframes parallax-subtle {
+    0%   { transform: translate(0, 0); }
+    25%  { transform: translate(2px, -3px); }
+    50%  { transform: translate(-3px, 2px); }
+    75%  { transform: translate(1px, -1px); }
+    100% { transform: translate(0, 0); }
+}
+
+/* ── Ken Burns slow zoom for hero images ── */
+@keyframes ken-burns {
+    0%   { transform: scale(1) translate(0, 0); }
+    50%  { transform: scale(1.05) translate(-1%, -1%); }
+    100% { transform: scale(1) translate(0, 0); }
+}
+
+/* ── Page breathing — subtle scale oscillation ── */
+@keyframes page-breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.003); }
+}
+
+/* ── Highlight cycle (travels through stars/cards) ── */
+@keyframes highlight-cycle {
+    0%   { box-shadow: 0 0 0 0 rgba(255, 87, 34, 0); }
+    10%  { box-shadow: 0 0 12px 4px rgba(255, 87, 34, 0.3); }
+    20%  { box-shadow: 0 0 0 0 rgba(255, 87, 34, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 87, 34, 0); }
+}
+
+/* ── Scroll hint bounce ── */
+@keyframes scroll-hint-bounce {
+    0%, 100% { transform: translateY(0); opacity: 0.6; }
+    50% { transform: translateY(-8px); opacity: 1; }
+}
+
+/* ── Skeleton shimmer for loading states ── */
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+/* ── AmbientFX Toolkit ── */
+/* FloatingParticles: slow upward drift with a slight sway */
+@keyframes floating-particle {
+    0%   { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
+    15%  { opacity: var(--p-opacity, 0.4); }
+    50%  { transform: translateY(-45vh) translateX(8px) scale(1.05); }
+    85%  { opacity: var(--p-opacity, 0.4); }
+    100% { transform: translateY(-90vh) translateX(-6px) scale(0.9); opacity: 0; }
+}
+.floating-particle {
+    animation: floating-particle 12s linear infinite;
+}
+
+/* SparkleField: click burst particles fly outward and fade */
+@keyframes sparkle-burst {
+    0%   { transform: translate(0, 0) scale(1); opacity: 1; }
+    100% { transform: translate(var(--dx), var(--dy)) scale(0.2); opacity: 0; }
+}
+.sparkle-burst {
+    animation: sparkle-burst 0.6s ease-out forwards;
+}
+
+/* ShimmerBorder: rotating conic gradient edge highlight */
+@keyframes shimmer-border-rotate {
+    0%   { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+.shimmer-border {
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(
+        from 0deg,
+        transparent 0%,
+        rgba(0, 229, 255, 0.6) 12%,
+        transparent 24%,
+        transparent 50%,
+        rgba(255, 87, 34, 0.5) 62%,
+        transparent 76%
+    );
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: shimmer-border-rotate 4s linear infinite;
+    pointer-events: none;
+}
+
+/* Typewriter caret blink */
+@keyframes typewriter-caret-blink {
+    0%, 49% { opacity: 1; }
+    50%, 100% { opacity: 0; }
+}
+.typewriter-caret {
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    margin-left: 2px;
+    vertical-align: -0.15em;
+    background: currentColor;
+    animation: typewriter-caret-blink 0.9s step-end infinite;
+}
+
+/* Aurora / nebula drift for the Browse night sky */
+@keyframes aurora-drift {
+    0%   { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); opacity: 0.5; }
+    33%  { transform: translate3d(-30px, -10px, 0) rotate(2deg) scale(1.05); opacity: 0.8; }
+    66%  { transform: translate3d(24px, 14px, 0) rotate(-2deg) scale(1.1); opacity: 0.6; }
+    100% { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); opacity: 0.5; }
+}
+.aurora-layer {
+    animation: aurora-drift 22s ease-in-out infinite;
+}
+
+/* Bob idle wander (browse) — gentle side-to-side sway */
+@keyframes bob-idle-wander {
+    0%   { transform: translateX(0) rotate(-2deg); }
+    25%  { transform: translateX(8px) rotate(2deg); }
+    50%  { transform: translateX(0) rotate(-1deg); }
+    75%  { transform: translateX(-8px) rotate(2deg); }
+    100% { transform: translateX(0) rotate(-2deg); }
+}
+.bob-idle-wander {
+    animation: bob-idle-wander 6s ease-in-out infinite;
+}
+
 /* Ambient auto-animation classes */
 .ambient-drift {
     animation: ambient-drift 8s ease-in-out infinite;
@@ -274,6 +419,34 @@
 }
 .auto-highlight {
     animation: auto-highlight 5s ease-in-out infinite;
+}
+
+/* New ambient utility classes */
+.ambient-meteor {
+    animation: meteor-shower 6s ease-in infinite;
+}
+.ambient-meteor-tail {
+    animation: meteor-tail 6s ease-in infinite;
+}
+.ambient-parallax {
+    animation: parallax-subtle 12s ease-in-out infinite;
+}
+.ambient-ken-burns {
+    animation: ken-burns 20s ease-in-out infinite;
+}
+.ambient-page-breathe {
+    animation: page-breathe 8s ease-in-out infinite;
+}
+.ambient-highlight-cycle {
+    animation: highlight-cycle 8s ease-in-out infinite;
+}
+.ambient-scroll-hint {
+    animation: scroll-hint-bounce 2s ease-in-out infinite;
+}
+.ambient-shimmer {
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.05) 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmer 3s ease-in-out infinite;
 }
 
 /* Mission Control CRT Glow Effect */
@@ -301,4 +474,78 @@
     );
     z-index: -1;
     pointer-events: none;
+}
+
+/* ── AmbientFX micro-interaction support ── */
+@keyframes sparkle-burst {
+    0% { transform: translate(0, 0) scale(0.4); opacity: 1; }
+    100% { transform: translate(var(--dx, 0), var(--dy, 0)) scale(1.2); opacity: 0; }
+}
+.sparkle-burst {
+    animation-name: sparkle-burst;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    animation-fill-mode: forwards;
+    pointer-events: none;
+}
+
+@keyframes floating-particle-rise {
+    0% { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
+    10% { opacity: var(--particle-opacity, 0.4); }
+    60% { transform: translateY(-60vh) translateX(14px) scale(0.9); }
+    100% { transform: translateY(-105vh) translateX(-8px) scale(0.7); opacity: 0; }
+}
+.floating-particle {
+    animation-name: floating-particle-rise;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    will-change: transform, opacity;
+}
+
+@keyframes shimmer-slide {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+.shimmer-border {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(
+        110deg,
+        transparent 30%,
+        rgba(0, 229, 255, 0.35) 45%,
+        rgba(255, 87, 34, 0.35) 55%,
+        transparent 70%
+    );
+    background-size: 200% 100%;
+    animation: shimmer-slide 3.2s linear infinite;
+    mix-blend-mode: screen;
+}
+
+@keyframes typewriter-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+.typewriter-caret {
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    background: currentColor;
+    margin-left: 2px;
+    vertical-align: -0.15em;
+    animation: typewriter-blink 0.8s step-end infinite;
+}
+
+/* Reduce motion safety */
+@media (prefers-reduced-motion: reduce) {
+    .sparkle-burst,
+    .floating-particle,
+    .shimmer-border,
+    .typewriter-caret,
+    .auto-float,
+    .auto-glow-pulse,
+    .auto-highlight,
+    .ambient-drift {
+        animation: none !important;
+    }
 }

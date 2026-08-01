@@ -6,6 +6,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import SafeImage from "@/components/SafeImage";
 import { Package, ExternalLink, Truck, ShoppingBag, Clock, ChevronRight, MapPin, Loader2 } from "lucide-react";
+import { RevealOnScroll, TiltCard, FloatingParticles } from "@/components/AmbientFX";
+import { useSparkleField } from "@/hooks/useAmbientLife";
 
 const TRACK_URLS = {
   USPS: (num) => `https://tools.usps.com/go/TrackConfirmAction?tLabels=${num}`,
@@ -115,6 +117,7 @@ function LiveTracking({ li, transactionId }) {
 
 export default function Purchases() {
   const { user, openAuth } = useAuth();
+  const sparkles = useSparkleField();
   const [purchases, setPurchases] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -135,21 +138,23 @@ export default function Purchases() {
     );
   }
 
-  return (
+return (
     <div data-testid="purchases-page" className="pt-14 min-h-screen">
+      {sparkles.layer}
+      <FloatingParticles count={6} color="rgba(52,211,153,0.2)" className="fixed inset-0" />
       <div className="border-b border-border px-6 md:px-12 lg:px-24 py-10">
-        <div className="text-xs font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3">
+        <div className="text-xs font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3 rise-in">
           <span className="text-primary">●</span> Your Orders
         </div>
-        <h1 className="font-display text-4xl sm:text-5xl font-light tracking-tighter">Order History</h1>
-        <p className="text-sm text-muted-foreground mt-3 max-w-xl">All your purchases from Print Cosmos makers.</p>
+        <h1 className="font-display text-4xl sm:text-5xl font-light tracking-tighter rise-in rise-in-1">Order History</h1>
+        <p className="text-sm text-muted-foreground mt-3 max-w-xl rise-in rise-in-2">All your purchases from Print Cosmos makers.</p>
       </div>
 
       <div className="px-6 md:px-12 lg:px-24 py-10">
         {loading ? (
           <div className="text-sm font-tech text-muted-foreground animate-pulse">Loading orders…</div>
         ) : purchases.length === 0 ? (
-          <div className="border border-dashed border-border rounded-2xl py-20 text-center">
+          <div className="border border-dashed border-border rounded-2xl py-20 text-center ambient-drift">
             <Package className="h-12 w-12 mx-auto mb-4 text-muted-foreground" strokeWidth={1.5} />
             <h3 className="font-display text-2xl font-light mb-2">No orders yet</h3>
             <p className="text-sm text-muted-foreground mb-6">Browse the marketplace and support a maker today.</p>
@@ -162,7 +167,9 @@ export default function Purchases() {
         ) : (
           <div className="space-y-6">
             {purchases.map((p) => (
-              <div key={p.transaction_id} data-testid={`order-card-${p.transaction_id}`} className="border border-border rounded-2xl overflow-hidden bg-card">
+              <RevealOnScroll key={p.transaction_id} className="rise-in">
+              <TiltCard maxTilt={3} glare={false}>
+              <div data-testid={`order-card-${p.transaction_id}`} className="border border-border rounded-2xl overflow-hidden bg-card auto-float">
                 <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-border bg-secondary/30">
                   <div className="flex items-center gap-3">
                     <div>
@@ -242,7 +249,9 @@ export default function Purchases() {
                     </div>
                   ))}
                 </div>
-              </div>
+</div>
+              </TiltCard>
+              </RevealOnScroll>
             ))}
           </div>
         )}

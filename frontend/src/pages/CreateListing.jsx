@@ -242,10 +242,10 @@ export default function CreateListing() {
   return (
     <div data-testid="create-listing-page" className="pt-14 min-h-screen">
       <div className="border-b border-border px-6 md:px-12 lg:px-24 py-10">
-        <div className="text-[12px] font-tech uppercase tracking-[0.28em] text-muted-foreground mb-3">
+        <div className="text-[12px] font-tech uppercase tracking-[0.28em] text-muted-foreground mb-3 rise-in">
           <span className="text-accent">•</span> NEW LISTING
         </div>
-        <h1 className="font-display text-4xl sm:text-5xl font-medium tracking-tighter">
+        <h1 className="font-display text-4xl sm:text-5xl font-medium tracking-tighter rise-in rise-in-1">
           Ship your print.
         </h1>
       </div>
@@ -500,7 +500,7 @@ export default function CreateListing() {
         </div>
 
         <aside className="space-y-6">
-          <div className="border border-border rounded-xl p-6 sticky top-24">
+          <div className="border border-border rounded-xl p-6 sticky top-24 auto-float">
             <div className="text-[10px] font-tech uppercase tracking-[0.2em] text-muted-foreground mb-2">EARNINGS PREVIEW</div>
             <div className="font-display text-5xl font-bold tracking-tighter text-primary drop-shadow-[0_0_12px_rgba(164,99,255,0.45)] mb-4">
               ${commission.sellerPayout.toFixed(2)}

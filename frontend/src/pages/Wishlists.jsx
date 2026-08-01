@@ -7,9 +7,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Box, Plus, Hammer, Eye } from "lucide-react";
 import { toast } from "sonner";
+import { RevealOnScroll, TiltCard, FloatingParticles } from "@/components/AmbientFX";
+import { useSparkleField } from "@/hooks/useAmbientLife";
 
 export default function Wishlists() {
   const { user, openAuth } = useAuth();
+  const sparkles = useSparkleField();
   const [wishlists, setWishlists] = useState([]);
   const [publicWishlists, setPublicWishlists] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -63,6 +66,8 @@ export default function Wishlists() {
 
   return (
     <div data-testid="wishlists-page" className="pt-14 min-h-screen">
+      {sparkles.layer}
+      <FloatingParticles count={6} color="rgba(167,139,250,0.25)" className="fixed inset-0" />
       <div className="border-b border-border px-6 md:px-12 lg:px-24 py-10">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>

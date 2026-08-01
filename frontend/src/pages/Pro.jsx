@@ -102,17 +102,17 @@ export default function Pro() {
   return (
     <div data-testid="pro-page" className="pt-20 min-h-screen">
       <div className="px-6 md:px-12 py-16 max-w-5xl">
-        <div className="text-[10px] font-tech uppercase tracking-[0.3em] text-accent mb-3">
+        <div className="text-[10px] font-tech uppercase tracking-[0.3em] text-accent mb-3 rise-in">
           <span>●</span> Membership
         </div>
-        <h1 className="font-display text-5xl sm:text-7xl font-light tracking-tighter mb-6">
+        <h1 className="font-display text-5xl sm:text-7xl font-light tracking-tighter mb-6 rise-in rise-in-1">
           Print Cosmos <span className="text-accent font-medium">Hyperspace</span>
         </h1>
-        <p className="text-base text-muted-foreground max-w-xl leading-relaxed mb-4">
+        <p className="text-base text-muted-foreground max-w-xl leading-relaxed mb-4 rise-in rise-in-2">
           Drop your platform fee to 2%, get a Print Cosmos badge across the platform, and unlock the Hyperspace
           toolkit. One-time payment of <span className="text-foreground font-tech">${proPrice.toFixed(2)}</span>.
         </p>
-        <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+        <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground rise-in rise-in-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent/10 border border-accent/20 text-accent font-bold">
             PH
           </div>
@@ -124,7 +124,7 @@ export default function Pro() {
           </div>
         </div>
 
-        <div className="grid sm:grid-cols-2 gap-4 mb-12">
+        <div className="grid sm:grid-cols-2 gap-4 mb-12 auto-float">
           {PERKS.map((p) => (
             <div key={p.title} className="border border-border rounded-xl p-6 flex gap-4">
               <div className="h-10 w-10 border border-accent/30 bg-accent/5 text-accent rounded-xl flex items-center justify-center shrink-0">
@@ -148,7 +148,7 @@ export default function Pro() {
             onClick={upgrade}
             disabled={busy}
             size="lg"
-            className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-xl font-tech text-xs uppercase tracking-wider"
+            className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-xl font-tech text-xs uppercase tracking-wider auto-glow-pulse"
           >
             <Sparkles className="h-4 w-4 mr-2" />
             {busy ? "Redirecting…" : verifyStatus === "polling" ? "Verifying payment…" : `Upgrade — $${proPrice.toFixed(2)}`}

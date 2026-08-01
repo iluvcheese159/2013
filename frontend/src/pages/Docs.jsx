@@ -40,8 +40,8 @@ function OverviewPanel() {
         For platform owners and administrators, there are advanced tools for managing users, processing refunds, issuing warnings, and reviewing audit logs. Each area of the platform is documented thoroughly so you can understand the workflows, available actions, and best practices for maintaining a healthy community marketplace.
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
-        {sections.map((s) => (
-          <div key={s.id} className="border border-border rounded-xl bg-card p-4 hover:bg-secondary/30 transition-colors">
+        {sections.map((s, i) => (
+          <div key={s.id} className="border border-border rounded-xl bg-card p-4 hover:bg-secondary/30 transition-colors auto-float" style={{ animationDelay: `${Math.min(i * 0.08, 0.5)}s` }}>
             <div className="flex items-center gap-2 mb-2">
               <s.icon className="h-4 w-4 text-accent" />
               <span className="text-sm font-medium">{s.label}</span>
@@ -120,10 +120,10 @@ export default function Docs() {
 
   return (
     <div className="pt-14 min-h-screen px-6 md:px-12 lg:px-24 pb-20" data-testid="docs-page">
-      <div className="text-xs font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3">Documentation</div>
-      <h1 className="font-display text-4xl font-light mb-10">Print Cosmos Docs</h1>
+      <div className="text-xs font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3 rise-in">Documentation</div>
+      <h1 className="font-display text-4xl font-light mb-10 rise-in rise-in-1">Print Cosmos Docs</h1>
       <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
-        <nav className="space-y-1">
+        <nav className="space-y-1 rise-in rise-in-2">
           {sections.map((s) => (
             <SectionLink key={s.id} section={s} onClick={setActiveSection} isActive={activeSection === s.id} />
           ))}

@@ -36,11 +36,11 @@ export default function SellerOrders() {
 
   return (
     <div className="pt-14 min-h-screen px-6 md:px-12 lg:px-24">
-      <div className="text-xs font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3">Orders</div>
-      <h1 className="font-display text-3xl font-light mb-6">Seller Orders</h1>
+      <div className="text-xs font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3 rise-in">Orders</div>
+      <h1 className="font-display text-3xl font-light mb-6 rise-in rise-in-1">Seller Orders</h1>
 
       {orders.length === 0 ? (
-        <div className="border border-dashed border-border rounded-xl py-16 text-center">
+        <div className="border border-dashed border-border rounded-xl py-16 text-center ambient-drift">
           <p className="text-sm text-muted-foreground mb-4">No orders yet.</p>
         </div>
       ) : (

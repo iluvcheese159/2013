@@ -5,11 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, ShoppingCart, MessageSquare } from "lucide-react";
 import SafeImage from "@/components/SafeImage";
+import { RevealOnScroll, TiltCard, FloatingParticles } from "@/components/AmbientFX";
+import { useSparkleField } from "@/hooks/useAmbientLife";
 
 const EMPTY = { title: "", category: "", print_time: "", price: "", listing_type: "", available_filament_colors: [], description: "", seller_name: "", image_paths: [] };
 
 export default function Compare() {
   const navigate = useNavigate();
+  const sparkles = useSparkleField();
   const [params] = useSearchParams();
   const ids = [params.get("a"), params.get("b"), params.get("c")].filter(Boolean);
   const [items, setItems] = useState([EMPTY, EMPTY, EMPTY]);
@@ -35,6 +38,8 @@ export default function Compare() {
 
   return (
     <div data-testid="compare-page" className="pt-14 min-h-screen px-6 md:px-12 lg:px-24 py-10">
+      {sparkles.layer}
+      <FloatingParticles count={6} color="rgba(255,87,34,0.2)" className="fixed inset-0" />
       <div className="flex items-center justify-between gap-4 mb-8">
         <div>
           <div className="text-[10px] font-tech uppercase tracking-[0.3em] text-muted-foreground mb-2 rise-in">Compare</div>

@@ -6,10 +6,13 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Share2, Edit3, Tag, Plus, Box, Trash2, Globe, Lock } from "lucide-react";
 import { toast } from "sonner";
+import { RevealOnScroll, TiltCard, FloatingParticles } from "@/components/AmbientFX";
+import { useSparkleField } from "@/hooks/useAmbientLife";
 
 export default function MyDesigns() {
   const { user, openAuth } = useAuth();
   const navigate = useNavigate();
+  const sparkles = useSparkleField();
   const [designs, setDesigns] = useState([]);
   const [openMenu, setOpenMenu] = useState(null);
 
@@ -57,20 +60,22 @@ export default function MyDesigns() {
     }
   };
 
-  return (
+return (
     <div data-testid="my-designs-page" className="pt-20 min-h-screen">
+      {sparkles.layer}
+      <FloatingParticles count={6} color="rgba(167,139,250,0.2)" className="fixed inset-0" />
       <div className="border-b border-border px-6 md:px-12 py-10">
         <div className="flex items-end justify-between gap-4 flex-wrap">
           <div>
-            <div className="text-[10px] font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3">
+            <div className="text-[10px] font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3 rise-in">
               <span className="text-primary">●</span> Workshop
             </div>
-            <h1 className="font-display text-4xl sm:text-5xl font-medium tracking-tighter">My designs</h1>
+            <h1 className="font-display text-4xl sm:text-5xl font-medium tracking-tighter rise-in rise-in-1">My designs</h1>
           </div>
           <Button
             data-testid="new-design-btn"
             onClick={() => navigate("/designer")}
-            className="bg-primary hover:bg-primary/90 rounded-xl font-tech text-xs uppercase tracking-wider"
+            className="bg-primary hover:bg-primary/90 rounded-xl font-tech text-xs uppercase tracking-wider rise-in rise-in-2"
           >
             <Plus className="h-4 w-4 mr-2" /> New design
           </Button>
@@ -79,7 +84,7 @@ export default function MyDesigns() {
 
       <div className="px-6 md:px-12 py-10">
         {designs.length === 0 ? (
-          <div className="border border-dashed border-border rounded-xl py-20 text-center">
+          <div className="border border-dashed border-border rounded-xl py-20 text-center ambient-drift">
             <Box className="h-8 w-8 mx-auto mb-4 text-muted-foreground" strokeWidth={1.5} />
             <p className="text-sm text-muted-foreground mb-4">Nothing built yet.</p>
             <Button onClick={() => navigate("/designer")} className="bg-primary hover:bg-primary/90 rounded-xl font-tech text-xs uppercase tracking-wider">
@@ -87,10 +92,11 @@ export default function MyDesigns() {
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 auto-float">
             {designs.map((d) => (
+              <RevealOnScroll key={d.design_id}>
+              <TiltCard maxTilt={4} glare={false}>
               <DesignCard
-                key={d.design_id}
                 d={d}
                 open={openMenu === d.design_id}
                 onToggle={() => setOpenMenu(openMenu === d.design_id ? null : d.design_id)}
@@ -99,6 +105,8 @@ export default function MyDesigns() {
                 onSell={() => navigate(`/create?design_id=${d.design_id}&title=${encodeURIComponent(d.title)}&model_path=${encodeURIComponent(d.model_path || "")}`)}
                 onDelete={() => removeDesign(d)}
               />
+              </TiltCard>
+              </RevealOnScroll>
             ))}
           </div>
         )}

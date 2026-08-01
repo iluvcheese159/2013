@@ -8,7 +8,6 @@ import SafeImage from "@/components/SafeImage";
 import ModelViewer from "@/components/ModelViewer";
 import { ArrowLeft, GitFork, Share2, Box, Lock, Loader2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -98,7 +97,7 @@ export default function DesignDetail() {
   return (
     <div data-testid="design-detail-page" className="pt-14 min-h-screen">
       {/* Back nav */}
-      <div className="px-6 md:px-12 lg:px-24 py-6 border-b border-border">
+      <div className="px-6 md:px-12 lg:px-24 py-6 border-b border-border rise-in">
         <button
           onClick={() => navigate(-1)}
           className="text-xs font-tech uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground inline-flex items-center gap-2"
@@ -109,7 +108,7 @@ export default function DesignDetail() {
 
       <div className="px-6 md:px-12 lg:px-24 py-10 grid lg:grid-cols-2 gap-10">
         {/* Media */}
-        <div>
+        <div className="rise-in rise-in-1">
           {images.length > 0 ? (
             <div className="aspect-square bg-secondary border border-border rounded-2xl overflow-hidden">
               <SafeImage
@@ -153,7 +152,7 @@ export default function DesignDetail() {
         </div>
 
         {/* Info */}
-        <div>
+        <div className="rise-in rise-in-2">
           <div className="text-[10px] font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3">
             <span className="text-primary">●</span> Open Design
           </div>
@@ -232,7 +231,7 @@ export default function DesignDetail() {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3 auto-float">
             <div className="border border-border rounded-xl p-4 text-center">
               <div className="font-display text-2xl font-light">{design.fork_count || 0}</div>
               <div className="text-[10px] font-tech uppercase tracking-wider text-muted-foreground mt-1">Forks</div>

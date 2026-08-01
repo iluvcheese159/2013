@@ -102,11 +102,11 @@ export default function DesignWorkshop() {
       <div className="border-b border-border px-6 md:px-12 py-10">
         <div className="flex items-end justify-between gap-4 flex-wrap">
           <div>
-            <div className="text-[10px] font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3">
+<div className="text-[10px] font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3 rise-in">
               <span className="text-primary">●</span> Workshop
             </div>
-            <h1 className="font-display text-4xl sm:text-5xl font-light tracking-tighter">Design</h1>
-            <p className="text-sm text-muted-foreground mt-3 max-w-xl">
+            <h1 className="font-display text-4xl sm:text-5xl font-light tracking-tighter rise-in rise-in-1">Design</h1>
+            <p className="text-sm text-muted-foreground mt-3 max-w-xl rise-in rise-in-2">
               Your projects live here. Open one to design, share, sell, or edit it.
             </p>
           </div>

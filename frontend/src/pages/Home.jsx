@@ -11,6 +11,8 @@ import UserBadges from "@/components/UserBadges";
 import SafeImage from "@/components/SafeImage";
 import StarryBackground from "@/components/StarryBackground";
 import ActivityFeed from "@/components/ActivityFeed";
+import { RevealOnScroll, TiltCard, FloatingParticles, KenBurns } from "@/components/AmbientFX";
+import { useSparkleField } from "@/hooks/useAmbientLife";
 
 const CATEGORIES = [
   { name: "Decor", icon: "✦" },
@@ -81,6 +83,9 @@ export default function Home() {
   const [quote, setQuote] = useState("");
   const firstName = user?.name?.split(" ")?.[0];
 
+  // Ambient click sparkles across the page
+  const sparkles = useSparkleField();
+
   // Generate consistent background variation for this session
   const backgroundSeed = useMemo(() => Date.now(), []);
   const starCount = useMemo(() => 150 + Math.floor(Math.random() * 100), []); // 150-250 stars
@@ -119,6 +124,9 @@ export default function Home() {
 
   return (
     <div data-testid="home-page" className="pt-14 min-h-screen">
+      {/* Sparkle click layer — whole page feels alive */}
+      {sparkles.layer}
+
       {/* Starry hero section */}
       <section className="relative min-h-[60vh] bg-black auto-glow-pulse">
         <StarryBackground 
@@ -126,6 +134,7 @@ export default function Home() {
           variationSeed={backgroundSeed}
           className="absolute inset-0"
         />
+        <FloatingParticles count={10} className="absolute inset-0" color="rgba(167,139,250,0.3)" />
         <div className="relative z-10 px-6 md:px-12 py-20 flex flex-col items-center justify-center min-h-[60vh] text-center">
           <div className="text-[10px] font-tech uppercase tracking-[0.3em] text-white/60 mb-4 rise-in rise-in-1">
             <span>●</span> {greeting}
@@ -203,65 +212,71 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Featured listing + community stat */}
-      <section className="px-6 md:px-12 py-10 auto-glow-pulse">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
-          {featured ? (
-            <Link to={`/listing/${featured.listing_id}`} data-testid="featured-listing-card" className="block rounded-2xl bg-card overflow-hidden group shadow-sm hover:shadow-lg transition-shadow auto-float">
-              <div className="aspect-square bg-secondary border-b border-border overflow-hidden">
-                {featured.image_paths?.[0] ? (
-                  <SafeImage src={fileUrl(featured.image_paths[0])} alt={featured.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                ) : (
-                  <div className="flex items-center justify-center h-full text-muted-foreground">
-                    <Box className="h-12 w-12" strokeWidth={1.2} />
+{/* Featured listing + community stat */}
+      <RevealOnScroll>
+        <section className="px-6 md:px-12 py-10 auto-glow-pulse">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+            {featured ? (
+              <TiltCard maxTilt={4} glare={false}>
+                <Link to={`/listing/${featured.listing_id}`} data-testid="featured-listing-card" className="block rounded-2xl bg-card overflow-hidden group shadow-sm hover:shadow-lg transition-shadow auto-float">
+                  <div className="aspect-square bg-secondary border-b border-border overflow-hidden">
+                    {featured.image_paths?.[0] ? (
+                      <SafeImage src={fileUrl(featured.image_paths[0])} alt={featured.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    ) : (
+                      <div className="flex items-center justify-center h-full text-muted-foreground">
+                        <Box className="h-12 w-12" strokeWidth={1.2} />
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-              <div className="p-4">
-                <div className="text-[9px] font-tech uppercase tracking-[0.2em] text-accent mb-1">Featured</div>
-                <div className="flex items-baseline justify-between gap-3">
-                  <span className="font-display text-base font-medium truncate">{featured.title}</span>
-                  <SalePrice
-                    isOnSale={featured.is_on_sale}
-                    baseOriginalPrice={featured.base_original_price ?? featured.price}
-                    activeSalePrice={featured.active_sale_price}
-                    saleClassName="text-sm"
-                    baseClassName="text-xs"
-                  />
+                  <div className="p-4">
+                    <div className="text-[9px] font-tech uppercase tracking-[0.2em] text-accent mb-1">Featured</div>
+                    <div className="flex items-baseline justify-between gap-3">
+                      <span className="font-display text-base font-medium truncate">{featured.title}</span>
+                      <SalePrice
+                        isOnSale={featured.is_on_sale}
+                        baseOriginalPrice={featured.base_original_price ?? featured.price}
+                        activeSalePrice={featured.active_sale_price}
+                        saleClassName="text-sm"
+                        baseClassName="text-xs"
+                      />
+                    </div>
+                    <div className="text-[10px] font-tech uppercase tracking-wider text-muted-foreground mt-1">
+                      by {featured.seller_name} <UserBadges isPro={featured.seller_is_pro} isPlatformOwner={featured.seller_is_platform_owner} milestoneBadges={featured.seller_milestone_badges} className="inline-flex align-middle ml-1" />
+                    </div>
+                  </div>
+                </Link>
+              </TiltCard>
+            ) : (
+              <Tile
+                kicker="Why Print Cosmos"
+                title="3 ways to be here"
+                body="Browse prints, share open designs, or sell what you ship."
+                cta="See the intro"
+                onClick={() => navigate("/intro")}
+                icon={<Sparkles className="h-6 w-6 text-accent" strokeWidth={1.5} />}
+                testid="why-tile"
+              />
+            )}
+            <TiltCard maxTilt={4} glare={false}>
+              <Link
+                to="/designs"
+                data-testid="designs-stat-card"
+                className="block rounded-2xl bg-card p-5 shadow-sm hover:shadow-lg transition-shadow group auto-float"
+                style={{ animationDelay: "0.5s" }}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <Share2 className="h-5 w-5 text-primary" strokeWidth={1.5} />
+                  <ArrowRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
                 </div>
-                <div className="text-[10px] font-tech uppercase tracking-wider text-muted-foreground mt-1">
-                  by {featured.seller_name} <UserBadges isPro={featured.seller_is_pro} isPlatformOwner={featured.seller_is_platform_owner} milestoneBadges={featured.seller_milestone_badges} className="inline-flex align-middle ml-1" />
+                <div className="font-display text-2xl font-medium tracking-tight">{stats.designs}</div>
+                <div className="text-[10px] font-tech uppercase tracking-[0.2em] text-muted-foreground mt-1">
+                  Open community designs — remix-ready STLs from makers like you
                 </div>
-              </div>
-            </Link>
-          ) : (
-            <Tile
-              kicker="Why Print Cosmos"
-              title="3 ways to be here"
-              body="Browse prints, share open designs, or sell what you ship."
-              cta="See the intro"
-              onClick={() => navigate("/intro")}
-              icon={<Sparkles className="h-6 w-6 text-accent" strokeWidth={1.5} />}
-              testid="why-tile"
-            />
-          )}
-          <Link
-            to="/designs"
-            data-testid="designs-stat-card"
-            className="block rounded-2xl bg-card p-5 shadow-sm hover:shadow-lg transition-shadow group auto-float"
-            style={{ animationDelay: "0.5s" }}
-          >
-            <div className="flex items-center justify-between mb-2">
-              <Share2 className="h-5 w-5 text-primary" strokeWidth={1.5} />
-              <ArrowRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
-            </div>
-            <div className="font-display text-2xl font-medium tracking-tight">{stats.designs}</div>
-            <div className="text-[10px] font-tech uppercase tracking-[0.2em] text-muted-foreground mt-1">
-              Open community designs — remix-ready STLs from makers like you
-            </div>
-          </Link>
-        </div>
-      </section>
+              </Link>
+            </TiltCard>
+          </div>
+        </section>
+      </RevealOnScroll>
 
       {/* Trending row */}
       {trending.length > 0 && (

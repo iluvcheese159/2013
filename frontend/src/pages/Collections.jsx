@@ -9,9 +9,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Plus, Users, Lock, FolderOpen } from "lucide-react";
 import { toast } from "sonner";
 import SafeImage from "@/components/SafeImage";
+import { RevealOnScroll, TiltCard, FloatingParticles } from "@/components/AmbientFX";
+import { useSparkleField } from "@/hooks/useAmbientLife";
 
 export default function Collections() {
   const { user, openAuth } = useAuth();
+  const sparkles = useSparkleField();
   const [myCollections, setMyCollections] = useState([]);
   const [publicCollections, setPublicCollections] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -86,8 +89,10 @@ export default function Collections() {
     </div>
   );
 
-  return (
+return (
     <div data-testid="collections-page" className="pt-14 min-h-screen">
+      {sparkles.layer}
+      <FloatingParticles count={6} color="rgba(0,229,255,0.2)" className="fixed inset-0" />
       <div className="border-b border-border px-6 md:px-12 lg:px-24 py-10">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>

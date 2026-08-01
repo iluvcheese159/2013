@@ -24,9 +24,12 @@ import {
   ChevronUp,
   Download
 } from "lucide-react";
+import { RevealOnScroll, TiltCard, FloatingParticles } from "@/components/AmbientFX";
+import { useSparkleField } from "@/hooks/useAmbientLife";
 
 export default function PrintFailure() {
   const { user, openAuth } = useAuth();
+  const sparkles = useSparkleField();
   const [failures, setFailures] = useState([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
@@ -200,7 +203,9 @@ export default function PrintFailure() {
   const cardClass = "border border-border rounded-2xl p-5 bg-card hover:border-primary/50 transition-colors cursor-pointer";
 
   return (
-    <div data-testid="print-failures-page" className="pt-14 min-h-screen">
+<div data-testid="print-failures-page" className="pt-14 min-h-screen">
+      {sparkles.layer}
+      <FloatingParticles count={6} color="rgba(251,146,60,0.2)" className="fixed inset-0" />
       <div className="border-b border-border px-6 md:px-12 lg:px-24 py-10">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
@@ -230,9 +235,11 @@ export default function PrintFailure() {
             <p className="text-sm text-muted-foreground">Be the first to report a failed print.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {failures.map((f) => (
-              <div key={f.failure_id} className={cardClass + " auto-float"} style={{ animationDelay: `${(f.failure_id || 0) % 5 * 0.15}s` }} onClick={() => openDetail(f)}>
+              <RevealOnScroll key={f.failure_id}>
+              <TiltCard maxTilt={4} glare={false}>
+              <div className={cardClass + " auto-float"} style={{ animationDelay: `${(f.failure_id || 0) % 5 * 0.15}s` }} onClick={() => openDetail(f)}>
                 <div className="flex items-start justify-between gap-3 mb-2">
                   <h3 className="font-display text-base font-medium leading-tight line-clamp-2">
                     {f.title}
@@ -270,7 +277,9 @@ export default function PrintFailure() {
                     {f.fixes_count} fixes
                   </span>
                 </div>
-              </div>
+</div>
+              </TiltCard>
+              </RevealOnScroll>
             ))}
           </div>
         )}

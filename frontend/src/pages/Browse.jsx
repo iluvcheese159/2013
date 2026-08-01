@@ -15,6 +15,7 @@ import ListingStar from "@/components/ListingStar";
 import Bob, { BobPro } from "@/components/Bob";
 import TentScene from "@/components/TentScene";
 import MoonViewer from "@/components/MoonViewer";
+import { useSparkleField } from "@/hooks/useAmbientLife";
 
 // ====================================================================
 // SECTION 1: Constants & Configuration
@@ -192,6 +193,64 @@ function computeSolarPhase(skyMode, userCoords) {
 // ====================================================================
 
 /**
+ * Ambient meteor shower — periodic shooting stars crossing the night sky.
+ * Renders a few meteors at staggered delays for a natural, alive feel.
+ */
+function MeteorShower() {
+  const meteors = useMemo(() => {
+    return Array.from({ length: 5 }).map((_, i) => ({
+      id: i,
+      top: 5 + Math.random() * 60,
+      left: 5 + Math.random() * 30,
+      delay: Math.random() * 5,
+      duration: 5 + Math.random() * 4,
+    }));
+  }, []);
+
+  return (
+    <div className="fixed inset-0 pointer-events-none z-[5] overflow-hidden" aria-hidden="true">
+      {meteors.map((m) => (
+        <div
+          key={m.id}
+          className="absolute ambient-meteor"
+          style={{
+            top: `${m.top}%`,
+            left: `${m.left}%`,
+            animationDelay: `${m.delay}s`,
+            animationDuration: `${m.duration}s`,
+          }}
+        >
+          <div className="ambient-meteor-tail h-px bg-gradient-to-r from-transparent via-white/90 to-transparent" style={{ transform: "rotate(35deg)" }} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/**
+ * Scroll hint overlay shown at the bottom center — tells users to scroll to zoom.
+ */
+function ScrollHint({ visible }) {
+  if (!visible) return null;
+  return (
+    <div
+      className="fixed bottom-28 left-1/2 -translate-x-1/2 z-40 pointer-events-none text-center"
+      style={{ animation: "fadeInUp 0.6s ease-out" }}
+    >
+      <div className="flex flex-col items-center gap-1 bg-black/40 backdrop-blur-sm rounded-2xl px-5 py-3 border border-white/10">
+        <div className="text-[10px] font-tech uppercase tracking-[0.3em] text-white/80 ambient-scroll-hint">
+          Scroll to zoom in
+        </div>
+        <svg width="18" height="26" viewBox="0 0 18 26" fill="none" className="ambient-scroll-hint">
+          <rect x="1" y="1" width="16" height="24" rx="8" stroke="rgba(255,255,255,0.5)" strokeWidth="1.2" />
+          <circle cx="9" cy="8" r="2.4" fill="rgba(255,255,255,0.7)" />
+        </svg>
+      </div>
+    </div>
+  );
+}
+
+/**
  * Tree silhouettes at the bottom of the night sky (matching intro aesthetic).
  */
   function TreeSilhouettes() {
@@ -257,6 +316,56 @@ function SunIcon() {
         background: "radial-gradient(circle, #fff9c4 0%, #fde047 40%, #f59e0b 100%)",
         boxShadow: "0 0 60px 30px rgba(253,224,71,0.4), 0 0 120px 60px rgba(245,158,11,0.15)",
       }} />
+    </div>
+  );
+}
+
+/**
+ * AuroraLayer — a slowly-pulsing nebula/aurora backdrop that drifts behind the
+ * night sky starfield. Gives the sky depth and makes it feel alive.
+ */
+function AuroraLayer() {
+  return (
+    <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden" aria-hidden="true">
+      {/* Nebula blobs */}
+      <div
+        className="aurora-layer absolute rounded-full"
+        style={{
+          width: "60vw",
+          height: "60vw",
+          left: "-10vw",
+          top: "-12vh",
+          background:
+            "radial-gradient(circle, rgba(100,60,180,0.16) 0%, rgba(0,229,255,0.05) 40%, transparent 70%)",
+          filter: "blur(30px)",
+        }}
+      />
+      <div
+        className="aurora-layer absolute rounded-full"
+        style={{
+          width: "50vw",
+          height: "50vw",
+          right: "-8vw",
+          top: "30vh",
+          background:
+            "radial-gradient(circle, rgba(40,120,220,0.14) 0%, rgba(255,87,34,0.04) 45%, transparent 70%)",
+          filter: "blur(40px)",
+          animationDelay: "-8s",
+        }}
+      />
+      <div
+        className="aurora-layer absolute rounded-full"
+        style={{
+          width: "40vw",
+          height: "40vw",
+          left: "30vw",
+          bottom: "-15vh",
+          background:
+            "radial-gradient(circle, rgba(120,80,220,0.12) 0%, rgba(0,229,255,0.04) 50%, transparent 70%)",
+          filter: "blur(36px)",
+          animationDelay: "-16s",
+        }}
+      />
     </div>
   );
 }
@@ -578,6 +687,41 @@ function useAmbientInteractions(starOffset, setStarOffset, zoomLevel, setZoomLev
   return { markUserInteraction };
 }
 
+/**
+ * Hook for mouse parallax — the starfield subtly shifts toward the cursor,
+ * giving the sky depth and making it feel alive and responsive.
+ */
+function useMouseParallax(disabled) {
+  const [parallax, setParallax] = useState({ x: 0, y: 0 });
+  const targetRef = useRef({ x: 0, y: 0 });
+  const frameRef = useRef(null);
+
+  useEffect(() => {
+    if (disabled) return;
+    const onMove = (e) => {
+      const nx = (e.clientX / window.innerWidth - 0.5) * 2;
+      const ny = (e.clientY / window.innerHeight - 0.5) * 2;
+      targetRef.current = { x: nx, y: ny };
+    };
+    let raf = null;
+    const tick = () => {
+      setParallax((prev) => ({
+        x: prev.x + (targetRef.current.x * 12 - prev.x) * 0.04,
+        y: prev.y + (targetRef.current.y * 8 - prev.y) * 0.04,
+      }));
+      raf = requestAnimationFrame(tick);
+    };
+    window.addEventListener("mousemove", onMove);
+    raf = requestAnimationFrame(tick);
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [disabled]);
+
+  return parallax;
+}
+
 // ====================================================================
 // SECTION 5: Main Browse Component
 // ====================================================================
@@ -601,6 +745,28 @@ export default function Browse() {
   const pageRef = useRef(null);
   const [starSeed] = useState(() => Date.now());
 
+  // Click-anywhere sparkle feedback — the sky answers with cosmic dust
+  const sparkles = useSparkleField();
+
+  // Bob interactivity: click Bob to make him wave + speak a quick hello
+  const [bobWave, setBobWave] = useState(false);
+  const [bobGreeting, setBobGreeting] = useState("");
+  const bobWaveTimer = useRef(null);
+  const handleBobClick = useCallback(() => {
+    setBobWave(true);
+    const hellos = [
+      "Hi! Scroll to zoom into the stars.",
+      "I'm Bob! Ask me anything about Print Cosmos.",
+      "Zoom in to reveal listings, then click one!",
+      "Try the sky mode toggle up top.",
+      "Double-click a star to explore the marketplace.",
+    ];
+    setBobGreeting(hellos[Math.floor(Math.random() * hellos.length)]);
+    clearTimeout(bobWaveTimer.current);
+    bobWaveTimer.current = setTimeout(() => setBobWave(false), 2400);
+  }, []);
+  useEffect(() => () => clearTimeout(bobWaveTimer.current), []);
+
   // --- Hooks ---
   const { userCountry, userCoords } = useUserLocation();
   const { skyMode, saveSkyMode, isDay, solarPhase, spaceView, setSpaceView } = useSkyMode(userCoords);
@@ -620,6 +786,15 @@ export default function Browse() {
 
   // Wire the real markUserInteraction into the ref so starfield controls call the latest version
   markUserInteractionRef.current = markUserInteraction;
+
+  // Mouse parallax — the sky subtly follows the cursor for depth and life
+  const parallax = useMouseParallax(isDay && !spaceView);
+
+  // Scroll hint — shows until the user has zoomed in at least once
+  const [showScrollHint, setShowScrollHint] = useState(true);
+  useEffect(() => {
+    if (zoomLevel >= 0.4) setShowScrollHint(false);
+  }, [zoomLevel]);
 
   // --- Derived Data ---
   const listingPositions = useMemo(() => generateListingPositions(500, starSeed), [starSeed]);
@@ -743,19 +918,38 @@ export default function Browse() {
   // --- Render Bob & Tent Scene ---
   const renderBobAndTent = () => {
     if (isDay) return null;
+    const isVisible = bobState === "walking" || bobState === "introducing";
+    // After first-visit tour, show Bob as idle and clickable near the tent
+    const isIdle = bobState === "in-tent";
     return (
       <>
-        {(bobState === "walking" || bobState === "introducing") && (
+        {(isVisible || isIdle) && (
           <div
-            className="absolute bottom-20 pointer-events-auto"
+            className="pointer-events-auto"
             style={{
+              position: "absolute",
+              bottom: isIdle ? "60px" : "80px",
               left: "50%",
               transform: "translateX(-50%)",
-              animation: bobState === "walking" ? "walk 2s ease-out forwards" : "none",
+              animation: isVisible && bobState === "walking" ? "walk 2s ease-out forwards" : "none",
+              cursor: "pointer",
             }}
+            onClick={handleBobClick}
           >
-            {user?.is_pro ? <BobPro state={bobState} /> : <Bob state={bobState} />}
-            {showSpeechBubble && (
+            <div className={bobWave ? "bob-idle-wander auto-glow-pulse" : isIdle ? "bob-idle-wander" : "ambient-drift"}>
+              {user?.is_pro ? <BobPro state={bobWave ? "introducing" : (bobState || "idle")} /> : <Bob state={bobWave ? "introducing" : (bobState || "idle")} />}
+            </div>
+            {/* Wave greeting bubble */}
+            {bobWave && (
+              <div
+                className="absolute -top-20 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-xl border border-white/20 text-white text-xs px-4 py-3 rounded-2xl whitespace-nowrap font-tech max-w-xs text-center"
+                style={{ animation: "fadeInUp 0.3s ease-out" }}
+              >
+                {bobGreeting}
+              </div>
+            )}
+            {/* First-visit speech bubble */}
+            {showSpeechBubble && !bobWave && (
               <div
                 className="absolute -top-16 left-1/2 -translate-x-1/2 bg-white text-black text-xs px-4 py-3 rounded-xl whitespace-nowrap font-tech max-w-xs"
                 style={{ animation: "fadeIn 0.5s ease-out" }}
@@ -766,7 +960,7 @@ export default function Browse() {
           </div>
         )}
         <div className="pointer-events-auto">
-          <TentScene bobInside={bobState === "in-tent"} onTentClick={() => console.info("Tent clicked")} />
+          <TentScene bobInside={isIdle} onTentClick={handleBobClick} />
         </div>
       </>
     );
@@ -793,7 +987,14 @@ export default function Browse() {
       {/* ----- BACKGROUND: Night Sky (Starfield) ----- */}
       {!isDay && (
         <>
-          <StarfieldRenderer starCount={400} seed={starSeed} className="fixed inset-0" offset={starOffset} />
+          <AuroraLayer />
+          <StarfieldRenderer
+            starCount={400}
+            seed={starSeed}
+            className="fixed inset-0"
+            offset={{ x: starOffset.x + parallax.x, y: starOffset.y + parallax.y }}
+          />
+          <MeteorShower />
           <TreeSilhouettes />
         </>
       )}
@@ -823,6 +1024,9 @@ export default function Browse() {
           </button>
         </div>
       )}
+
+      {/* ----- SPARKLE FIELD (click feedback) ----- */}
+      {sparkles.layer}
 
       {/* ----- STARFIELD OVERLAY: Listing Stars + Ads ----- */}
       <div
@@ -918,6 +1122,9 @@ export default function Browse() {
           </div>
         </div>
       </div>
+
+      {/* ----- SCROLL HINT (shows until user zooms) ----- */}
+      <ScrollHint visible={showScrollHint && !isDay} />
 
       {/* ----- BOTTOM: Bob, Tent, Moon Viewer ----- */}
       <div className="fixed bottom-0 left-0 right-0 pointer-events-none z-20">

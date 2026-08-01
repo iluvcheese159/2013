@@ -50,18 +50,18 @@ export default function CheckoutSuccess() {
       {status === "polling" && (
         <>
           <Loader2 className="h-10 w-10 text-primary animate-spin mb-6" />
-          <h1 className="font-display text-3xl font-light mb-3">Verifying payment…</h1>
-          <p className="text-sm text-muted-foreground">Hang tight while we confirm your payment.</p>
+          <h1 className="font-display text-3xl font-light mb-3 rise-in">Verifying payment…</h1>
+          <p className="text-sm text-muted-foreground rise-in rise-in-1">Hang tight while we confirm your payment.</p>
         </>
       )}
       {status === "paid" && (
         <>
-          <CheckCircle2 className="h-12 w-12 text-emerald-500 mb-6" strokeWidth={1.5} />
-          <h1 className="font-display text-4xl sm:text-5xl font-light tracking-tighter mb-3">Order placed.</h1>
-          <p className="text-sm text-muted-foreground max-w-md mb-8">
+          <CheckCircle2 className="h-12 w-12 text-emerald-500 mb-6 auto-float" strokeWidth={1.5} />
+          <h1 className="font-display text-4xl sm:text-5xl font-light tracking-tighter mb-3 rise-in">Order placed.</h1>
+          <p className="text-sm text-muted-foreground max-w-md mb-8 rise-in rise-in-1">
             Your payment cleared. The seller has been notified and your print will ship soon.
           </p>
-          <div className="flex gap-3">
+          <div className="flex gap-3 rise-in rise-in-2">
             <Link to="/browse">
               <Button data-testid="success-browse-btn" className="bg-primary hover:bg-primary/90 rounded-xl font-tech text-xs uppercase tracking-wider">
                 Browse more prints
@@ -78,8 +78,8 @@ export default function CheckoutSuccess() {
       {(status === "failed" || status === "expired") && (
         <>
           <XCircle className="h-12 w-12 text-destructive mb-6" strokeWidth={1.5} />
-          <h1 className="font-display text-3xl font-light mb-3">Payment {status === "expired" ? "expired" : "incomplete"}.</h1>
-          <p className="text-sm text-muted-foreground mb-8">No charge was made. Try again when you&apos;re ready.</p>
+          <h1 className="font-display text-3xl font-light mb-3 rise-in">Payment {status === "expired" ? "expired" : "incomplete"}.</h1>
+          <p className="text-sm text-muted-foreground mb-8 rise-in rise-in-1">No charge was made. Try again when you&apos;re ready.</p>
           <Link to="/browse">
             <Button className="bg-primary hover:bg-primary/90 rounded-xl font-tech text-xs uppercase tracking-wider">Back to browse</Button>
           </Link>

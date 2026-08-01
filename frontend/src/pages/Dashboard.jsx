@@ -13,8 +13,11 @@ import { BRAND_LOGO_URL, BRAND_NAME } from "@/lib/branding";
 import { toast } from "sonner";
 import SalePrice from "@/components/SalePrice";
 import SafeImage from "@/components/SafeImage";
+import { RevealOnScroll, TiltCard, FloatingParticles } from "@/components/AmbientFX";
+import { useSparkleField } from "@/hooks/useAmbientLife";
 
 export default function Dashboard() {
+  const sparkles = useSparkleField();
   // Ambient animation refs
   const pageRef = useRef(null);
   const timeRef = useRef(0);
@@ -223,7 +226,9 @@ export default function Dashboard() {
   };
 
   return (
-    <div data-testid="dashboard-page" className="pt-14 min-h-screen">
+<div data-testid="dashboard-page" className="pt-14 min-h-screen">
+      {sparkles.layer}
+      <FloatingParticles count={6} color="rgba(255,87,34,0.15)" className="fixed inset-0" />
       <div className="border-b border-border px-6 md:px-12 lg:px-24 py-10" ref={pageRef}>
         <div className="text-xs font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3 rise-in">
           <span className="text-primary">●</span> Dashboard

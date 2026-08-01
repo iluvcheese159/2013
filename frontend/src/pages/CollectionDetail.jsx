@@ -35,8 +35,8 @@ export default function CollectionDetail() {
     <div data-testid="collection-detail-page" className="pt-14 min-h-screen px-6 md:px-12 lg:px-24 py-10">
       <div className="flex items-center justify-between gap-4 mb-8">
         <div>
-          <div className="text-[10px] font-tech uppercase tracking-[0.3em] text-muted-foreground mb-2">Collection</div>
-          <h1 className="font-display text-3xl font-light tracking-tighter">{col.name}</h1>
+          <div className="text-[10px] font-tech uppercase tracking-[0.3em] text-muted-foreground mb-2 rise-in">Collection</div>
+          <h1 className="font-display text-3xl font-light tracking-tighter rise-in rise-in-1">{col.name}</h1>
           {col.description && <p className="text-sm text-muted-foreground mt-2 max-w-2xl">{col.description}</p>}
           <div className="flex items-center gap-3 text-[10px] font-tech uppercase tracking-wider text-muted-foreground mt-2">
             <span>by {col.user_name}</span>

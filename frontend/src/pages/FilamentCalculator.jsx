@@ -6,8 +6,11 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Activity, Calculator, Clock, CircleDollarSign, Droplet, Flame, Home, Package, Zap } from "lucide-react";
 import { toast } from "sonner";
+import { RevealOnScroll, TiltCard, FloatingParticles } from "@/components/AmbientFX";
+import { useSparkleField } from "@/hooks/useAmbientLife";
 
 export default function FilamentCalculator() {
+  const sparkles = useSparkleField();
   const [formData, setFormData] = useState({
     model_volume: 100,
     material: "PLA",
@@ -61,8 +64,10 @@ export default function FilamentCalculator() {
     setResult(null);
   };
 
-  if (!result) return (
+return (
     <div className="pt-14 min-h-screen">
+      {sparkles.layer}
+      <FloatingParticles count={6} color="rgba(251,146,60,0.2)" className="fixed inset-0" />
       <div className="border-b border-border px-6 md:px-12 lg:px-24 py-10">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>

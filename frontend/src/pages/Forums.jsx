@@ -8,6 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import WireframeCube from "@/components/WireframeCube";
 import { Plus, Rocket, Gauge, MessageCircle, Eye, Pin, Link2, ImageIcon, Send, ThumbsUp } from "lucide-react";
+import { RevealOnScroll, TiltCard, FloatingParticles } from "@/components/AmbientFX";
+import { useSparkleField } from "@/hooks/useAmbientLife";
 
 const SECTIONS = ["3D Printing Help", "Design Showcases", "General Chat", "Hardware Reviews"];
 
@@ -28,8 +30,11 @@ export default function Forums() {
     image_url: "",
     link_url: "",
   });
-  const [commentBody, setCommentBody] = useState("");
+const [commentBody, setCommentBody] = useState("");
   const [replyTo, setReplyTo] = useState(null);
+
+  // Ambient click sparkles
+  const sparkles = useSparkleField();
 
   const loadPosts = async () => {
     const r = await api.get(`/forums/posts?section_category=${encodeURIComponent(section)}&sort_mode=hot`);
@@ -132,6 +137,9 @@ export default function Forums() {
 
   return (
     <div data-testid="forums-page" className="pt-14 min-h-screen">
+      {/* Click sparkles */}
+      {sparkles.layer}
+
       <div className="border-b border-border px-6 md:px-12 lg:px-24 py-8">
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -155,22 +163,23 @@ export default function Forums() {
         </div>
       </div>
 
-      <div className="px-6 md:px-12 lg:px-24 py-8 grid grid-cols-1 gap-3">
-        {posts.length === 0 ? (
-          <div className="border border-dashed border-border rounded-2xl px-6 py-10 text-center flex flex-col items-center rise-in">
-            <div className="mb-6 opacity-90 auto-float">
-              <WireframeCube size={88} />
+      <RevealOnScroll>
+        <div className="px-6 md:px-12 lg:px-24 py-8 grid grid-cols-1 gap-3">
+          {posts.length === 0 ? (
+            <div className="border border-dashed border-border rounded-2xl px-6 py-10 text-center flex flex-col items-center rise-in">
+              <div className="mb-6 opacity-90 auto-float">
+                <WireframeCube size={88} />
+              </div>
+              <p className="max-w-xl text-sm text-muted-foreground leading-relaxed">
+                No forum posts found in this section yet. Be the first to start a thread.
+              </p>
             </div>
-            <p className="max-w-xl text-sm text-muted-foreground leading-relaxed">
-              No forum posts found in this section yet. Be the first to start a thread.
-            </p>
-          </div>
-        ) : posts.map((post, idx) => (
-          <button
-            key={post.post_id}
-            onClick={() => openDetail(post)}
-            className={`text-left border rounded-xl bg-card overflow-hidden hover:border-primary transition-colors mission-control-glow rise-in rise-in-${Math.min(idx + 1, 4)} ${post.is_pinned_by_admin ? "border-[#00FFC8]/60" : "border-border/40"}`}
-          >
+          ) : posts.map((post, idx) => (
+            <TiltCard key={post.post_id} maxTilt={3} glare={false}>
+              <button
+                onClick={() => openDetail(post)}
+                className={`w-full text-left border rounded-xl bg-card overflow-hidden hover:border-primary transition-colors mission-control-glow rise-in rise-in-${Math.min(idx + 1, 4)} ${post.is_pinned_by_admin ? "border-[#00FFC8]/60" : "border-border/40"}`}
+              >
             <div className="flex">
               <div className="w-14 border-r border-border p-2 flex flex-col items-center gap-2">
                 <button onClick={(e) => { e.stopPropagation(); vote(post.post_id, "up"); }} className="h-8 w-8 rounded-xl flex items-center justify-center hover:bg-secondary text-[#F59E0B]">
@@ -198,10 +207,13 @@ export default function Forums() {
                   </button>
                 </div>
               </div>
-            </div>
-          </button>
-        ))}
-      </div>
+                  </div>
+                </div>
+              </button>
+            </TiltCard>
+          ))}
+        </div>
+      </RevealOnScroll>
 
       <div className="px-6 md:px-12 lg:px-24 pb-20">
         <div className="text-[10px] font-tech uppercase tracking-wider text-muted-foreground mb-2">Most Recently Viewed Forums</div>

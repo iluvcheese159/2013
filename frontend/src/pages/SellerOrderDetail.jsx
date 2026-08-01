@@ -126,10 +126,10 @@ export default function SellerOrderDetail() {
   return (
     <div className="pt-14 min-h-screen px-6 md:px-12 lg:px-24">
       {showConfetti && <Confetti />}
-      <div className="flex items-center justify-between mb-6">
+<div className="flex items-center justify-between mb-6">
         <div>
-          <div className="text-xs font-tech uppercase tracking-[0.3em] text-muted-foreground">Seller Order</div>
-          <h1 className="font-display text-3xl font-light">Order {order.transaction_id}</h1>
+          <div className="text-xs font-tech uppercase tracking-[0.3em] text-muted-foreground rise-in">Seller Order</div>
+          <h1 className="font-display text-3xl font-light rise-in rise-in-1">Order {order.transaction_id}</h1>
         </div>
         <div className="flex items-center gap-2">
           {order.status !== "completed" && (

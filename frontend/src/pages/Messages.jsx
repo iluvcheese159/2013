@@ -440,7 +440,7 @@ export default function Messages() {
               {activeMessages.map((m) => {
                 const mine = m.sender_id === user.user_id;
                 return (
-                  <div key={m.message_id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
+                  <div key={m.message_id} className={`flex ${mine ? "justify-end" : "justify-start"} ${mine ? "auto-glow-pulse" : "ambient-drift"}`}>
                     <div
                       onContextMenu={(e) => onBubbleContext(e, m)}
                       className={`max-w-md px-4 py-2 rounded-lg text-sm ${mine ? "bg-primary text-primary-foreground" : "bg-secondary text-foreground"}`}

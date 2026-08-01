@@ -5,11 +5,14 @@ import { Box, Share2, GitFork, Search, ChevronRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import SafeImage from "@/components/SafeImage";
 import ModelViewer from "@/components/ModelViewer";
+import { RevealOnScroll, TiltCard, FloatingParticles } from "@/components/AmbientFX";
+import { useSparkleField } from "@/hooks/useAmbientLife";
 
 export default function Designs() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
+  const sparkles = useSparkleField();
 
   useEffect(() => {
     api.get("/designs").then((r) => setItems(r.data)).catch(() => {}).finally(() => setLoading(false));
@@ -22,8 +25,10 @@ export default function Designs() {
       )
     : items;
 
-  return (
+return (
     <div data-testid="designs-page" className="pt-14 min-h-screen">
+      {sparkles.layer}
+      <FloatingParticles count={6} color="rgba(255,87,34,0.2)" className="fixed inset-0" />
       <div className="border-b border-border px-6 md:px-12 lg:px-24 py-10">
         <div className="text-xs font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3 rise-in">
           <span className="text-primary">●</span> Community
@@ -60,10 +65,11 @@ export default function Designs() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filtered.map((d) => (
+              <RevealOnScroll key={d.design_id}>
+              <TiltCard maxTilt={4} glare={false}>
               <Link
-                key={d.design_id}
                 to={`/designs/${d.design_id}`}
                 data-testid={`design-card-${d.design_id}`}
                 className="group border border-border rounded-2xl overflow-hidden hover:border-primary/50 hover:shadow-lg transition-all bg-card auto-float"
@@ -102,7 +108,9 @@ export default function Designs() {
                     <p className="text-xs text-muted-foreground mt-2 line-clamp-2">{d.description}</p>
                   )}
                 </div>
-              </Link>
+</Link>
+              </TiltCard>
+              </RevealOnScroll>
             ))}
           </div>
         )}

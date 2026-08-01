@@ -223,8 +223,8 @@ export default function OwnerControlHub() {
 
   return (
     <div className="pt-14 min-h-screen px-6 md:px-12 lg:px-24" data-testid="owner-control-page">
-      <div className="text-xs font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3">Owner Control</div>
-      <h1 className="font-display text-4xl font-light mb-8">Owner User Control Management Hub</h1>
+<div className="text-xs font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3 rise-in">Owner Control</div>
+      <h1 className="font-display text-4xl font-light mb-8 rise-in rise-in-1">Owner User Control Management Hub</h1>
 
       <section className="border border-border rounded-xl p-4 bg-card mb-6">
         <h2 className="font-tech text-xs uppercase tracking-wider text-muted-foreground mb-3">Moderate Users Console</h2>

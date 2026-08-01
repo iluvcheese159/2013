@@ -11,11 +11,11 @@ export default function SuspendedPage() {
   return (
     <div className="pt-32 px-6 md:px-12 lg:px-24 text-center min-h-screen">
       <div className="max-w-md mx-auto">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-destructive/10 mb-6">
+<div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-destructive/10 mb-6 auto-float">
           <Shield className="h-8 w-8 text-destructive" />
         </div>
-        <h1 className="font-display text-3xl font-light mb-4">Account Suspended</h1>
-        <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
+        <h1 className="font-display text-3xl font-light mb-4 rise-in">Account Suspended</h1>
+        <p className="text-sm text-muted-foreground mb-6 leading-relaxed rise-in rise-in-1">
           Your account has been suspended due to: <span className="text-foreground font-medium">{reason}</span>.
           The suspension will be lifted on <span className="text-foreground font-medium">{until}</span>.
         </p>

@@ -10,11 +10,11 @@ export default function Terms() {
         <Link to="/" className="text-xs font-tech uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground inline-flex items-center gap-2 mb-6">
           <ArrowLeft className="h-3 w-3" /> Back home
         </Link>
-        <div className="text-[10px] font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3">
+<div className="text-[10px] font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3 rise-in">
           <span className="text-primary">●</span> Legal
         </div>
-        <h1 className="font-display text-4xl sm:text-5xl font-light tracking-tighter mb-3">Terms & Conditions</h1>
-        <p className="text-sm text-muted-foreground mb-12">Last updated: Feb 2026 · Print Cosmos maker marketplace</p>
+        <h1 className="font-display text-4xl sm:text-5xl font-light tracking-tighter mb-3 rise-in rise-in-1">Terms & Conditions</h1>
+        <p className="text-sm text-muted-foreground mb-12 rise-in rise-in-2">Last updated: Feb 2026 · Print Cosmos maker marketplace</p>
 
         <Section icon={Scale} title="1 · Platform overview">
           Print Cosmos is a marketplace for 3D-printed products and 3D design files. You may browse without an account.
@@ -85,7 +85,7 @@ export default function Terms() {
 
 function Section({ icon: Icon, title, children }) {
   return (
-    <section className="mb-10">
+    <section className="mb-10 auto-float">
       <div className="flex items-center gap-3 mb-4">
         <div className="h-9 w-9 border border-border bg-card rounded-xl flex items-center justify-center">
           <Icon className="h-4 w-4 text-primary" strokeWidth={1.5} />
