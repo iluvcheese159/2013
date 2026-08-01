@@ -20,11 +20,11 @@ function generateMilkyWayStars(count, seed) {
   const r = () => { s = (s * 9301 + 49297) % 233280; return s / 233280; };
 
   const milkyWayAngle = Math.PI / 4;
-  const milkyWayWidth = 0.3;
+  const milkyWayWidth = 0.22;
 
   for (let i = 0; i < count; i++) {
     let x, y;
-    const inMilkyWay = r() < 0.35;
+    const inMilkyWay = r() < 0.3;
 
     if (inMilkyWay) {
       const bandPos = r();
@@ -38,8 +38,9 @@ function generateMilkyWayStars(count, seed) {
       y = r() * 100;
     }
 
-    const size = 0.3 + r() * 3.5;
-    const brightness = 0.15 + (size / 3.5) * 0.7;
+    // Natural pinpoints: heavily skewed small (power-4), never over ~1.8px.
+    const size = 0.2 + Math.pow(r(), 4) * 1.6;
+    const brightness = 0.15 + (size / 1.8) * 0.55;
 
     // Star color temperature
     const colorRand = r();
@@ -55,7 +56,7 @@ function generateMilkyWayStars(count, seed) {
       size,
       opacity: brightness,
       color,
-      twinkleSpeed: 1.5 + r() * 5,
+      twinkleSpeed: 2 + r() * 5,
       twinklePhase: r() * Math.PI * 2,
       inMilkyWay,
     });
@@ -140,6 +141,9 @@ function SkyDome({ stars, opacity, children }) {
         perspectiveOrigin: "50% 50%",
       }}
     >
+      {/* Deepest layer: Milky Way band */}
+      <div className="milkyway-layer" />
+
       <div
         className="absolute inset-0"
         style={{
@@ -149,16 +153,6 @@ function SkyDome({ stars, opacity, children }) {
           transition: "opacity 1.5s ease",
         }}
       >
-        {/* Milky Way band - subtle glow */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background: "radial-gradient(ellipse 60% 20% at 50% 40%, rgba(200, 200, 255, 0.06) 0%, transparent 70%)",
-            transform: "rotate(45deg) scale(1.5)",
-            pointerEvents: "none",
-          }}
-        />
-
         {/* Stars */}
         {stars.map((s) => (
           <div
@@ -171,7 +165,7 @@ function SkyDome({ stars, opacity, children }) {
               height: s.size + "px",
               backgroundColor: s.color,
               opacity: s.opacity,
-              boxShadow: s.size > 2 ? `0 0 ${s.size * 2}px ${s.color}` : "none",
+              boxShadow: s.size > 1.3 ? `0 0 ${s.size * 1.5}px ${s.color}` : "none",
               animation: `twinkle ${s.twinkleSpeed}s ease-in-out infinite`,
               animationDelay: s.twinklePhase + "s",
               transform: `translateZ(${s.inMilkyWay ? 20 : -10}px)`,
@@ -221,8 +215,9 @@ function TreeSilhouettes({ opacity = 0.5 }) {
  * A single "zoom star" that the user clicks/scrolls into to reveal a benefit.
  */
 function ZoomStar({ facet, index, active, onClick, position }) {
-  const size = 8 + index * 2;
-  const glowSize = size * 3;
+  // Natural sizing: 6px → 11px across facets, moderate glow
+  const size = 6 + index * 1.2;
+  const glowSize = size * 2.2;
 
   return (
     <button
@@ -242,7 +237,7 @@ function ZoomStar({ facet, index, active, onClick, position }) {
           width: size + "px",
           height: size + "px",
           backgroundColor: facet.color,
-          boxShadow: `0 0 ${glowSize}px ${facet.color}66, 0 0 ${glowSize * 2}px ${facet.color}33`,
+          boxShadow: `0 0 ${glowSize}px ${facet.color}55, 0 0 ${glowSize * 1.8}px ${facet.color}22`,
           animation: "star-breathe 3s ease-in-out infinite",
           animationDelay: index * 0.5 + "s",
         }}
@@ -302,11 +297,12 @@ function BenefitCard({ facet, visible }) {
         })}
       </div>
 
-      {/* Text content */}
+      {/* Text content — crossfades smoothly when the facet changes */}
       <div
+        key={facet.id}
         className="relative max-w-2xl mx-auto px-8 text-center"
         style={{
-          animation: visible ? "fade-in-up 0.8s ease-out" : "none",
+          animation: visible ? "text-crossfade-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) both" : "none",
         }}
       >
         <div
@@ -477,7 +473,11 @@ function BobIntroOverlay({ visible, onDismiss }) {
         </div>
 
         <div className="max-w-sm text-center">
-          <p className="text-white/90 text-sm font-tech leading-relaxed" style={{ animation: "fadeIn 0.5s ease-out" }}>
+          <p
+            key={speechIndex}
+            className="text-white/90 text-sm font-tech leading-relaxed"
+            style={{ animation: "text-crossfade-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both" }}
+          >
             {speeches[speechIndex]}
           </p>
           <div className="flex justify-center gap-1.5 mt-4">
@@ -540,8 +540,11 @@ export default function Intro() {
 
   // ---- Auto-advance through scenes 0-1 ----
   useEffect(() => {
-    const t0 = setTimeout(() => { setPhase(1); }, 3000);
-    const t1 = setTimeout(() => { setPhase(2); }, 5500);
+    // Phase 0 (campsite + Bob) gets a generous hold so the scene and
+    // our stick figure are clearly visible and paced. Phase 1 (camera
+    // drift) then runs for ~4.5s so the "look up" transition breathes.
+    const t0 = setTimeout(() => { setPhase(1); }, 7000);
+    const t1 = setTimeout(() => { setPhase(2); }, 11500);
     timers.current = [t0, t1];
     return () => timers.current.forEach(clearTimeout);
   }, []);
@@ -681,24 +684,32 @@ export default function Intro() {
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            background: "radial-gradient(ellipse 50% 15% at 50% 40%, rgba(180, 180, 255, 0.04) 0%, transparent 60%)",
+            background: "radial-gradient(ellipse 50% 14% at 50% 40%, rgba(180, 180, 255, 0.04) 0%, transparent 60%)",
             transform: "rotate(35deg)",
           }}
         />
       </SkyDome>
 
+      {/* ===== BACKGROUND: Cosmic Blur Backdrop =====
+           Sits directly over the Milky Way + stars, under all text/UI,
+           giving typography a clean, softly-blurred reading surface. */}
+      <div className="cosmic-blur" style={{ opacity: phase >= 0 ? 1 : 0 }} />
+
       {/* ===== SCENE 0: Campsite ===== */}
       {phase === 0 && (
         <div
           className="absolute inset-0 z-20"
-          style={{ animation: "fadeIn 2s ease-out" }}
+          style={{ animation: "fadeIn 2s cubic-bezier(0.16, 1, 0.3, 1)" }}
         >
           {/* Campfire scene with Bob, tent, trees */}
           <CampfireScene />
 
           {/* Hint text at bottom */}
           <div className="absolute bottom-[5%] left-1/2 -translate-x-1/2 text-center">
-            <p className="text-white/20 text-[10px] font-tech uppercase tracking-[0.4em]">
+            <p
+              className="text-white/25 text-[10px] font-tech uppercase tracking-[0.4em]"
+              style={{ animation: "text-crossfade-in 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both" }}
+            >
               A quiet night in the cosmos...
             </p>
           </div>
@@ -710,7 +721,7 @@ export default function Intro() {
         <div
           className="absolute inset-0 z-20"
           style={{
-            animation: "camera-drift 3s ease-out forwards",
+            animation: "camera-drift 4s cubic-bezier(0.45, 0, 0.25, 1) forwards",
           }}
         >
           {/* Trees at bottom */}
@@ -720,7 +731,7 @@ export default function Intro() {
           <div className="absolute inset-0 flex items-center justify-center">
             <p
               className="text-white/40 text-sm font-tech uppercase tracking-[0.5em]"
-              style={{ animation: "fadeIn 2s ease-out 1s both" }}
+              style={{ animation: "text-crossfade-in 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.8s both" }}
             >
               Look up at the stars...
             </p>
@@ -730,7 +741,10 @@ export default function Intro() {
 
       {/* ===== SCENE 2: Star Zoom Phase ===== */}
       {phase === 2 && (
-        <div className="absolute inset-0 z-20">
+        <div
+          className="absolute inset-0 z-20"
+          style={{ animation: "text-crossfade-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) both" }}
+        >
           {/* Tree silhouettes at bottom */}
           <TreeSilhouettes opacity={0.4} />
 
@@ -750,7 +764,7 @@ export default function Intro() {
           <div className="absolute bottom-[8%] left-1/2 -translate-x-1/2 text-center z-30">
             <p
               className="text-white/30 text-[10px] font-tech uppercase tracking-[0.3em]"
-              style={{ animation: "fadeIn 1s ease-out 0.5s both" }}
+              style={{ animation: "text-crossfade-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both" }}
             >
               Scroll or click a star to explore
             </p>
@@ -766,8 +780,8 @@ export default function Intro() {
             className="absolute inset-0"
             style={{
               animation: isZooming
-                ? "fadeOut 0.6s ease-out forwards"
-                : "fadeIn 0.8s ease-out",
+                ? "fadeOut 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards"
+                : "fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1)",
             }}
           >
             {/* Background stars visible behind */}
@@ -782,8 +796,8 @@ export default function Intro() {
                   top: zoomTarget.y + "%",
                   transform: "translate(-50%, -50%)",
                   animation: isZooming
-                    ? "star-zoom-out 0.6s ease-out forwards"
-                    : "star-zoom-in 1s ease-out",
+                    ? "star-zoom-out 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards"
+                    : "star-zoom-in 1.2s cubic-bezier(0.16, 1, 0.3, 1)",
                 }}
               >
                 <div
@@ -822,7 +836,7 @@ export default function Intro() {
             {showBenefit && (
               <div
                 className="absolute bottom-[12%] left-1/2 -translate-x-1/2 z-30"
-                style={{ animation: "fadeIn 1s ease-out 0.5s both" }}
+                style={{ animation: "text-crossfade-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both" }}
               >
                 <p className="text-white/20 text-[9px] font-tech uppercase tracking-[0.3em]">
                   Scroll to discover more

@@ -3,6 +3,7 @@ import { useRef, useEffect } from "react";
 /**
  * Bob as a stick figure for the intro scene.
  * Based on reference image 2: circle head, line body, line limbs, no face features.
+ * Rendered as clean white lines (matching the reference style).
  */
 export default function IntroBob({ state = "sitting", isPro = false }) {
   const svgRef = useRef(null);
@@ -41,11 +42,13 @@ export default function IntroBob({ state = "sitting", isPro = false }) {
     };
   }, []);
 
-  const strokeColor = isPro ? "#fbbf24" : "#6b7280";
+  // Clean white-line stick figure — pro keeps a gold accent.
+  const strokeColor = isPro ? "#fbbf24" : "#ffffff";
   const strokeWidth = 2;
+  const glow = "0 0 6px rgba(255,255,255,0.45)";
 
   return (
-    <svg ref={svgRef} width="60" height="100" viewBox="0 0 60 100" fill="none" className="relative">
+    <svg ref={svgRef} width="60" height="100" viewBox="0 0 60 100" fill="none" className="relative" style={{ filter: `drop-shadow(${glow})` }}>
       <g id="ib-head">
         <circle cx="30" cy="12" r="10" stroke={strokeColor} strokeWidth={strokeWidth} fill="none" />
         <line x1="30" y1="22" x2="30" y2="30" stroke={strokeColor} strokeWidth={strokeWidth} strokeLinecap="round" />

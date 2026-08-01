@@ -63,6 +63,14 @@ export default function CampfireScene({ bobRef }) {
           const sway = Math.sin(t * 0.5) * 1.5;
           trees.setAttribute("transform", "translate(" + sway + ", 0)");
         }
+
+        // Gentle idle sway for Bob sitting by the fire
+        const bob = svgRef.current.querySelector("#cf-bob");
+        if (bob) {
+          const bobSway = Math.sin(t * 1.1) * 1.5;
+          const bobRock = Math.sin(t * 0.7) * 0.8;
+          bob.setAttribute("transform", "translate(148, 170) rotate(" + bobRock + " 32 40) translate(" + bobSway * 0.3 + ", 0)");
+        }
       }
 
       frameRef.current = requestAnimationFrame(animate);
@@ -136,6 +144,22 @@ export default function CampfireScene({ bobRef }) {
           <circle cx="-4" cy="-18" r="1" fill="#fbbf24" opacity="0.6" />
           <circle cx="3" cy="-16" r="0.8" fill="#fbbf24" opacity="0.5" />
           <circle cx="0" cy="-22" r="0.6" fill="#fef08a" opacity="0.4" />
+        </g>
+
+        {/* Bob — sitting on the log, watching the fire (clean white stick figure) */}
+        <g id="cf-bob" transform="translate(148, 170)" style={{ filter: "drop-shadow(0 0 5px rgba(255,255,255,0.35)) drop-shadow(0 0 12px rgba(249,115,22,0.25))" }}>
+          <circle cx="20" cy="0" r="11" fill="none" stroke="#ffffff" strokeWidth="2" />
+          <line x1="20" y1="11" x2="20" y2="22" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
+          {/* Torso leaning toward the fire */}
+          <line x1="20" y1="22" x2="32" y2="40" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
+          {/* Folded legs */}
+          <line x1="32" y1="40" x2="23" y2="52" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
+          <line x1="32" y1="40" x2="41" y2="52" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
+          {/* Arms reaching toward the warmth */}
+          <line x1="24" y1="27" x2="40" y2="33" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
+          <line x1="40" y1="33" x2="44" y2="31" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
+          <line x1="18" y1="29" x2="12" y2="36" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
+          <line x1="12" y1="36" x2="10" y2="34" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
         </g>
 
         <g id="cf-fireflies">

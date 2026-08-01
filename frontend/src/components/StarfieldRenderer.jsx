@@ -29,11 +29,11 @@ function generateStars(count, seed) {
   };
 
   const milkyWayAngle = Math.PI / 4;
-  const milkyWayWidth = 0.3;
+  const milkyWayWidth = 0.22;
 
   for (let i = 0; i < count; i++) {
     let x, y;
-    const inMilkyWay = random() < 0.4;
+    const inMilkyWay = random() < 0.3;
 
     if (inMilkyWay) {
       const bandPos = random();
@@ -47,11 +47,14 @@ function generateStars(count, seed) {
       y = random();
     }
 
-    const size = powerDistribution(0.5, 3.5, 3, random());
-    const baseBrightness = size / 3.5;
-    const brightness = baseBrightness * (0.5 + random() * 0.5);
+    // Natural night sky: the vast majority of stars are tiny pinpoints.
+    // Power-4 distribution makes sub-1px stars overwhelmingly common, with
+    // only a rare handful reaching ~1.8px — no more 3.5px blobs.
+    const size = powerDistribution(0.35, 1.8, 4, random());
+    const baseBrightness = size / 1.8;
+    const brightness = baseBrightness * (0.35 + random() * 0.45);
     const color = getStarColor(random);
-    const twinkleSpeed = 2 + random() * 4;
+    const twinkleSpeed = 2.5 + random() * 4.5;
     const twinklePhase = random() * Math.PI * 2;
 
     stars.push({
@@ -59,7 +62,7 @@ function generateStars(count, seed) {
       x: x * 100,
       y: y * 100,
       size,
-      opacity: 0.2 + brightness * 0.6,
+      opacity: 0.15 + brightness * 0.5,
       color: `rgb(${color.r}, ${color.g}, ${color.b})`,
       twinkleSpeed,
       twinklePhase,
@@ -103,6 +106,8 @@ export default function StarfieldRenderer({
               opacity: star.opacity,
               transform: "translateZ(0)",
               willChange: "opacity",
+              // Only the rare brighter stars get a faint halo — keeps the sky clean.
+              boxShadow: star.size > 1.3 ? `0 0 ${star.size * 1.5}px ${star.color}88` : "none",
               animation: `twinkle ${star.twinkleSpeed}s ease-in-out infinite`,
               animationDelay: `${star.twinklePhase}s`,
             }}

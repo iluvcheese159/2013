@@ -65,6 +65,12 @@ export default function ListingStar({ item, position, color, isFiltered, reveale
     transition: "opacity 0.3s, transform 0.3s",
   };
 
+  // Cleaner dot sizing: 5px idle → 8px on pulse, subtle glow
+  const dotSize = ambientPulse ? 8 : 5;
+  const dotGlow = ambientPulse
+    ? `0 0 ${brightness.glowSpread}px ${rgb}, 0 0 ${brightness.glowSpread * 1.6}px ${rgb}80`
+    : `0 0 ${Math.round(brightness.glowSpread * 0.55)}px ${rgb}`;
+
   return (
     <div
       data-testid={`listing-star-${item.listing_id}`}
@@ -87,19 +93,17 @@ export default function ListingStar({ item, position, color, isFiltered, reveale
           className="absolute -inset-2 rounded-full blur-sm"
           style={{
             backgroundColor: rgb,
-            opacity: ambientPulse ? brightness.baseOpacity * 1.2 : brightness.baseOpacity * 0.6,
+            opacity: ambientPulse ? brightness.baseOpacity * 1.1 : brightness.baseOpacity * 0.45,
             transition: "opacity 0.5s ease-in-out",
           }}
         />
         <div
           className="relative rounded-full"
           style={{
-            width: ambientPulse ? 12 : 8,
-            height: ambientPulse ? 12 : 8,
+            width: dotSize,
+            height: dotSize,
             backgroundColor: rgb,
-            boxShadow: ambientPulse
-              ? `0 0 ${brightness.glowSpread * 2}px ${rgb}, 0 0 ${brightness.glowSpread * 3}px ${rgb}80`
-              : `0 0 ${brightness.glowSpread}px ${rgb}`,
+            boxShadow: dotGlow,
             animation: `twinkle ${brightness.twinkleDuration}s ease-in-out infinite`,
             animationDelay: `${twinkleDelay}s`,
             transition: "width 0.5s ease-in-out, height 0.5s ease-in-out, box-shadow 0.5s ease-in-out",
@@ -121,7 +125,7 @@ export default function ListingStar({ item, position, color, isFiltered, reveale
         <Link to={`/listing/${item.listing_id}`} className="block" title={item.title}>
           {/* Title above */}
           <div
-            className="text-center mb-1 px-1 font-tech text-[10px] uppercase tracking-wider leading-tight whitespace-nowrap overflow-hidden text-ellipsis max-w-[120px]"
+            className="text-center mb-1 px-1 font-tech text-[10px] uppercase tracking-wider leading-tight whitespace-nowrap overflow-hidden text-ellipsis max-w-[100px]"
             style={{ color: rgb, textShadow: `0 0 8px ${rgb}` }}
           >
             {item.title}
@@ -131,10 +135,10 @@ export default function ListingStar({ item, position, color, isFiltered, reveale
           <div
             className="rounded-xl overflow-hidden border"
             style={{
-              width: 96,
-              height: 96,
+              width: 80,
+              height: 80,
               borderColor: rgb,
-              boxShadow: `0 0 ${12 + Math.round(brightness.glowSpread / 2)}px 2px ${rgb}50`,
+              boxShadow: `0 0 ${10 + Math.round(brightness.glowSpread / 2)}px 2px ${rgb}40`,
             }}
           >
             {cover ? (
@@ -147,7 +151,7 @@ export default function ListingStar({ item, position, color, isFiltered, reveale
           {/* Seller strip — slides up on hover/tap-hold */}
           <div
             className="overflow-hidden transition-all duration-200"
-            style={{ maxHeight: sellerVisible ? 48 : 0, opacity: sellerVisible ? 1 : 0 }}
+            style={{ maxHeight: sellerVisible ? 40 : 0, opacity: sellerVisible ? 1 : 0 }}
           >
             <div
               className="flex items-center gap-1.5 px-2 py-1.5 rounded-b-xl"

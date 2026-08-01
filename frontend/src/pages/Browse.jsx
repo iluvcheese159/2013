@@ -997,6 +997,10 @@ export default function Browse() {
       {/* ----- BACKGROUND: Night Sky (Starfield) ----- */}
       {!isDay && (
         <>
+          {/* Deepest layer: Milky Way band */}
+          <div className="fixed inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 0 }} aria-hidden="true">
+            <div className="milkyway-layer" />
+          </div>
           <AuroraLayer />
           <StarfieldRenderer
             starCount={400}
@@ -1006,6 +1010,9 @@ export default function Browse() {
           />
           <MeteorShower />
           <TreeSilhouettes />
+          {/* Soft blurred backdrop directly over the Milky Way + stars and
+              under all text/UI — keeps headings and body copy perfectly readable. */}
+          <div className="cosmic-blur" style={{ zIndex: 8 }} />
         </>
       )}
 
