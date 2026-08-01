@@ -11,59 +11,128 @@ export const markIntroSeen = () => {
 };
 
 // ====================================================================
-// Star Generation with Milky Way
+// Canvas Star Field — renders directly to canvas for crisp pinpoints
 // ====================================================================
 
 function generateMilkyWayStars(count, seed) {
   const stars = [];
   let s = seed;
   const r = () => { s = (s * 9301 + 49297) % 233280; return s / 233280; };
-
   const milkyWayAngle = Math.PI / 4;
-  const milkyWayWidth = 0.22;
+  const milkyWayWidth = 0.25;
 
   for (let i = 0; i < count; i++) {
     let x, y;
-    const inMilkyWay = r() < 0.3;
-
+    const inMilkyWay = r() < 0.35;
     if (inMilkyWay) {
       const bandPos = r();
       const bandOffset = (r() - 0.5) * milkyWayWidth;
-      x = bandPos + bandOffset * Math.cos(milkyWayAngle + Math.PI / 2);
-      y = bandPos + bandOffset * Math.sin(milkyWayAngle + Math.PI / 2);
-      x = Math.max(0, Math.min(100, x * 100));
-      y = Math.max(0, Math.min(100, y * 100));
+      x = (bandPos + bandOffset * Math.cos(milkyWayAngle + Math.PI / 2)) * 100;
+      y = (bandPos + bandOffset * Math.sin(milkyWayAngle + Math.PI / 2)) * 100;
+      x = Math.max(0, Math.min(100, x));
+      y = Math.max(0, Math.min(100, y));
     } else {
       x = r() * 100;
       y = r() * 100;
     }
-
-    // Natural pinpoints: heavily skewed small (power-5), never over ~1.6px.
-    const size = 0.2 + Math.pow(r(), 5) * 1.4;
-    const brightness = 0.12 + (size / 1.6) * 0.55;
-
-    // Realistic star color temperature: mostly white/blue-white
-    const colorRand = r();
-    let color;
-    if (colorRand < 0.55) color = "rgb(245, 248, 255)"; // blue-white
-    else if (colorRand < 0.75) color = "rgb(255, 255, 255)"; // white
-    else if (colorRand < 0.88) color = "rgb(255, 252, 240)"; // warm white
-    else if (colorRand < 0.95) color = "rgb(255, 245, 220)"; // yellow-white
-    else color = "rgb(220, 230, 255)"; // faint blue
-
-    stars.push({
-      id: i,
-      x,
-      y,
-      size,
-      opacity: brightness,
-      color,
-      twinkleSpeed: 3 + r() * 6,
-      twinklePhase: r() * Math.PI * 2,
-      inMilkyWay,
-    });
+    // Size: power-3 so most are 0.5–1.2px, rare ones up to 2px
+    const size = 0.4 + Math.pow(r(), 3) * 1.6;
+    const opacity = 0.35 + r() * 0.65;
+    const cr = r();
+    // Realistic palette: blue-white dominant
+    const color = cr < 0.5  ? [245, 248, 255]
+                : cr < 0.72 ? [255, 255, 255]
+                : cr < 0.87 ? [255, 252, 235]
+                : cr < 0.95 ? [255, 240, 200]
+                :              [210, 225, 255];
+    stars.push({ x, y, size, opacity, color, inMilkyWay,
+      twinkleSpeed: 2 + r() * 5, twinklePhase: r() * Math.PI * 2 });
   }
   return stars;
+}
+
+function StarCanvas({ stars }) {
+  const canvasRef = useRef(null);
+  const frameRef = useRef(null);
+  const timeRef = useRef(0);
+  const lastTimeRef = useRef(0);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    const draw = (timestamp) => {
+      const dt = lastTimeRef.current ? (timestamp - lastTimeRef.current) / 1000 : 0;
+      lastTimeRef.current = timestamp;
+      timeRef.current += dt;
+      const t = timeRef.current;
+
+      const W = canvas.width;
+      const H = canvas.height;
+      ctx.clearRect(0, 0, W, H);
+
+      // Milky Way glow band
+      const mwGrad = ctx.createLinearGradient(0, H, W, 0);
+      mwGrad.addColorStop(0,   "rgba(0,0,0,0)");
+      mwGrad.addColorStop(0.3, "rgba(80,70,140,0.07)");
+      mwGrad.addColorStop(0.5, "rgba(160,140,220,0.13)");
+      mwGrad.addColorStop(0.65,"rgba(200,180,255,0.10)");
+      mwGrad.addColorStop(0.75,"rgba(255,220,160,0.06)");
+      mwGrad.addColorStop(1,   "rgba(0,0,0,0)");
+      ctx.fillStyle = mwGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      // Stars
+      for (let i = 0; i < stars.length; i++) {
+        const s = stars[i];
+        const twinkle = 0.6 + 0.4 * Math.sin(t / s.twinkleSpeed + s.twinklePhase);
+        const alpha = s.opacity * twinkle;
+        const px = (s.x / 100) * W;
+        const py = (s.y / 100) * H;
+        const [r, g, b] = s.color;
+
+        ctx.beginPath();
+        ctx.arc(px, py, s.size / 2, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${r},${g},${b},${alpha})`;
+        ctx.fill();
+
+        // Soft glow for brighter stars only
+        if (s.size > 1.2) {
+          const grd = ctx.createRadialGradient(px, py, 0, px, py, s.size * 2.5);
+          grd.addColorStop(0, `rgba(${r},${g},${b},${alpha * 0.4})`);
+          grd.addColorStop(1, "rgba(0,0,0,0)");
+          ctx.beginPath();
+          ctx.arc(px, py, s.size * 2.5, 0, Math.PI * 2);
+          ctx.fillStyle = grd;
+          ctx.fill();
+        }
+      }
+
+      frameRef.current = requestAnimationFrame(draw);
+    };
+
+    frameRef.current = requestAnimationFrame(draw);
+    return () => {
+      cancelAnimationFrame(frameRef.current);
+      window.removeEventListener("resize", resize);
+    };
+  }, [stars]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 w-full h-full"
+      style={{ display: "block" }}
+    />
+  );
 }
 
 // ====================================================================
@@ -132,51 +201,12 @@ const FACETS = [
 // ====================================================================
 
 /**
- * Spherical sky dome effect using CSS perspective and 3D transforms.
+ * Star field background — canvas-rendered for crisp pinpoints at any DPR.
  */
-function SkyDome({ stars, opacity, children }) {
+function StarBackground({ stars }) {
   return (
-    <div
-      className="absolute inset-0 overflow-hidden"
-      style={{
-        perspective: "1200px",
-        perspectiveOrigin: "50% 50%",
-      }}
-    >
-      {/* Deepest layer: Milky Way band */}
-      <div className="milkyway-layer" />
-
-      <div
-        className="absolute inset-0"
-        style={{
-          transform: "rotateX(10deg) rotateY(0deg)",
-          transformStyle: "preserve-3d",
-          opacity: opacity !== undefined ? opacity : 1,
-          transition: "opacity 1.5s ease",
-        }}
-      >
-        {/* Stars */}
-        {stars.map((s) => (
-          <div
-            key={s.id}
-            className="absolute rounded-full"
-            style={{
-              left: s.x + "%",
-              top: s.y + "%",
-              width: s.size + "px",
-              height: s.size + "px",
-              backgroundColor: s.color,
-              opacity: s.opacity,
-              boxShadow: s.size > 1.3 ? `0 0 ${s.size * 1.5}px ${s.color}` : "none",
-              animation: `twinkle ${s.twinkleSpeed}s ease-in-out infinite`,
-              animationDelay: s.twinklePhase + "s",
-              transform: `translateZ(${s.inMilkyWay ? 20 : -10}px)`,
-            }}
-          />
-        ))}
-
-        {children}
-      </div>
+    <div className="absolute inset-0 overflow-hidden" style={{ background: "#02040e" }}>
+      <StarCanvas stars={stars} />
     </div>
   );
 }
@@ -644,22 +674,22 @@ export default function Intro() {
       ref={containerRef}
       className="fixed inset-0 bg-black overflow-hidden"
     >
-      {/* ===== BACKGROUND: Sky Dome with Stars ===== */}
-      <SkyDome stars={stars} opacity={phase >= 0 ? 1 : 0}>
-        {/* Milky Way extra glow */}
+      {/* ===== BACKGROUND: Canvas Star Field + Milky Way ===== */}
+      <StarBackground stars={stars} />
+
+      {/* ===== FROSTED BLUR — only behind text panels (phase 3+), not over the sky ===== */}
+      {phase >= 3 && (
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            background: "radial-gradient(ellipse 50% 14% at 50% 40%, rgba(180, 180, 255, 0.04) 0%, transparent 60%)",
-            transform: "rotate(35deg)",
+            zIndex: 15,
+            background: "rgba(2, 4, 14, 0.45)",
+            backdropFilter: "blur(4px)",
+            WebkitBackdropFilter: "blur(4px)",
+            transition: "opacity 0.8s ease",
           }}
         />
-      </SkyDome>
-
-      {/* ===== BACKGROUND: Cosmic Blur Backdrop =====
-           Sits directly over the Milky Way + stars, under all text/UI,
-           giving typography a clean, softly-blurred reading surface. */}
-      <div className="cosmic-blur" style={{ opacity: phase >= 0 ? 1 : 0 }} />
+      )}
 
       {/* ===== SCENE 0: Campsite ===== */}
       {phase === 0 && (
