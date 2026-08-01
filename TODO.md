@@ -55,3 +55,8 @@ Make the Browse page feel more natural and interactive, then bring the same life
 - [x] 5.6 Rework loading animation — 40 floating particles (4 colors, varied shapes), 3 shooting stars with meteor-tail, larger 3D CosmosLoader (88px), animated "LOADING" text with letter-by-letter pulse, shimmer progress bar, corner decorative elements
 - [x] 5.7 Final build verification — `npm run build` compiles successfully (478.84 kB JS, 18.27 kB CSS)
 
+## Bug Fix — `/browse` ReferenceError (`setStarOffset is not defined`)
+- [x] Fixed `frontend/src/pages/Browse.jsx` — `Browse()` component was calling `useAmbientInteractions(starOffset, setStarOffset, zoomLevel, setZoomLevel)` but never destructured `setStarOffset`/`setZoomLevel` from `useStarfieldControls(...)`.
+- [x] Added `setZoomLevel, setStarOffset` to the `useStarfieldControls` destructuring in the main `Browse` component so both setters are in scope.
+- [x] Verified `npm run build` compiles successfully (478.85 kB JS, 18.27 kB CSS).
+

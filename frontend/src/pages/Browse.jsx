@@ -786,7 +786,7 @@ export default function Browse() {
 
   // Starfield controls — manage pan/zoom state (runs first to provide state)
   const {
-    starOffset, zoomLevel, isPanning,
+    starOffset, zoomLevel, isPanning, setZoomLevel, setStarOffset,
     onWheel, onStarfieldPointerDown, onStarfieldPointerMove, onStarfieldPointerUp,
   } = useStarfieldControls(pageRef, markUserInteractionRef);
 
