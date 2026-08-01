@@ -6,14 +6,19 @@ import { Button } from "@/components/ui/button";
 import { Heart, MessageSquare, ArrowLeft, ArrowRight, Star, Share2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import SafeImage from "@/components/SafeImage";
+import { FloatingParticles, KenBurns } from "@/components/AmbientFX";
+import { useSparkleField } from "@/hooks/useAmbientLife";
 
 export default function Inspiration() {
   const [items, setItems] = useState([]);
   const [index, setIndex] = useState(0);
   const [favorites, setFavorites] = useState({});
   const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
+const { user } = useAuth();
   const navigate = useNavigate();
+
+  // Ambient click sparkles across the page
+  const sparkles = useSparkleField();
 
   useEffect(() => {
     Promise.all([api.get("/listings"), api.get("/designs")])
@@ -63,9 +68,11 @@ export default function Inspiration() {
     return () => window.removeEventListener("keydown", onKey);
   }, [next, prev]);
 
-  if (loading) {
+if (loading) {
     return (
       <div className="h-screen w-screen flex items-center justify-center bg-black text-white font-tech text-xs uppercase tracking-wider">
+        {sparkles.layer}
+        <FloatingParticles count={6} color="rgba(255,255,255,0.1)" className="fixed inset-0" />
         Loading inspiration...
       </div>
     );
@@ -74,6 +81,8 @@ export default function Inspiration() {
   if (!items.length) {
     return (
       <div className="h-screen w-screen flex items-center justify-center bg-black text-white font-tech text-xs uppercase tracking-wider">
+        {sparkles.layer}
+        <FloatingParticles count={6} color="rgba(255,255,255,0.1)" className="fixed inset-0" />
         No items yet
       </div>
     );
@@ -85,8 +94,10 @@ export default function Inspiration() {
   const title = current.title || "Untitled";
   const subtitle = isListing ? `${current.category || ""} · $${current.base_original_price ?? current.price ?? 0}` : `by ${current.creator_name || "Unknown"}`;
 
-  return (
+return (
     <div className="fixed inset-0 z-50 bg-black text-white">
+      {sparkles.layer}
+      <FloatingParticles count={8} color="rgba(255,255,255,0.08)" className="fixed inset-0 pointer-events-none" />
       <div className="absolute inset-0">
         {image ? (
           <SafeImage src={fileUrl(image)} alt={title} className="w-full h-full object-cover" />

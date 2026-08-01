@@ -85,7 +85,7 @@ export default function Terms() {
 
 function Section({ icon: Icon, title, children }) {
   return (
-    <section className="mb-10 auto-float">
+    <section className="mb-10 rise-in">
       <div className="flex items-center gap-3 mb-4">
         <div className="h-9 w-9 border border-border bg-card rounded-xl flex items-center justify-center">
           <Icon className="h-4 w-4 text-primary" strokeWidth={1.5} />

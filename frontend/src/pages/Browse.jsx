@@ -765,6 +765,12 @@ export default function Browse() {
     clearTimeout(bobWaveTimer.current);
     bobWaveTimer.current = setTimeout(() => setBobWave(false), 2400);
   }, []);
+  const handleBobKeyDown = useCallback((e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handleBobClick();
+    }
+  }, [handleBobClick]);
   useEffect(() => () => clearTimeout(bobWaveTimer.current), []);
 
   // --- Hooks ---
@@ -775,6 +781,9 @@ export default function Browse() {
   // Create a stable ref to wire user-interaction tracking between hooks
   const markUserInteractionRef = useRef(() => {});
 
+  // Scroll hint — visible initially, dismissed on real user interactions
+  const [showScrollHint, setShowScrollHint] = useState(true);
+
   // Starfield controls — manage pan/zoom state (runs first to provide state)
   const {
     starOffset, zoomLevel, isPanning,
@@ -783,18 +792,16 @@ export default function Browse() {
 
   // Ambient auto-interactions — the page breathes and drifts on its own (uses starOffset/zoomLevel from above)
   const { markUserInteraction } = useAmbientInteractions(starOffset, setStarOffset, zoomLevel, setZoomLevel);
+  const handleUserInteraction = useCallback(() => {
+    markUserInteraction();
+    setShowScrollHint(false);
+  }, [markUserInteraction]);
 
   // Wire the real markUserInteraction into the ref so starfield controls call the latest version
-  markUserInteractionRef.current = markUserInteraction;
+  markUserInteractionRef.current = handleUserInteraction;
 
   // Mouse parallax — the sky subtly follows the cursor for depth and life
   const parallax = useMouseParallax(isDay && !spaceView);
-
-  // Scroll hint — shows until the user has zoomed in at least once
-  const [showScrollHint, setShowScrollHint] = useState(true);
-  useEffect(() => {
-    if (zoomLevel >= 0.4) setShowScrollHint(false);
-  }, [zoomLevel]);
 
   // --- Derived Data ---
   const listingPositions = useMemo(() => generateListingPositions(500, starSeed), [starSeed]);
@@ -903,7 +910,7 @@ export default function Browse() {
   return (
       <div className="relative z-10 px-6 md:px-12 lg:px-24 py-32 pointer-events-none">
         <div className="text-xs font-tech uppercase tracking-[0.3em] text-white/60 mb-3 rise-in rise-in-1">
-          <span className="text-white">\u2022</span> {contentMeta}
+          <span className="text-white">•</span> {contentMeta}
         </div>
         <h1 className={"font-display text-4xl sm:text-5xl font-light tracking-tighter mb-6 text-white rise-in rise-in-2" + (loading ? " animate-pulse" : "")}>
           {contentTitle}
@@ -935,6 +942,9 @@ export default function Browse() {
               cursor: "pointer",
             }}
             onClick={handleBobClick}
+            onKeyDown={handleBobKeyDown}
+            role="button"
+            tabIndex={0}
           >
             <div className={bobWave ? "bob-idle-wander auto-glow-pulse" : isIdle ? "bob-idle-wander" : "ambient-drift"}>
               {user?.is_pro ? <BobPro state={bobWave ? "introducing" : (bobState || "idle")} /> : <Bob state={bobWave ? "introducing" : (bobState || "idle")} />}
@@ -1020,7 +1030,7 @@ export default function Browse() {
             onClick={() => setSpaceView(false)}
             className="absolute top-20 left-6 z-50 px-3 py-1.5 text-[10px] font-tech uppercase tracking-wider border border-white/30 text-white/70 rounded-full bg-black/40 hover:bg-black/60 hover:text-white transition-colors"
           >
-            \u2190 Back to surface
+← Back to surface
           </button>
         </div>
       )}

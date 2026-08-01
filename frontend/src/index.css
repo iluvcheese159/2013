@@ -322,68 +322,6 @@
 }
 
 /* ── AmbientFX Toolkit ── */
-/* FloatingParticles: slow upward drift with a slight sway */
-@keyframes floating-particle {
-    0%   { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
-    15%  { opacity: var(--p-opacity, 0.4); }
-    50%  { transform: translateY(-45vh) translateX(8px) scale(1.05); }
-    85%  { opacity: var(--p-opacity, 0.4); }
-    100% { transform: translateY(-90vh) translateX(-6px) scale(0.9); opacity: 0; }
-}
-.floating-particle {
-    animation: floating-particle 12s linear infinite;
-}
-
-/* SparkleField: click burst particles fly outward and fade */
-@keyframes sparkle-burst {
-    0%   { transform: translate(0, 0) scale(1); opacity: 1; }
-    100% { transform: translate(var(--dx), var(--dy)) scale(0.2); opacity: 0; }
-}
-.sparkle-burst {
-    animation: sparkle-burst 0.6s ease-out forwards;
-}
-
-/* ShimmerBorder: rotating conic gradient edge highlight */
-@keyframes shimmer-border-rotate {
-    0%   { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-.shimmer-border {
-    position: absolute;
-    inset: -1px;
-    border-radius: inherit;
-    padding: 1px;
-    background: conic-gradient(
-        from 0deg,
-        transparent 0%,
-        rgba(0, 229, 255, 0.6) 12%,
-        transparent 24%,
-        transparent 50%,
-        rgba(255, 87, 34, 0.5) 62%,
-        transparent 76%
-    );
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    animation: shimmer-border-rotate 4s linear infinite;
-    pointer-events: none;
-}
-
-/* Typewriter caret blink */
-@keyframes typewriter-caret-blink {
-    0%, 49% { opacity: 1; }
-    50%, 100% { opacity: 0; }
-}
-.typewriter-caret {
-    display: inline-block;
-    width: 2px;
-    height: 1em;
-    margin-left: 2px;
-    vertical-align: -0.15em;
-    background: currentColor;
-    animation: typewriter-caret-blink 0.9s step-end infinite;
-}
-
 /* Aurora / nebula drift for the Browse night sky */
 @keyframes aurora-drift {
     0%   { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); opacity: 0.5; }
@@ -530,7 +468,7 @@
     display: inline-block;
     width: 2px;
     height: 1em;
-    background: currentColor;
+    background: currentcolor;
     margin-left: 2px;
     vertical-align: -0.15em;
     animation: typewriter-blink 0.8s step-end infinite;
@@ -545,7 +483,17 @@
     .auto-float,
     .auto-glow-pulse,
     .auto-highlight,
-    .ambient-drift {
+    .ambient-drift,
+    .ambient-meteor,
+    .ambient-meteor-tail,
+    .ambient-parallax,
+    .ambient-ken-burns,
+    .ambient-page-breathe,
+    .ambient-highlight-cycle,
+    .ambient-scroll-hint,
+    .ambient-shimmer,
+    .aurora-layer,
+    .bob-idle-wander {
         animation: none !important;
     }
 }

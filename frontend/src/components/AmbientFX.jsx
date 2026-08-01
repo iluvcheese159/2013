@@ -264,8 +264,16 @@ export function Typewriter({ words, className = "", speed = 70, hold = 2200 }) {
   const [wordIdx, setWordIdx] = useState(0);
   const [text, setText] = useState("");
   const [deleting, setDeleting] = useState(false);
+  const hasWords = Array.isArray(words) && words.length > 0;
 
   useEffect(() => {
+    if (!hasWords) {
+      setText("");
+      setDeleting(false);
+      setWordIdx(0);
+      return undefined;
+    }
+
     const word = words[wordIdx % words.length];
     let timer;
     if (!deleting && text === word) {
@@ -282,7 +290,11 @@ export function Typewriter({ words, className = "", speed = 70, hold = 2200 }) {
       }, deleting ? speed / 2 : speed);
     }
     return () => clearTimeout(timer);
-  }, [text, deleting, wordIdx, words, speed, hold]);
+  }, [text, deleting, wordIdx, words, hasWords, speed, hold]);
+
+  if (!hasWords) {
+    return <span className={className} />;
+  }
 
   return (
     <span className={className}>

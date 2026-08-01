@@ -3,8 +3,11 @@ import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import { FloatingParticles, RevealOnScroll } from "@/components/AmbientFX";
+import { useSparkleField } from "@/hooks/useAmbientLife";
 
 export default function CheckoutSuccess() {
+  const sparkles = useSparkleField();
   const [params] = useSearchParams();
   const sessionId = params.get("session_id");
   const [status, setStatus] = useState("polling"); // polling | paid | failed | expired
@@ -46,7 +49,10 @@ export default function CheckoutSuccess() {
   }, [sessionId]);
 
   return (
-    <div data-testid="checkout-success-page" className="pt-32 px-6 md:px-12 lg:px-24 min-h-screen flex flex-col items-center justify-center text-center">
+    <div className="relative min-h-screen overflow-hidden">
+      {sparkles.layer}
+      <FloatingParticles count={10} color="rgba(52, 211, 153, 0.12)" className="fixed inset-0" />
+      <div data-testid="checkout-success-page" className="relative z-10 pt-32 px-6 md:px-12 lg:px-24 min-h-screen flex flex-col items-center justify-center text-center">
       {status === "polling" && (
         <>
           <Loader2 className="h-10 w-10 text-primary animate-spin mb-6" />
@@ -85,6 +91,7 @@ export default function CheckoutSuccess() {
           </Link>
         </>
       )}
+    </div>
     </div>
   );
 }

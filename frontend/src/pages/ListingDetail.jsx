@@ -16,6 +16,8 @@ import UserBadges from "@/components/UserBadges";
 import RestrictedContentToggle from "@/components/RestrictedContentToggle";
 import SafeImage from "@/components/SafeImage";
 import StarfieldRenderer from "@/components/StarfieldRenderer";
+import { FloatingParticles, RevealOnScroll, TiltCard } from "@/components/AmbientFX";
+import { useSparkleField } from "@/hooks/useAmbientLife";
 
 const TABS = [
   { id: "details", label: "Details", icon: Info },
@@ -74,6 +76,10 @@ export default function ListingDetail() {
   const { user, openAuth } = useAuth();
   const { add: addToCart } = useCart();
   const navigate = useNavigate();
+
+  // Ambient click sparkles across the page
+  const sparkles = useSparkleField();
+
 
   const openReport = (type, id) => {
     if (!user) { openAuth("signin"); return; }
@@ -175,6 +181,8 @@ export default function ListingDetail() {
   if (!item) {
     return (
       <div className="pt-32 px-6 md:px-12 lg:px-24 text-sm font-tech text-muted-foreground">
+        {sparkles.layer}
+        <FloatingParticles count={5} color="rgba(255,87,34,0.12)" className="fixed inset-0" />
         Loading listing…
       </div>
     );
@@ -387,6 +395,8 @@ export default function ListingDetail() {
 
   return (
     <div data-testid="listing-detail-page" className="pt-14 min-h-screen relative bg-black">
+      {sparkles.layer}
+      <FloatingParticles count={6} color="rgba(255,87,34,0.1)" className="fixed inset-0 pointer-events-none" />
       {/* Subtle starfield background - dimmer than Browse page */}
       <StarfieldRenderer starCount={150} seed={starSeed} className="fixed inset-0 opacity-30" />
       

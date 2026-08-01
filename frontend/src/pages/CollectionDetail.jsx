@@ -3,10 +3,13 @@ import { useParams, Link } from "react-router-dom";
 import { api, fileUrl } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Users, Lock, ArrowLeft } from "lucide-react";
+import { Users, Lock, ArrowLeft, Eye, Star } from "lucide-react";
 import SafeImage from "@/components/SafeImage";
+import { RevealOnScroll, TiltCard, FloatingParticles } from "@/components/AmbientFX";
+import { useSparkleField } from "@/hooks/useAmbientLife";
 
 export default function CollectionDetail() {
+  const sparkles = useSparkleField();
   const { id } = useParams();
   const { user, openAuth } = useAuth();
   const [col, setCol] = useState(null);
@@ -32,7 +35,10 @@ export default function CollectionDetail() {
   if (!col) return <div className="pt-24 px-6 md:px-12 text-sm text-muted-foreground">Collection not found.</div>;
 
   return (
-    <div data-testid="collection-detail-page" className="pt-14 min-h-screen px-6 md:px-12 lg:px-24 py-10">
+    <div className="relative min-h-screen overflow-hidden">
+      {sparkles.layer}
+      <FloatingParticles count={6} color="rgba(167, 139, 250, 0.12)" className="fixed inset-0" />
+      <div data-testid="collection-detail-page" className="relative z-10 pt-14 min-h-screen px-6 md:px-12 lg:px-24 py-10">
       <div className="flex items-center justify-between gap-4 mb-8">
         <div>
           <div className="text-[10px] font-tech uppercase tracking-[0.3em] text-muted-foreground mb-2 rise-in">Collection</div>
@@ -87,6 +93,7 @@ export default function CollectionDetail() {
           ))}
         </div>
       )}
+    </div>
     </div>
   );
 }

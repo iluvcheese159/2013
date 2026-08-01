@@ -11,6 +11,8 @@ import { Search, Send, ArrowLeft, Plus, Lock, Globe, SmilePlus, Reply, Forward }
 import UserBadges from "@/components/UserBadges";
 import ConstellationBuilder from "@/components/ConstellationBuilder";
 import EmptyConstellation from "@/components/EmptyConstellation";
+import { FloatingParticles } from "@/components/AmbientFX";
+import { useSparkleField } from "@/hooks/useAmbientLife";
 
 export default function Messages() {
   const { user, openAuth } = useAuth();
@@ -47,6 +49,9 @@ export default function Messages() {
   const [previewStartTime, setPreviewStartTime] = useState(null);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Ambient click sparkles across the page
+  const sparkles = useSparkleField();
 
   const handleSaveConstellation = (data) => {
     setConstellationData((prev) => ({
@@ -164,6 +169,8 @@ export default function Messages() {
   if (!user) {
     return (
       <div className="pt-24 px-6 md:px-12 text-center">
+        {sparkles.layer}
+        <FloatingParticles count={5} color="rgba(255,87,34,0.12)" className="fixed inset-0" />
         <h1 className="font-display text-3xl font-medium mb-4">Sign in to message makers</h1>
         <Button data-testid="messages-signin-btn" onClick={() => openAuth("signin")} className="bg-primary hover:bg-primary/90 rounded-xl font-tech text-xs uppercase tracking-wider">
           Sign in
@@ -237,6 +244,8 @@ export default function Messages() {
 
   return (
     <div data-testid="messages-page" className="pt-14 h-screen flex">
+      {sparkles.layer}
+      <FloatingParticles count={6} color="rgba(255,87,34,0.1)" className="fixed inset-0 pointer-events-none" />
       <aside className="w-80 border-r border-border bg-card overflow-y-auto flex flex-col">
         <div className="p-4 border-b border-border">
           <div className="flex items-center gap-2 mb-2">

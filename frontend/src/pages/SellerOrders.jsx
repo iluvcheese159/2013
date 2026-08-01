@@ -7,10 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import SafeImage from "@/components/SafeImage";
+import { FloatingParticles } from "@/components/AmbientFX";
+import { useSparkleField } from "@/hooks/useAmbientLife";
 
 const CARRIERS = ["USPS", "UPS", "FedEx", "DHL"];
 
 export default function SellerOrders() {
+  const sparkles = useSparkleField();
   const [orders, setOrders] = useState([]);
   const [saving, setSaving] = useState(false);
   const navigate = useNavigate();
@@ -35,7 +38,10 @@ export default function SellerOrders() {
   };
 
   return (
-    <div className="pt-14 min-h-screen px-6 md:px-12 lg:px-24">
+    <div className="relative min-h-screen overflow-hidden">
+      {sparkles.layer}
+      <FloatingParticles count={8} color="rgba(100, 180, 255, 0.10)" className="fixed inset-0" />
+      <div className="relative z-10 pt-14 min-h-screen px-6 md:px-12 lg:px-24">
       <div className="text-xs font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3 rise-in">Orders</div>
       <h1 className="font-display text-3xl font-light mb-6 rise-in rise-in-1">Seller Orders</h1>
 
@@ -106,6 +112,7 @@ export default function SellerOrders() {
           </Table>
         </div>
       )}
+    </div>
     </div>
   );
 }

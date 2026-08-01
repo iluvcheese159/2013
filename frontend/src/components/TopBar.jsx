@@ -5,7 +5,7 @@ import { useUI } from "@/contexts/UIContext";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
-import { LogOut, User, LayoutDashboard, Sparkles, UserCircle, Layers, ShieldCheck, Tag, BarChart3, ShieldAlert, BookOpen } from "lucide-react";
+import { LogOut, User, LayoutDashboard, Sparkles, UserCircle, Layers, ShieldCheck, Tag, BarChart3, ShieldAlert } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -134,9 +134,6 @@ export default function TopBar() {
                 <DropdownMenuItem data-testid="menu-my-designs" onClick={() => navigate("/my-designs")}>
                   <Layers className="h-4 w-4 mr-2" /> My designs
                 </DropdownMenuItem>
-                <DropdownMenuItem data-testid="menu-docs" onClick={() => navigate("/docs")}>
-                  <BookOpen className="h-4 w-4 mr-2" /> Documentation
-                </DropdownMenuItem>
                 <DropdownMenuItem data-testid="menu-dashboard" onClick={() => navigate("/dashboard")}>
                   <LayoutDashboard className="h-4 w-4 mr-2" /> Dashboard
                 </DropdownMenuItem>
@@ -182,15 +179,6 @@ export default function TopBar() {
                 </Avatar>
                 <span className="text-xs font-tech text-muted-foreground">{guestOrUser.name}</span>
               </div>
-              <Button
-                data-testid="docs-btn"
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate("/docs")}
-                className="hidden sm:inline-flex font-tech text-xs uppercase tracking-wider rounded-xl"
-              >
-                <BookOpen className="h-3.5 w-3.5 mr-1.5" /> Documentation
-              </Button>
               <Button
               data-testid="signin-btn"
               variant="outline"

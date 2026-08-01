@@ -9,8 +9,11 @@ import { api, fileUrl } from "@/lib/api";
 import { ShoppingCart, X, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import SafeImage from "@/components/SafeImage";
+import { RevealOnScroll, TiltCard, FloatingParticles } from "@/components/AmbientFX";
+import { useSparkleField } from "@/hooks/useAmbientLife";
 
 export default function Cart() {
+  const sparkles = useSparkleField();
   const navigate = useNavigate();
   const { items, remove, clear } = useCart();
   const { user, openAuth } = useAuth();
@@ -73,8 +76,11 @@ export default function Cart() {
     }
   };
 
-  return (
-      <div data-testid="cart-page" className="pt-20 min-h-screen px-6 md:px-12 py-16 max-w-3xl">
+return (
+    <div className="relative min-h-screen overflow-hidden">
+      {sparkles.layer}
+      <FloatingParticles count={8} color="rgba(0, 229, 255, 0.12)" className="fixed inset-0" />
+      <div data-testid="cart-page" className="pt-20 min-h-screen px-6 md:px-12 py-16 max-w-3xl relative z-10">
       <button onClick={() => navigate(-1)} className="text-xs font-tech uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground inline-flex items-center gap-2 mb-6 rise-in">
         <ArrowLeft className="h-3 w-3" /> Back
       </button>
@@ -208,6 +214,7 @@ export default function Cart() {
           </p>
         </>
       )}
+    </div>
     </div>
   );
 }

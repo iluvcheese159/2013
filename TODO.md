@@ -39,6 +39,19 @@ Make the Browse page feel more natural and interactive, then bring the same life
 - [x] 3.22 `Messages.jsx` — subtle RevealOnScroll message bubbles
 
 ### Phase 4 — Verify
-- [ ] 4.1 Lint/build check
-- [ ] 4.2 Final review of changed files
+- [x] 4.1 Lint/build check — `npm run build` passes (fixed unbalanced `<button>` JSX in Forums.jsx post cards)
+- [x] 4.2 Final review of changed files — AmbientFX/useAmbientLife confirmed; FilamentCalculator + Purchases JSX verified balanced
+- [x] 4.3 ListingDetail.jsx — SparkleField + FloatingParticles added to both returns (loading + main), ambient CSS classes (rise-in, auto-float, auto-glow-pulse, ambient-drift) already present
+- [x] 4.4 Inspiration.jsx — SparkleField + FloatingParticles added to all three returns (loading, empty, main)
+- [x] 4.5 Messages.jsx — SparkleField + FloatingParticles confirmed present in both returns
+- [x] 4.6 Final build — `npm run build` passes with ambient interactivity on all pages
+
+### Phase 5 — Post-feedback polish
+- [x] 5.1 Remove "Documentation" section from Sidebar (already done — no `/docs` entry in NAV)
+- [x] 5.2 Remove "Documentation" section from Footer component
+- [x] 5.3 Remove `/docs` link from Home.jsx footer
+- [x] 5.4 Remove `/docs` route from App.js + remove unused Docs import
+- [x] 5.5 Make intro start immediately on page load — `HomeOrIntro` shows intro on first-session visit via `requestAnimationFrame`, no `checking` delay
+- [x] 5.6 Rework loading animation — 40 floating particles (4 colors, varied shapes), 3 shooting stars with meteor-tail, larger 3D CosmosLoader (88px), animated "LOADING" text with letter-by-letter pulse, shimmer progress bar, corner decorative elements
+- [x] 5.7 Final build verification — `npm run build` compiles successfully (478.84 kB JS, 18.27 kB CSS)
 

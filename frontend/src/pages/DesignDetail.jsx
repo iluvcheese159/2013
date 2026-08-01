@@ -10,8 +10,11 @@ import { ArrowLeft, GitFork, Share2, Box, Lock, Loader2, ExternalLink } from "lu
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { RevealOnScroll, TiltCard, FloatingParticles } from "@/components/AmbientFX";
+import { useSparkleField } from "@/hooks/useAmbientLife";
 
 export default function DesignDetail() {
+  const sparkles = useSparkleField();
   const { id } = useParams();
   const navigate = useNavigate();
   const { user, openAuth } = useAuth();
@@ -94,8 +97,11 @@ export default function DesignDetail() {
   const images = design.image_paths || [];
   const isOwner = user && user.user_id === design.creator_id;
 
-  return (
-    <div data-testid="design-detail-page" className="pt-14 min-h-screen">
+return (
+    <div className="relative min-h-screen overflow-hidden">
+      {sparkles.layer}
+      <FloatingParticles count={8} color="rgba(96, 165, 250, 0.12)" className="fixed inset-0" />
+      <div data-testid="design-detail-page" className="relative z-10 pt-14 min-h-screen">
       {/* Back nav */}
       <div className="px-6 md:px-12 lg:px-24 py-6 border-b border-border rise-in">
         <button
@@ -305,6 +311,7 @@ export default function DesignDetail() {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

@@ -15,6 +15,8 @@ import MilestoneBadge3D from "@/components/MilestoneBadge3D";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import PrinterModelSelector from "@/components/PrinterModelSelector";
 import PRINTER_MODELS from "@/constants/printerModels";
+import { FloatingParticles, RevealOnScroll, TiltCard } from "@/components/AmbientFX";
+import { useSparkleField } from "@/hooks/useAmbientLife";
 
 const TYPES = [
   { id: "personal", label: "Personal", icon: UserIcon },
@@ -54,6 +56,9 @@ export default function Profile() {
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [kycBusy, setKycBusy] = useState(false);
   const [termsBusy, setTermsBusy] = useState(false);
+
+  // Ambient click sparkles across the page
+  const sparkles = useSparkleField();
 
   // Ambient animation refs
   const pageRef = useRef(null);
@@ -145,6 +150,8 @@ export default function Profile() {
     const terminated = publicProfile.enforcement_status === "Terminated";
     return (
       <div className="pt-20 min-h-screen px-6 md:px-12 py-10 max-w-5xl" data-testid="public-profile-page">
+        {sparkles.layer}
+        <FloatingParticles count={6} color="rgba(255,87,34,0.12)" className="fixed inset-0" />
         {terminated ? (
           <div className="border border-destructive/40 bg-destructive/10 text-destructive rounded-xl p-6 text-sm font-tech">
             This user profile has been permanently banned by the Moderator for violations of the Print Cosmos Terms of Service.
@@ -450,6 +457,8 @@ export default function Profile() {
 
   return (
     <div data-testid="profile-page" className="pt-20 min-h-screen">
+      {sparkles.layer}
+      <FloatingParticles count={6} color="rgba(255,87,34,0.12)" className="fixed inset-0" />
       <div className="px-6 md:px-12 py-10 max-w-3xl">
         <div className="text-[10px] font-tech uppercase tracking-[0.3em] text-muted-foreground mb-3 rise-in">
           <span className="text-primary">●</span> Profile

@@ -105,6 +105,8 @@ export default function Bob({ state = "idle", position = "tent", isWarning = fal
 }
 
 export function BobPro({ state = "idle" }) {
+  const isSpeaking = state === "introducing";
+
   return (
     <div className="relative inline-block">
       <svg width="60" height="100" viewBox="0 0 60 100" fill="none">
@@ -116,7 +118,16 @@ export function BobPro({ state = "idle" }) {
           <circle cx="23" cy="10" r="1.2" fill="#fbbf24" />
           <circle cx="37" cy="10" r="1.2" fill="#fbbf24" />
           <path d="M28 14 L30 18 L32 14" fill="none" stroke="#fbbf24" strokeWidth="1.2" strokeLinecap="round" />
-          <path d="M23 24 Q30 22 37 24" fill="none" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" />
+          <path d={isSpeaking ? "M23 24 Q30 25 37 24" : "M23 24 Q30 22 37 24"} fill="none" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round">
+            {isSpeaking && (
+              <animate
+                attributeName="d"
+                dur="0.45s"
+                repeatCount="indefinite"
+                values="M23 24 Q30 22 37 24;M23 24 Q30 26 37 24;M23 24 Q30 22 37 24"
+              />
+            )}
+          </path>
           <line x1="26" y1="29" x2="26" y2="35" stroke="#fbbf24" strokeWidth="1.5" strokeLinecap="round" />
           <line x1="34" y1="29" x2="34" y2="35" stroke="#fbbf24" strokeWidth="1.5" strokeLinecap="round" />
           {/* Pro crown */}

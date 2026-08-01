@@ -7,8 +7,10 @@ import { Button } from "@/components/ui/button";
 import ProInvoiceReceipt from "@/components/ProInvoiceReceipt";
 import { Check, Sparkles, MessageSquare, Hammer, Percent } from "lucide-react";
 import { toast } from "sonner";
+import { FloatingParticles } from "@/components/AmbientFX";
+import { useSparkleField } from "@/hooks/useAmbientLife";
 
-const BRAND_URL = "https://printhive.net";
+const BRAND_URL = "https://printcosmos.net";
 
 const PERKS = [
   { icon: Percent, title: "2% fee instead of 3.5%", body: "Keep more of every print you sell." },
@@ -18,6 +20,7 @@ const PERKS = [
 ];
 
 export default function Pro() {
+  const sparkles = useSparkleField();
   const { user, openAuth, setUser } = useAuth();
   const [busy, setBusy] = useState(false);
   const [proPrice, setProPrice] = useState(4.99);
@@ -81,9 +84,12 @@ export default function Pro() {
     }
   };
 
-  if (verifyStatus === "paid") {
+if (verifyStatus === "paid") {
     return (
-      <div data-testid="pro-success" className="pt-20 px-6 pb-16 text-center min-h-screen">
+      <div className="relative min-h-screen overflow-hidden">
+        {sparkles.layer}
+        <FloatingParticles count={12} color="rgba(167, 139, 250, 0.15)" className="fixed inset-0" />
+        <div data-testid="pro-success" className="relative z-10 pt-20 px-6 pb-16 text-center min-h-screen">
         <Sparkles className="h-12 w-12 text-accent mx-auto mb-6" strokeWidth={1.5} />
         <h1 className="font-display text-4xl font-medium tracking-tighter mb-4">You're Print Cosmos.</h1>
         <p className="text-sm text-muted-foreground mb-8 max-w-md mx-auto">
@@ -96,11 +102,15 @@ export default function Pro() {
           Go to dashboard
         </Button>
       </div>
+      </div>
     );
   }
 
-  return (
-    <div data-testid="pro-page" className="pt-20 min-h-screen">
+return (
+    <div className="relative min-h-screen overflow-hidden">
+      {sparkles.layer}
+      <FloatingParticles count={10} color="rgba(167, 139, 250, 0.12)" className="fixed inset-0" />
+      <div data-testid="pro-page" className="relative z-10 pt-20 min-h-screen">
       <div className="px-6 md:px-12 py-16 max-w-5xl">
         <div className="text-[10px] font-tech uppercase tracking-[0.3em] text-accent mb-3 rise-in">
           <span>●</span> Membership
@@ -154,6 +164,7 @@ export default function Pro() {
             {busy ? "Redirecting…" : verifyStatus === "polling" ? "Verifying payment…" : `Upgrade — $${proPrice.toFixed(2)}`}
           </Button>
         )}
+      </div>
       </div>
     </div>
   );

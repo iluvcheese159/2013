@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUI } from "@/contexts/UIContext";
 import { useCart } from "@/contexts/CartContext";
-import { Home, Hammer, Search, MessageSquare, ShoppingCart, Sparkles, PanelLeftClose, PanelLeftOpen, Tag, Rocket, ShieldAlert, FolderOpen, BookOpen } from "lucide-react";
+import { Home, Hammer, Search, MessageSquare, ShoppingCart, Sparkles, PanelLeftClose, PanelLeftOpen, Tag, Rocket, ShieldAlert, FolderOpen } from "lucide-react";
 import { BRAND_NAME } from "@/lib/branding";
 import BrandLogo from "@/components/BrandLogo";
 
@@ -14,7 +14,6 @@ const NAV = [
   { to: "/forums", icon: Rocket, label: "Mission Control", testid: "side-forums" },
   { to: "/collections", icon: FolderOpen, label: "Collections", testid: "side-collections" },
   { to: "/messages", icon: MessageSquare, label: "Messages", testid: "side-messages", auth: true },
-  { to: "/docs", icon: BookOpen, label: "Documentation", testid: "side-docs" },
 ];
 
 const OWNER_NAV = [

@@ -207,8 +207,7 @@ const [commentBody, setCommentBody] = useState("");
                   </button>
                 </div>
               </div>
-                  </div>
-                </div>
+            </div>
               </button>
             </TiltCard>
           ))}

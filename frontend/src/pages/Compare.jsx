@@ -14,21 +14,25 @@ export default function Compare() {
   const navigate = useNavigate();
   const sparkles = useSparkleField();
   const [params] = useSearchParams();
-  const ids = [params.get("a"), params.get("b"), params.get("c")].filter(Boolean);
+  const idA = params.get("a") || "";
+  const idB = params.get("b") || "";
+  const idC = params.get("c") || "";
+  const ids = [idA, idB, idC].filter(Boolean);
   const [items, setItems] = useState([EMPTY, EMPTY, EMPTY]);
   const [loading, setLoading] = useState(true);
   const [inputIds, setInputIds] = useState(ids.join(","));
 
   useEffect(() => {
+    const requestIds = [idA, idB, idC].filter(Boolean);
     setLoading(true);
-    Promise.all(ids.map((id) => api.get(`/listings/${id}`).then((r) => r.data).catch(() => EMPTY)))
+    Promise.all(requestIds.map((id) => api.get(`/listings/${id}`).then((r) => r.data).catch(() => EMPTY)))
       .then((results) => {
         const merged = [EMPTY, EMPTY, EMPTY];
         results.forEach((r, i) => { if (r?.listing_id) merged[i] = r; });
         setItems(merged);
       })
       .finally(() => setLoading(false));
-  }, [ids]);
+  }, [idA, idB, idC]);
 
   const loadCompare = () => {
     const parts = inputIds.split(",").map((s) => s.trim()).filter(Boolean);

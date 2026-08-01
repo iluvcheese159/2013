@@ -381,11 +381,9 @@ export default function Home() {
           <BrandLogo alt={BRAND_NAME} className="h-8 w-auto object-contain" />
         </div>
         <div className="flex items-center gap-4">
-          <Link to="/terms" data-testid="footer-terms-link" className="hover:text-primary">Terms & Conditions</Link>
+<Link to="/terms" data-testid="footer-terms-link" className="hover:text-primary">Terms & Conditions</Link>
           <span>·</span>
           <a href={`mailto:${SUPPORT_EMAIL}`} className="hover:text-primary">{SUPPORT_EMAIL}</a>
-          <span>·</span>
-          <Link to="/docs" className="hover:text-accent">Documentation</Link>
           <span>·</span>
           <span>3.5% standard · 2% with Hyperspace · Stripe-secured</span>
         </div>
