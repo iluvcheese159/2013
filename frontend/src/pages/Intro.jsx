@@ -38,16 +38,18 @@ function generateMilkyWayStars(count, seed) {
       y = r() * 100;
     }
 
-    // Natural pinpoints: heavily skewed small (power-4), never over ~1.8px.
-    const size = 0.2 + Math.pow(r(), 4) * 1.6;
-    const brightness = 0.15 + (size / 1.8) * 0.55;
+    // Natural pinpoints: heavily skewed small (power-5), never over ~1.6px.
+    const size = 0.2 + Math.pow(r(), 5) * 1.4;
+    const brightness = 0.12 + (size / 1.6) * 0.55;
 
-    // Star color temperature
+    // Realistic star color temperature: mostly white/blue-white
     const colorRand = r();
     let color;
-    if (colorRand < 0.6) color = "rgb(240, 245, 255)"; // white
-    else if (colorRand < 0.85) color = "rgb(255, 250, 240)"; // yellow-white
-    else color = "rgb(255, 240, 220)"; // orange-white
+    if (colorRand < 0.55) color = "rgb(245, 248, 255)"; // blue-white
+    else if (colorRand < 0.75) color = "rgb(255, 255, 255)"; // white
+    else if (colorRand < 0.88) color = "rgb(255, 252, 240)"; // warm white
+    else if (colorRand < 0.95) color = "rgb(255, 245, 220)"; // yellow-white
+    else color = "rgb(220, 230, 255)"; // faint blue
 
     stars.push({
       id: i,
@@ -56,7 +58,7 @@ function generateMilkyWayStars(count, seed) {
       size,
       opacity: brightness,
       color,
-      twinkleSpeed: 2 + r() * 5,
+      twinkleSpeed: 3 + r() * 6,
       twinklePhase: r() * Math.PI * 2,
       inMilkyWay,
     });
@@ -261,42 +263,6 @@ function BenefitCard({ facet, visible }) {
         transform: visible ? "scale(1)" : "scale(0.8)",
       }}
     >
-      {/* Space background behind text */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background: facet.systemBg,
-          opacity: 0.6,
-          transition: "opacity 1s ease",
-        }}
-      />
-
-      {/* Star halos around the text */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {Array.from({ length: 8 }).map((_, i) => {
-          const angle = (i / 8) * Math.PI * 2;
-          const radius = 30 + Math.random() * 20;
-          const size = 2 + Math.random() * 4;
-          return (
-            <div
-              key={i}
-              className="absolute rounded-full"
-              style={{
-                left: `calc(50% + ${Math.cos(angle) * radius}%)`,
-                top: `calc(50% + ${Math.sin(angle) * radius}%)`,
-                width: size + "px",
-                height: size + "px",
-                backgroundColor: facet.color,
-                opacity: 0.3 + Math.random() * 0.4,
-                boxShadow: `0 0 ${size * 3}px ${facet.color}`,
-                animation: `twinkle ${2 + Math.random() * 3}s ease-in-out infinite`,
-                animationDelay: Math.random() * 2 + "s",
-              }}
-            />
-          );
-        })}
-      </div>
-
       {/* Text content — crossfades smoothly when the facet changes */}
       <div
         key={facet.id}
@@ -533,7 +499,7 @@ export default function Intro() {
   const [showBenefit, setShowBenefit] = useState(false);
   const [autoAdvanceTimer, setAutoAdvanceTimer] = useState(null);
 
-  const stars = useMemo(() => generateMilkyWayStars(400, 42), []);
+  const stars = useMemo(() => generateMilkyWayStars(600, 42), []);
   const timers = useRef([]);
   const containerRef = useRef(null);
   const scrollLocked = useRef(false);
@@ -642,7 +608,7 @@ export default function Intro() {
 
   // ---- Click on a specific star ----
   const handleStarClick = useCallback((index) => {
-    if (isZooming) return;
+    if (isZooming || phase < 2) return; // disabled during intro phases
     setZoomTarget(STAR_POSITIONS[index]);
     setFacetIndex(index);
     setIsZooming(true);
@@ -653,7 +619,7 @@ export default function Intro() {
       setPhase(3);
       startAutoAdvance();
     }, 1200);
-  }, [isZooming, startAutoAdvance]);
+  }, [isZooming, phase, startAutoAdvance]);
 
   // ---- Navigation handlers ----
   const handleGuest = () => { markIntroSeen(); navigate("/"); };
@@ -748,7 +714,7 @@ export default function Intro() {
           {/* Tree silhouettes at bottom */}
           <TreeSilhouettes opacity={0.4} />
 
-          {/* Clickable stars */}
+          {/* Clickable stars — only enabled once intro phases are past */}
           {FACETS.map((facet, i) => (
             <ZoomStar
               key={facet.id}

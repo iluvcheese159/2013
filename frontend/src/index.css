@@ -240,9 +240,10 @@
     overflow: hidden;
     pointer-events: none;
     background:
-        radial-gradient(ellipse 70% 22% at 50% 42%, rgba(190, 200, 255, 0.10) 0%, transparent 70%),
-        radial-gradient(ellipse 55% 16% at 48% 45%, rgba(150, 170, 255, 0.07) 0%, transparent 65%),
-        radial-gradient(ellipse 45% 12% at 52% 40%, rgba(120, 140, 255, 0.05) 0%, transparent 60%);
+        radial-gradient(ellipse 80% 30% at 52% 40%, rgba(200, 210, 255, 0.13) 0%, transparent 65%),
+        radial-gradient(ellipse 60% 20% at 50% 44%, rgba(160, 180, 255, 0.09) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 14% at 54% 38%, rgba(130, 150, 255, 0.07) 0%, transparent 55%),
+        radial-gradient(ellipse 25% 8% at 50% 42%, rgba(255, 240, 200, 0.06) 0%, transparent 50%);
     transform: rotate(38deg) scale(1.5);
 }
 .milkyway-layer::before {
@@ -250,16 +251,19 @@
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(1px 1px at 30% 44%, rgba(255,255,255,0.5), transparent 50%),
-        radial-gradient(1px 1px at 40% 38%, rgba(255,255,255,0.4), transparent 50%),
-        radial-gradient(1px 1px at 50% 42%, rgba(255,255,255,0.5), transparent 50%),
-        radial-gradient(1px 1px at 60% 40%, rgba(255,255,255,0.4), transparent 50%),
-        radial-gradient(1px 1px at 70% 45%, rgba(255,255,255,0.45), transparent 50%),
-        radial-gradient(1px 1px at 35% 48%, rgba(255,255,255,0.35), transparent 50%),
-        radial-gradient(1px 1px at 55% 46%, rgba(255,255,255,0.35), transparent 50%),
-        radial-gradient(1px 1px at 45% 50%, rgba(255,255,255,0.3), transparent 50%);
-    filter: blur(0.6px);
-    opacity: 0.5;
+        radial-gradient(1px 1px at 28% 42%, rgba(255,255,255,0.65), transparent 50%),
+        radial-gradient(1px 1px at 36% 38%, rgba(255,255,255,0.55), transparent 50%),
+        radial-gradient(1px 1px at 44% 44%, rgba(255,255,255,0.6), transparent 50%),
+        radial-gradient(1px 1px at 52% 40%, rgba(255,255,255,0.65), transparent 50%),
+        radial-gradient(1px 1px at 60% 43%, rgba(255,255,255,0.55), transparent 50%),
+        radial-gradient(1px 1px at 68% 39%, rgba(255,255,255,0.5), transparent 50%),
+        radial-gradient(1px 1px at 33% 47%, rgba(255,255,255,0.45), transparent 50%),
+        radial-gradient(1px 1px at 48% 48%, rgba(255,255,255,0.4), transparent 50%),
+        radial-gradient(1px 1px at 56% 46%, rgba(255,255,255,0.45), transparent 50%),
+        radial-gradient(1px 1px at 40% 50%, rgba(255,255,255,0.35), transparent 50%),
+        radial-gradient(1px 1px at 64% 50%, rgba(255,255,255,0.35), transparent 50%);
+    filter: blur(0.4px);
+    opacity: 0.7;
 }
 @keyframes milkyway-drift {
     0%   { transform: rotate(38deg) scale(1.5) translate3d(0, 0, 0); }

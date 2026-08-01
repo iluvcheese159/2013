@@ -64,12 +64,12 @@ export default function CampfireScene({ bobRef }) {
           trees.setAttribute("transform", "translate(" + sway + ", 0)");
         }
 
-        // Gentle idle sway for Bob sitting by the fire
+        // Gentle idle sway for Bob sitting in the bottom-left corner
         const bob = svgRef.current.querySelector("#cf-bob");
         if (bob) {
           const bobSway = Math.sin(t * 1.1) * 1.5;
           const bobRock = Math.sin(t * 0.7) * 0.8;
-          bob.setAttribute("transform", "translate(148, 170) rotate(" + bobRock + " 32 40) translate(" + bobSway * 0.3 + ", 0)");
+          bob.setAttribute("transform", "translate(18, 195) rotate(" + bobRock + " 20 30) translate(" + bobSway * 0.3 + ", 0)");
         }
       }
 
@@ -95,23 +95,73 @@ export default function CampfireScene({ bobRef }) {
         <ellipse cx="200" cy="270" rx="180" ry="30" fill="#1a1a1a" />
         <ellipse cx="200" cy="268" rx="160" ry="20" fill="#222" />
 
-        <g id="cf-trees" opacity="0.6">
-          <rect x="20" y="160" width="6" height="80" fill="#0a1a0a" />
-          <polygon points="23,120 0,170 46,170" fill="#0a1a0a" />
-          <polygon points="23,130 4,165 42,165" fill="#0d220d" />
-          <polygon points="23,140 8,160 38,160" fill="#0a1a0a" />
-          <rect x="60" y="140" width="8" height="100" fill="#0a1a0a" />
-          <polygon points="64,90 30,150 98,150" fill="#0a1a0a" />
-          <polygon points="64,100 35,145 93,145" fill="#0d220d" />
-          <polygon points="64,110 40,140 88,140" fill="#0a1a0a" />
-          <polygon points="64,120 45,135 83,135" fill="#0d220d" />
-          <rect x="320" y="150" width="7" height="90" fill="#0a1a0a" />
-          <polygon points="323,105 295,155 351,155" fill="#0a1a0a" />
-          <polygon points="323,115 300,150 346,150" fill="#0d220d" />
-          <polygon points="323,125 305,145 341,145" fill="#0a1a0a" />
-          <rect x="360" y="170" width="5" height="70" fill="#0a1a0a" />
-          <polygon points="362,140 345,175 379,175" fill="#0a1a0a" />
-          <polygon points="362,148 348,172 376,172" fill="#0d220d" />
+        {/* Dense forest — left cluster (surrounds Bob) */}
+        <g id="cf-trees" opacity="0.85">
+          {/* Far-left background trees */}
+          <rect x="-5" y="170" width="5" height="80" fill="#060e06" />
+          <polygon points="-3,130 -22,175 16,175" fill="#060e06" />
+          <polygon points="-3,140 -18,170 12,170" fill="#081208" />
+          <polygon points="-3,150 -14,165 8,165" fill="#060e06" />
+
+          <rect x="12" y="155" width="6" height="95" fill="#0a1a0a" />
+          <polygon points="15,105 -8,160 38,160" fill="#0a1a0a" />
+          <polygon points="15,115 -4,155 34,155" fill="#0d220d" />
+          <polygon points="15,125 0,150 30,150" fill="#0a1a0a" />
+          <polygon points="15,135 4,145 26,145" fill="#0d220d" />
+
+          <rect x="32" y="148" width="7" height="102" fill="#0a1a0a" />
+          <polygon points="35,95 8,155 62,155" fill="#0a1a0a" />
+          <polygon points="35,107 12,150 58,150" fill="#0d220d" />
+          <polygon points="35,118 16,145 54,145" fill="#0a1a0a" />
+          <polygon points="35,128 20,140 50,140" fill="#0d220d" />
+
+          <rect x="52" y="158" width="5" height="92" fill="#060e06" />
+          <polygon points="54,118 36,163 72,163" fill="#060e06" />
+          <polygon points="54,128 40,158 68,158" fill="#081208" />
+          <polygon points="54,138 44,153 64,153" fill="#060e06" />
+
+          <rect x="68" y="145" width="8" height="105" fill="#0a1a0a" />
+          <polygon points="72,88 40,152 104,152" fill="#0a1a0a" />
+          <polygon points="72,100 44,147 100,147" fill="#0d220d" />
+          <polygon points="72,112 48,142 96,142" fill="#0a1a0a" />
+          <polygon points="72,122 52,137 92,137" fill="#0d220d" />
+
+          <rect x="88" y="152" width="6" height="98" fill="#060e06" />
+          <polygon points="91,112 70,157 112,157" fill="#060e06" />
+          <polygon points="91,122 74,152 108,152" fill="#081208" />
+          <polygon points="91,132 78,147 104,147" fill="#060e06" />
+
+          {/* Mid-left trees */}
+          <rect x="108" y="160" width="5" height="90" fill="#0a1a0a" />
+          <polygon points="110,125 92,165 128,165" fill="#0a1a0a" />
+          <polygon points="110,133 96,160 124,160" fill="#0d220d" />
+          <polygon points="110,141 100,155 120,155" fill="#0a1a0a" />
+
+          {/* Right side trees */}
+          <rect x="290" y="155" width="7" height="95" fill="#0a1a0a" />
+          <polygon points="293,108 265,160 321,160" fill="#0a1a0a" />
+          <polygon points="293,118 270,155 316,155" fill="#0d220d" />
+          <polygon points="293,128 275,150 311,150" fill="#0a1a0a" />
+
+          <rect x="315" y="148" width="8" height="102" fill="#0a1a0a" />
+          <polygon points="319,98 288,155 350,155" fill="#0a1a0a" />
+          <polygon points="319,110 292,150 346,150" fill="#0d220d" />
+          <polygon points="319,122 296,145 342,145" fill="#0a1a0a" />
+          <polygon points="319,132 300,140 338,140" fill="#0d220d" />
+
+          <rect x="340" y="158" width="6" height="92" fill="#060e06" />
+          <polygon points="343,120 322,163 364,163" fill="#060e06" />
+          <polygon points="343,130 326,158 360,158" fill="#081208" />
+          <polygon points="343,140 330,153 356,153" fill="#060e06" />
+
+          <rect x="358" y="165" width="5" height="85" fill="#0a1a0a" />
+          <polygon points="360,132 342,170 378,170" fill="#0a1a0a" />
+          <polygon points="360,140 346,165 374,165" fill="#0d220d" />
+
+          <rect x="375" y="155" width="7" height="95" fill="#060e06" />
+          <polygon points="378,112 356,160 400,160" fill="#060e06" />
+          <polygon points="378,122 360,155 396,155" fill="#081208" />
+          <polygon points="378,132 364,150 392,150" fill="#060e06" />
         </g>
 
         <g id="cf-tent" transform="translate(200, 140)">
@@ -146,20 +196,22 @@ export default function CampfireScene({ bobRef }) {
           <circle cx="0" cy="-22" r="0.6" fill="#fef08a" opacity="0.4" />
         </g>
 
-        {/* Bob — sitting on the log, watching the fire (clean white stick figure) */}
-        <g id="cf-bob" transform="translate(148, 170)" style={{ filter: "drop-shadow(0 0 5px rgba(255,255,255,0.35)) drop-shadow(0 0 12px rgba(249,115,22,0.25))" }}>
+        {/* Bob — sitting in the bottom-left corner, watching the fire */}
+        <g id="cf-bob" transform="translate(18, 195)" style={{ filter: "drop-shadow(0 0 5px rgba(255,255,255,0.35)) drop-shadow(0 0 12px rgba(249,115,22,0.25))" }}>
+          {/* Round head (chibi style matching reference) */}
           <circle cx="20" cy="0" r="11" fill="none" stroke="#ffffff" strokeWidth="2" />
-          <line x1="20" y1="11" x2="20" y2="22" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
+          {/* Neck */}
+          <line x1="20" y1="11" x2="20" y2="18" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
           {/* Torso leaning toward the fire */}
-          <line x1="20" y1="22" x2="32" y2="40" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
-          {/* Folded legs */}
-          <line x1="32" y1="40" x2="23" y2="52" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
-          <line x1="32" y1="40" x2="41" y2="52" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
-          {/* Arms reaching toward the warmth */}
-          <line x1="24" y1="27" x2="40" y2="33" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
-          <line x1="40" y1="33" x2="44" y2="31" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
-          <line x1="18" y1="29" x2="12" y2="36" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
-          <line x1="12" y1="36" x2="10" y2="34" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
+          <line x1="20" y1="18" x2="28" y2="34" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
+          {/* Folded legs (sitting) */}
+          <line x1="28" y1="34" x2="18" y2="46" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
+          <line x1="28" y1="34" x2="36" y2="46" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
+          {/* Arm reaching toward fire */}
+          <line x1="22" y1="22" x2="36" y2="28" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
+          <line x1="36" y1="28" x2="40" y2="26" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
+          {/* Other arm resting */}
+          <line x1="18" y1="24" x2="10" y2="30" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
         </g>
 
         <g id="cf-fireflies">
