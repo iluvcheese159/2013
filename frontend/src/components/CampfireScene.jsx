@@ -95,7 +95,7 @@ export default function CampfireScene({ lookUp = false }) {
         viewBox="0 0 520 460"
         preserveAspectRatio="xMinYMax meet"
         className="absolute bottom-0 left-0"
-        style={{ width: "min(320px, 32vw)", height: "auto" }}
+        style={{ width: "min(320px, 32vw)", height: "min(400px, 40vw)" }}
         fill="none"
       >
         <defs>
@@ -134,17 +134,35 @@ export default function CampfireScene({ lookUp = false }) {
           <ellipse cx="370" cy="402" rx="60" ry="9" fill="#fbbf24" opacity="0.18" />
         </g>
 
-        {/* ══ LOG ══ */}
-        <g transform="translate(52, 380)">
-          <ellipse cx="96" cy="58" rx="98" ry="13" fill="#020402" opacity="0.4" />
-          <rect x="0" y="22" width="192" height="36" rx="18" fill="#3d1f0a" stroke="#5c3010" strokeWidth="2" />
-          <rect x="2" y="22" width="188" height="16" rx="16" fill="#4e2810" />
-          {[30,65,100,135,165].map(x => (
-            <line key={x} x1={x} y1="24" x2={x} y2="56" stroke="#2a1206" strokeWidth="1" opacity="0.45" />
-          ))}
-          <ellipse cx="10"  cy="40" rx="9" ry="17" fill="#3d1f0a" stroke="#5c3010" strokeWidth="1.5" />
-          <ellipse cx="182" cy="40" rx="9" ry="17" fill="#3d1f0a" stroke="#5c3010" strokeWidth="1.5" />
+        {/* ══ LOG + BOB — scaled down 0.72×, anchored at bottom-left area ══ */}
+        <g transform="translate(41, 117) scale(0.72)">
+
+        {/* ══ LOG — end-on view ══ */}
+        <g>
+          <ellipse cx="148" cy="438" rx="44" ry="7" fill="#010201" opacity="0.5" />
+          <path d="M110 418 Q148 432 186 418 L186 430 Q148 444 110 430 Z" fill="#2a1206" />
+          <ellipse cx="148" cy="418" rx="38" ry="14" fill="#3d1f0a" stroke="#5c3010" strokeWidth="2" />
+          <ellipse cx="148" cy="418" rx="26" ry="9" fill="none" stroke="#2a1206" strokeWidth="1" opacity="0.6" />
+          <ellipse cx="148" cy="418" rx="14" ry="5" fill="none" stroke="#2a1206" strokeWidth="1" opacity="0.5" />
+          <ellipse cx="148" cy="418" rx="5"  ry="2" fill="#4e2810" opacity="0.7" />
+          <ellipse cx="148" cy="415" rx="28" ry="8" fill="#4e2810" opacity="0.4" />
         </g>
+
+        {/* ══ BOB — sitting on log, stick figure ══ */}
+        <g id="bob-all">
+          <g id="bob-head" transform="rotate(15, 148, 333)">
+            <circle cx="148" cy="320" r="11" fill="none" stroke="white" strokeWidth="2.5" />
+          </g>
+          <line x1="148" y1="331" x2="148" y2="400" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+          <line x1="148" y1="345" x2="134" y2="360" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+          <line x1="148" y1="345" x2="164" y2="356" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+          <line x1="148" y1="400" x2="128" y2="400" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+          <line x1="128" y1="400" x2="122" y2="420" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+          <line x1="148" y1="400" x2="168" y2="400" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+          <line x1="168" y1="400" x2="174" y2="420" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+        </g>
+
+        </g> {/* end log+bob scale group */}
 
         {/* ══ CAMPFIRE ══ */}
         <g transform="translate(295, 380)">
@@ -163,41 +181,6 @@ export default function CampfireScene({ lookUp = false }) {
             <circle cx="-2"  cy="-66" r="1.4" fill="#fef9c3" opacity="0.6" />
             <circle cx="16"  cy="-44" r="1.2" fill="#fbbf24" opacity="0.5" />
           </g>
-        </g>
-
-        {/* ══ BOB ══
-            Drawing order (painter's algorithm — later = on top):
-            1. Legs (behind body)
-            2. Body (covers leg tops)
-            3. Arms (behind body overlap covered by body redraw)
-            4. Body redraw (white fill no stroke) to erase arm-body joint lines
-            5. Head (on top of body, joint covered by white fill)
-
-            Key: wherever two stroked shapes meet, we paint a white
-            filled (no-stroke) version of the TOP shape to erase the
-            underlying stroke line. Result = zero visible joint lines.
-        ══ */}
-
-        {/* ══ BOB — sitting on log, stick figure ══
-             Log top surface is at y = 380+22 = 402
-             Bob sits with hips at ~402, legs dangling forward ══ */}
-        <g id="bob-all">
-          {/* Head — circle only, no face */}
-          <g id="bob-head" transform="rotate(15, 148, 333)">
-            <circle cx="148" cy="320" r="11" fill="none" stroke="white" strokeWidth="2.5" />
-          </g>
-          {/* Neck + body (torso ends at log surface ~402) */}
-          <line x1="148" y1="331" x2="148" y2="400" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-          {/* Left arm */}
-          <line x1="148" y1="345" x2="134" y2="360" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-          {/* Right arm toward fire */}
-          <line x1="148" y1="345" x2="164" y2="356" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-          {/* Left leg — bent at knee, sitting on log, foot dangles down */}
-          <line x1="148" y1="400" x2="128" y2="400" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-          <line x1="128" y1="400" x2="122" y2="420" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-          {/* Right leg — bent at knee */}
-          <line x1="148" y1="400" x2="168" y2="400" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-          <line x1="168" y1="400" x2="174" y2="420" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
         </g>
 
         {/* ══ FIREFLIES ══ */}
