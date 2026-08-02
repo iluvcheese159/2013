@@ -95,8 +95,8 @@ export default function CampfireScene({ lookUp = false }) {
         ref={svgRef}
         viewBox="0 0 520 460"
         preserveAspectRatio="xMidYMax meet"
-        className="absolute bottom-0 left-0 right-0 mx-auto"
-        style={{ width: "80vw", height: "auto", overflow: "visible", maxWidth: "900px" }}
+        className="absolute bottom-0 left-0"
+        style={{ width: "min(320px, 32vw)", height: "auto", overflow: "visible" }}
         overflow="visible"
         fill="none"
       >
@@ -111,14 +111,7 @@ export default function CampfireScene({ lookUp = false }) {
         <Forest />
 
         {/* ══ GROUND ══ */}
-        {/* Base ground plane */}
-        <polygon points="-20,420 540,420 540,480 -20,480" fill="#0a1a08" />
-        {/* Grass edge highlight */}
-        <polygon points="-20,418 540,418 540,426 -20,426" fill="#0f2a0c" />
-        {/* Dirt path around fire */}
-        <ellipse cx="230" cy="422" rx="120" ry="10" fill="#0d1a0b" />
-        {/* Fire light on ground */}
-        <ellipse cx="230" cy="421" rx="80" ry="7" fill="#f97316" opacity="0.08" />
+        <ellipse cx="200" cy="452" rx="210" ry="14" fill="#050a05" />
 
         {/* ══ TENT — yellow glowing A-frame ══ */}
         <g id="tent">
@@ -162,22 +155,10 @@ export default function CampfireScene({ lookUp = false }) {
           <line x1="148" y1="387" x2="148" y2="359" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
           {/* Arm toward fire */}
           <line x1="148" y1="365" x2="162" y2="376" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-          {/* Stick — tapered branch, wider at hand end, narrower at tip */}
-          <path
-            d="M162 378 C175 372 195 364 215 356 C218 355 221 354 222 353 L224 351 C222 350 219 350 216 351 C196 359 176 368 163 374 Z"
-            fill="#6b3a1f"
-          />
-          {/* Bark highlight */}
-          <path
-            d="M163 374 C183 366 203 357 220 351"
-            fill="none" stroke="#8b5a2b" strokeWidth="0.8" opacity="0.6" strokeLinecap="round"
-          />
-          {/* Knot on stick */}
-          <ellipse cx="193" cy="363" rx="2.5" ry="1.5" fill="#4a2810" opacity="0.7" transform="rotate(-20, 193, 363)" />
+          {/* Stick toward fire */}
+          <line x1="162" y1="376" x2="224" y2="352" stroke="#c8a96e" strokeWidth="2" strokeLinecap="round" />
           {/* Marshmallow on stick tip */}
-          <rect x="220" y="344" width="13" height="11" rx="3.5" fill="white" opacity="0.95" />
-          {/* Toasted bottom */}
-          <rect x="220" y="351" width="13" height="4" rx="2" fill="#f59e0b" opacity="0.75" />
+          <rect x="220" y="344" width="10" height="9" rx="3" fill="white" opacity="0.9" />
           {/* Head */}
           <g id="bob-head" transform="rotate(15, 148, 359)">
             <circle cx="148" cy="348" r="10" fill="none" stroke="white" strokeWidth="2.5" />
@@ -218,12 +199,8 @@ export default function CampfireScene({ lookUp = false }) {
             fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
         </g>
 
-        {/* ══ ROCKS ══ */}
-        <Rock cx={195} cy={424} rx={14} ry={9} rot={-8} />
-        <Rock cx={178} cy={428} rx={10} ry={7} rot={5} />
-        <Rock cx={270} cy={425} rx={12} ry={8} rot={12} />
-        <Rock cx={285} cy={430} rx={8}  ry={6} rot={-5} />
-        <Rock cx={255} cy={427} rx={9}  ry={6} rot={20} />
+        {/* ══ FIRE LIGHT ON GROUND ══ */}
+        <ellipse cx="230" cy="450" rx="140" ry="14" fill="#f97316" opacity="0.07" />
       </svg>
     </div>
   );
@@ -277,66 +254,31 @@ function Forest() {
 
 function Pine({ cx, base, h, layers, col, w }) {
   const trunkH = h * 0.26;
-  // Derive slightly lighter/darker shades for left/right faces
-  const shadeDark  = col;  // right face stays base
-  const shadeLight = col.replace(/^#(\w{2})(\w{2})(\w{2})$/, (_, r, g, b) => {
-    const bump = (hex) => Math.min(255, parseInt(hex,16)+18).toString(16).padStart(2,'0');
-    return `#${bump(r)}${bump(g)}${bump(b)}`;
-  });
+  const alt = col === "#0a1a0a" ? "#0d220d" : "#0a1a0a";
   return (
     <g>
-      {/* Trunk */}
-      <rect x={cx-3} y={base-trunkH} width={6} height={trunkH} fill="#1a0e06" />
+      <rect x={cx-3} y={base-trunkH} width={6} height={trunkH} fill={col} />
       {Array.from({length:layers}).map((_,li) => {
         const t  = li / (layers - 1);
         const y  = (base - h) + t * (base - trunkH - (base - h)) * 0.86;
         const pw = h * w * (1 - t * 0.5);
         const ph = (h / layers) * 1.4;
-        const tip = cx;
-        const bl  = cx - pw/2;
-        const br  = cx + pw/2;
-        const bot = y + ph;
-        return (
-          <g key={li}>
-            {/* Left face — lighter */}
-            <polygon points={`${tip},${y} ${bl},${bot} ${cx},${bot}`} fill={shadeLight} />
-            {/* Right face — darker */}
-            <polygon points={`${tip},${y} ${cx},${bot} ${br},${bot}`} fill={shadeDark} />
-          </g>
-        );
+        return <polygon key={li}
+          points={`${cx},${y} ${cx-pw/2},${y+ph} ${cx+pw/2},${y+ph}`}
+          fill={li%2===0 ? col : alt} />;
       })}
     </g>
   );
 }
 
 function Round({ cx, base, col }) {
-  const light = col.replace(/^#(\w{2})(\w{2})(\w{2})$/, (_, r, g, b) => {
-    const bump = (hex) => Math.min(255, parseInt(hex,16)+22).toString(16).padStart(2,'0');
-    return `#${bump(r)}${bump(g)}${bump(b)}`;
-  });
   return (
     <g>
-      <rect x={cx-4} y={base-52} width={8} height={52} fill="#1a0e06" />
+      <rect x={cx-4} y={base-52} width={8} height={52} fill={col} />
       <circle cx={cx}    cy={base-72} r={36} fill={col} />
-      <circle cx={cx-16} cy={base-62} r={26} fill={light} />
+      <circle cx={cx-16} cy={base-62} r={26} fill={col} />
       <circle cx={cx+16} cy={base-62} r={26} fill={col} />
-      <circle cx={cx}    cy={base-90} r={22} fill={light} />
-    </g>
-  );
-}
-
-function Rock({ cx, cy, rx, ry, rot }) {
-  return (
-    <g transform={`rotate(${rot}, ${cx}, ${cy})`}>
-      {/* Shadow */}
-      <ellipse cx={cx+2} cy={cy+ry*0.6} rx={rx*0.9} ry={ry*0.45} fill="#000" opacity="0.35" />
-      {/* Base */}
-      <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill="#2a2e28" />
-      {/* Top highlight */}
-      <ellipse cx={cx-rx*0.2} cy={cy-ry*0.25} rx={rx*0.55} ry={ry*0.35} fill="#3d4239" opacity="0.8" />
-      {/* Crack */}
-      <path d={`M${cx-rx*0.1},${cy-ry*0.5} Q${cx+rx*0.15},${cy} ${cx},${cy+ry*0.6}`}
-        fill="none" stroke="#1a1d18" strokeWidth="0.8" opacity="0.6" />
+      <circle cx={cx}    cy={base-90} r={22} fill={col} />
     </g>
   );
 }

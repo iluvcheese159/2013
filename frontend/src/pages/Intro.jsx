@@ -766,7 +766,7 @@ export default function Intro() {
       {phase === 1 && (
         <div
           className="absolute inset-0 z-20 pointer-events-none"
-          style={{ animation: "pan-right-out 3.5s cubic-bezier(0.45, 0, 0.25, 1) forwards" }}
+          style={{ animation: "fadeOut 3.5s cubic-bezier(0.45, 0, 0.25, 1) forwards" }}
         >
           <CampfireScene lookUp={true} />
         </div>

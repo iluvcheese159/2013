@@ -179,10 +179,6 @@
     0% { transform: translateY(0) scale(1); }
     100% { transform: translateY(-35%) scale(1.15); }
 }
-@keyframes pan-right-out {
-    0%   { transform: translateX(0);      opacity: 1; }
-    100% { transform: translateX(-60vw); opacity: 0; }
-}
 @keyframes star-zoom-in {
     0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0; }
     60% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
