@@ -60,7 +60,7 @@ export default function CampfireScene({ lookUp = false }) {
       tiltRef.current += (target - tiltRef.current) * Math.min(dt * 2.2, 1);
       const head = svg.querySelector("#bob-head");
       if (head) head.setAttribute("transform",
-        `rotate(${tiltRef.current.toFixed(2)}, 148, 268)`);
+        `rotate(${tiltRef.current.toFixed(2)}, 148, 293)`);
 
       // Body breathe
       const body = svg.querySelector("#bob-all");
@@ -95,7 +95,7 @@ export default function CampfireScene({ lookUp = false }) {
         viewBox="0 0 520 420"
         preserveAspectRatio="xMinYMax meet"
         className="absolute bottom-0 left-0"
-        style={{ width: "min(580px, 58vw)", height: "auto" }}
+        style={{ width: "min(320px, 32vw)", height: "auto" }}
         fill="none"
       >
         <defs>
@@ -177,90 +177,23 @@ export default function CampfireScene({ lookUp = false }) {
             filled (no-stroke) version of the TOP shape to erase the
             underlying stroke line. Result = zero visible joint lines.
         ══ */}
+
+        {/* ══ BOB — simple stick figure, no face, small ══ */}
         <g id="bob-all">
-
-          {/* ── 1. LEFT LEG ── */}
-          {/* Thigh going down-left */}
-          <ellipse cx="122" cy="348" rx="22" ry="14" fill="white" stroke="#1a1a1a" strokeWidth="2.8"
-            transform="rotate(-30,122,348)" />
-          {/* Shin */}
-          <ellipse cx="100" cy="372" rx="18" ry="12" fill="white" stroke="#1a1a1a" strokeWidth="2.8"
-            transform="rotate(-15,100,372)" />
-          {/* Foot */}
-          <ellipse cx="88" cy="390" rx="20" ry="10" fill="white" stroke="#1a1a1a" strokeWidth="2.8" />
-          {/* Cover thigh-shin joint */}
-          <ellipse cx="110" cy="362" rx="16" ry="11" fill="white" stroke="none"
-            transform="rotate(-22,110,362)" />
-          {/* Cover shin-foot joint */}
-          <ellipse cx="94" cy="382" rx="15" ry="10" fill="white" stroke="none" />
-
-          {/* ── 2. RIGHT LEG ── */}
-          <ellipse cx="174" cy="348" rx="22" ry="14" fill="white" stroke="#1a1a1a" strokeWidth="2.8"
-            transform="rotate(30,174,348)" />
-          <ellipse cx="196" cy="372" rx="18" ry="12" fill="white" stroke="#1a1a1a" strokeWidth="2.8"
-            transform="rotate(15,196,372)" />
-          <ellipse cx="208" cy="390" rx="20" ry="10" fill="white" stroke="#1a1a1a" strokeWidth="2.8" />
-          {/* Cover joints */}
-          <ellipse cx="186" cy="362" rx="16" ry="11" fill="white" stroke="none"
-            transform="rotate(22,186,362)" />
-          <ellipse cx="202" cy="382" rx="15" ry="10" fill="white" stroke="none" />
-
-          {/* ── 3. LEFT ARM ── */}
-          <ellipse cx="108" cy="290" rx="14" ry="22" fill="white" stroke="#1a1a1a" strokeWidth="2.8"
-            transform="rotate(25,108,290)" />
-          {/* Forearm */}
-          <ellipse cx="96" cy="318" rx="12" ry="18" fill="white" stroke="#1a1a1a" strokeWidth="2.8"
-            transform="rotate(10,96,318)" />
-          {/* Hand */}
-          <circle cx="90" cy="338" r="13" fill="white" stroke="#1a1a1a" strokeWidth="2.8" />
-          {/* Cover arm joints */}
-          <ellipse cx="102" cy="306" rx="11" ry="16" fill="white" stroke="none"
-            transform="rotate(18,102,306)" />
-          <ellipse cx="93" cy="328" rx="11" ry="14" fill="white" stroke="none" />
-
-          {/* ── 4. RIGHT ARM ── */}
-          <ellipse cx="188" cy="290" rx="14" ry="22" fill="white" stroke="#1a1a1a" strokeWidth="2.8"
-            transform="rotate(-25,188,290)" />
-          <ellipse cx="200" cy="318" rx="12" ry="18" fill="white" stroke="#1a1a1a" strokeWidth="2.8"
-            transform="rotate(-10,200,318)" />
-          <circle cx="206" cy="338" r="13" fill="white" stroke="#1a1a1a" strokeWidth="2.8" />
-          {/* Cover joints */}
-          <ellipse cx="194" cy="306" rx="11" ry="16" fill="white" stroke="none"
-            transform="rotate(-18,194,306)" />
-          <ellipse cx="203" cy="328" rx="11" ry="14" fill="white" stroke="none" />
-
-          {/* ── 5. BODY ── short wide rounded rect */}
-          <rect x="108" y="268" width="80" height="72" rx="26" fill="white" stroke="#1a1a1a" strokeWidth="2.8" />
-          {/* White fill over arm-body joints (no stroke = erases lines) */}
-          <rect x="110" y="270" width="76" height="68" rx="24" fill="white" stroke="none" />
-
-          {/* ── 6. HEAD (rotates for look-up) ── */}
-          <g id="bob-head" transform="rotate(15, 148, 268)">
-            {/* Head circle */}
-            <circle cx="148" cy="220" r="58" fill="white" stroke="#1a1a1a" strokeWidth="2.8" />
-            {/* White fill over head-body joint */}
-            <circle cx="148" cy="220" r="56" fill="white" stroke="none" />
-            {/* Cheeks */}
-            <ellipse cx="108" cy="232" rx="13" ry="9" fill="#ffb3b3" opacity="0.55" />
-            <ellipse cx="188" cy="232" rx="13" ry="9" fill="#ffb3b3" opacity="0.55" />
-            {/* Eyes — ONLY filled dots, zero lines */}
-            <circle cx="132" cy="218" r="5.5" fill="#1a1a1a" />
-            <circle cx="164" cy="218" r="5.5" fill="#1a1a1a" />
-            {/* Eye shine */}
-            <circle cx="135" cy="215" r="2.2" fill="white" />
-            <circle cx="167" cy="215" r="2.2" fill="white" />
-            {/* Mouth — single arc, no lines */}
-            <path d="M136 236 Q148 246 160 236"
-              fill="none" stroke="#1a1a1a" strokeWidth="2.4" strokeLinecap="round" />
-            {/* Hair tufts — curved arcs only, no straight lines */}
-            <path d="M118 168 Q148 154 178 168"
-              fill="none" stroke="#1a1a1a" strokeWidth="2.8" strokeLinecap="round" />
-            <path d="M133 162 Q148 152 163 162"
-              fill="none" stroke="#1a1a1a" strokeWidth="2.2" strokeLinecap="round" />
+          {/* Head — circle only, no face */}
+          <g id="bob-head" transform="rotate(15, 148, 295)">
+            <circle cx="148" cy="282" r="11" fill="none" stroke="white" strokeWidth="2.5" />
           </g>
-
-          {/* White cover strip at head-body junction to erase overlap stroke */}
-          <rect x="110" y="268" width="76" height="18" fill="white" stroke="none" />
+          {/* Neck + body */}
+          <line x1="148" y1="293" x2="148" y2="322" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+          {/* Left arm */}
+          <line x1="148" y1="304" x2="136" y2="316" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+          {/* Right arm toward fire */}
+          <line x1="148" y1="304" x2="163" y2="312" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+          {/* Left leg */}
+          <line x1="148" y1="322" x2="138" y2="342" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+          {/* Right leg */}
+          <line x1="148" y1="322" x2="158" y2="342" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
         </g>
 
         {/* ══ FIREFLIES ══ */}
