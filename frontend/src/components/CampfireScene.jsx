@@ -60,7 +60,7 @@ export default function CampfireScene({ lookUp = false }) {
       tiltRef.current += (target - tiltRef.current) * Math.min(dt * 2.2, 1);
       const head = svg.querySelector("#bob-head");
       if (head) head.setAttribute("transform",
-        `rotate(${tiltRef.current.toFixed(2)}, 148, 293)`);
+        `rotate(${tiltRef.current.toFixed(2)}, 148, 333)`);
 
       // Body breathe
       const body = svg.querySelector("#bob-all");
@@ -92,7 +92,7 @@ export default function CampfireScene({ lookUp = false }) {
     <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 10 }}>
       <svg
         ref={svgRef}
-        viewBox="0 0 520 420"
+        viewBox="0 0 520 460"
         preserveAspectRatio="xMinYMax meet"
         className="absolute bottom-0 left-0"
         style={{ width: "min(320px, 32vw)", height: "auto" }}
@@ -109,33 +109,33 @@ export default function CampfireScene({ lookUp = false }) {
         <Forest />
 
         {/* ══ GROUND ══ */}
-        <ellipse cx="200" cy="412" rx="210" ry="14" fill="#050a05" />
+        <ellipse cx="200" cy="452" rx="210" ry="14" fill="#050a05" />
 
         {/* ══ TENT — yellow glowing A-frame ══ */}
         <g id="tent">
           {/* Glow halo */}
-          <ellipse cx="370" cy="355" rx="105" ry="28" fill="#fbbf24" opacity="0.15" />
+          <ellipse cx="370" cy="395" rx="105" ry="28" fill="#fbbf24" opacity="0.15" />
           {/* Main body */}
-          <path d="M270 360 L370 195 L470 360 Z" fill="#d97706" stroke="#92400e" strokeWidth="2.5" strokeLinejoin="round" />
+          <path d="M270 400 L370 235 L470 400 Z" fill="#d97706" stroke="#92400e" strokeWidth="2.5" strokeLinejoin="round" />
           {/* Right shading */}
-          <path d="M370 195 L420 360 L470 360 Z" fill="#b45309" />
+          <path d="M370 235 L420 400 L470 400 Z" fill="#b45309" />
           {/* Left highlight */}
-          <path d="M270 360 L320 360 L370 195 Z" fill="#f59e0b" opacity="0.5" />
+          <path d="M270 400 L320 400 L370 235 Z" fill="#f59e0b" opacity="0.5" />
           {/* Door */}
-          <path d="M342 360 Q370 300 398 360 Z" fill="#78350f" />
+          <path d="M342 400 Q370 340 398 400 Z" fill="#78350f" />
           {/* Interior glow */}
-          <path id="tglow" d="M346 360 Q370 305 394 360 Z" fill="#fef08a" opacity="0.6" />
+          <path id="tglow" d="M346 400 Q370 345 394 400 Z" fill="#fef08a" opacity="0.6" />
           {/* Guy ropes */}
-          <line x1="370" y1="198" x2="248" y2="268" stroke="#d97706" strokeWidth="1.2" opacity="0.5" />
-          <line x1="370" y1="198" x2="492" y2="268" stroke="#d97706" strokeWidth="1.2" opacity="0.5" />
-          <line x1="248" y1="268" x2="252" y2="285" stroke="#92400e" strokeWidth="2.5" strokeLinecap="round" />
-          <line x1="492" y1="268" x2="488" y2="285" stroke="#92400e" strokeWidth="2.5" strokeLinecap="round" />
+          <line x1="370" y1="238" x2="248" y2="308" stroke="#d97706" strokeWidth="1.2" opacity="0.5" />
+          <line x1="370" y1="238" x2="492" y2="308" stroke="#d97706" strokeWidth="1.2" opacity="0.5" />
+          <line x1="248" y1="308" x2="252" y2="325" stroke="#92400e" strokeWidth="2.5" strokeLinecap="round" />
+          <line x1="492" y1="308" x2="488" y2="325" stroke="#92400e" strokeWidth="2.5" strokeLinecap="round" />
           {/* Ground glow spill */}
-          <ellipse cx="370" cy="362" rx="60" ry="9" fill="#fbbf24" opacity="0.18" />
+          <ellipse cx="370" cy="402" rx="60" ry="9" fill="#fbbf24" opacity="0.18" />
         </g>
 
         {/* ══ LOG ══ */}
-        <g transform="translate(52, 340)">
+        <g transform="translate(52, 380)">
           <ellipse cx="96" cy="58" rx="98" ry="13" fill="#020402" opacity="0.4" />
           <rect x="0" y="22" width="192" height="36" rx="18" fill="#3d1f0a" stroke="#5c3010" strokeWidth="2" />
           <rect x="2" y="22" width="188" height="16" rx="16" fill="#4e2810" />
@@ -147,7 +147,7 @@ export default function CampfireScene({ lookUp = false }) {
         </g>
 
         {/* ══ CAMPFIRE ══ */}
-        <g transform="translate(295, 340)">
+        <g transform="translate(295, 380)">
           <ellipse id="glow2" cx="0" cy="22" rx="88" ry="38" fill="#f97316" opacity="0.3" />
           <ellipse id="glow1" cx="0" cy="12" rx="52" ry="28" fill="#fbbf24" opacity="0.45" />
           <line x1="-42" y1="20" x2="42" y2="8"  stroke="#5a3010" strokeWidth="11" strokeLinecap="round" />
@@ -178,22 +178,26 @@ export default function CampfireScene({ lookUp = false }) {
             underlying stroke line. Result = zero visible joint lines.
         ══ */}
 
-        {/* ══ BOB — simple stick figure, no face, small ══ */}
+        {/* ══ BOB — sitting on log, stick figure ══
+             Log top surface is at y = 380+22 = 402
+             Bob sits with hips at ~402, legs dangling forward ══ */}
         <g id="bob-all">
           {/* Head — circle only, no face */}
-          <g id="bob-head" transform="rotate(15, 148, 295)">
-            <circle cx="148" cy="282" r="11" fill="none" stroke="white" strokeWidth="2.5" />
+          <g id="bob-head" transform="rotate(15, 148, 333)">
+            <circle cx="148" cy="320" r="11" fill="none" stroke="white" strokeWidth="2.5" />
           </g>
-          {/* Neck + body */}
-          <line x1="148" y1="293" x2="148" y2="322" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+          {/* Neck + body (torso ends at log surface ~402) */}
+          <line x1="148" y1="331" x2="148" y2="400" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
           {/* Left arm */}
-          <line x1="148" y1="304" x2="136" y2="316" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+          <line x1="148" y1="345" x2="134" y2="360" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
           {/* Right arm toward fire */}
-          <line x1="148" y1="304" x2="163" y2="312" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-          {/* Left leg */}
-          <line x1="148" y1="322" x2="138" y2="342" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-          {/* Right leg */}
-          <line x1="148" y1="322" x2="158" y2="342" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+          <line x1="148" y1="345" x2="164" y2="356" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+          {/* Left leg — bent at knee, sitting on log, foot dangles down */}
+          <line x1="148" y1="400" x2="128" y2="400" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+          <line x1="128" y1="400" x2="122" y2="420" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+          {/* Right leg — bent at knee */}
+          <line x1="148" y1="400" x2="168" y2="400" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+          <line x1="168" y1="400" x2="174" y2="420" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
         </g>
 
         {/* ══ FIREFLIES ══ */}
@@ -205,14 +209,14 @@ export default function CampfireScene({ lookUp = false }) {
 
         {/* ══ SMOKE ══ */}
         <g opacity="0.12">
-          <path d="M292 295 Q285 268 294 250 Q300 236 292 220"
+          <path d="M292 335 Q285 308 294 290 Q300 276 292 260"
             fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round" />
-          <path d="M300 292 Q308 265 302 247 Q298 233 306 216"
+          <path d="M300 332 Q308 305 302 287 Q298 273 306 256"
             fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
         </g>
 
         {/* ══ FIRE LIGHT ON GROUND ══ */}
-        <ellipse cx="295" cy="410" rx="140" ry="14" fill="#f97316" opacity="0.07" />
+        <ellipse cx="295" cy="450" rx="140" ry="14" fill="#f97316" opacity="0.07" />
       </svg>
     </div>
   );

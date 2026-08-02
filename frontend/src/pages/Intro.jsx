@@ -735,21 +735,26 @@ export default function Intro() {
 
       {/* ===== SCENE 1: Camera pans up from campsite to star-filled sky ===== */}
       {phase === 1 && (
-        <div
-          className="absolute inset-0 z-20"
-          style={{ animation: "camera-drift 4s cubic-bezier(0.45, 0, 0.25, 1) forwards" }}
-        >
-          {/* Keep campsite visible at bottom as camera pans up */}
-          <CampfireScene lookUp={true} />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <p
-              className="text-white/40 text-sm font-tech uppercase tracking-[0.5em]"
-              style={{ animation: "text-crossfade-in 1.2s ease 0.8s both" }}
-            >
-              Look up at the stars...
-            </p>
+        <>
+          {/* Campsite stays fixed at bottom — NOT inside the animated div */}
+          <div className="absolute inset-0 z-20 pointer-events-none">
+            <CampfireScene lookUp={true} />
           </div>
-        </div>
+          {/* Only the text pans up with camera-drift */}
+          <div
+            className="absolute inset-0 z-21"
+            style={{ animation: "camera-drift 4s cubic-bezier(0.45, 0, 0.25, 1) forwards" }}
+          >
+            <div className="absolute inset-0 flex items-center justify-center">
+              <p
+                className="text-white/40 text-sm font-tech uppercase tracking-[0.5em]"
+                style={{ animation: "text-crossfade-in 1.2s ease 0.8s both" }}
+              >
+                Look up at the stars...
+              </p>
+            </div>
+          </div>
+        </>
       )}
 
       {/* ===== SCENE 2: Star Zoom Phase ===== */}
