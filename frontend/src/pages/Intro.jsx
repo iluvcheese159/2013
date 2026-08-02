@@ -569,6 +569,7 @@ export default function Intro() {
   const { openAuth, user } = useAuth();
   const [phase, setPhase] = useState(0); // 0=campsite, 1=camera-up, 2=star-zoom, 3=benefit, 4=final
   const [facetIndex, setFacetIndex] = useState(0);
+  const [displayFacetIndex, setDisplayFacetIndex] = useState(0);
   const [showBobIntro, setShowBobIntro] = useState(false);
   const [isZooming, setIsZooming] = useState(false);
   const [zoomTarget, setZoomTarget] = useState(null);
@@ -610,27 +611,26 @@ export default function Intro() {
 
   // ---- Advance to next benefit or final scene ----
   const advanceToNext = useCallback(() => {
-    setFacetIndex((prevIndex) => {
-      if (prevIndex < FACETS.length - 1) {
-        const nextIndex = prevIndex + 1;
-        setIsZooming(true);
-        setShowBenefit(false);
-        setTimeout(() => {
-          setFacetIndex(nextIndex);
-          setZoomTarget(STAR_POSITIONS[nextIndex]);
-          setTimeout(() => {
-            setIsZooming(false);
-            setShowBenefit(true);
-            if (startAutoAdvanceRef.current) startAutoAdvanceRef.current();
-          }, 800);
-        }, 600);
-        return nextIndex;
-      } else {
-        setPhase(4);
-        return prevIndex;
-      }
-    });
-  }, []);
+    if (facetIndex >= FACETS.length - 1) {
+      setPhase(4);
+      return;
+    }
+    const nextIndex = facetIndex + 1;
+    // 1. Hide current content immediately
+    setShowBenefit(false);
+    setIsZooming(true);
+    // 2. After fade-out completes, swap content and fade in
+    setTimeout(() => {
+      setFacetIndex(nextIndex);
+      setDisplayFacetIndex(nextIndex);
+      setZoomTarget(STAR_POSITIONS[nextIndex]);
+      setIsZooming(false);
+      setTimeout(() => {
+        setShowBenefit(true);
+        if (startAutoAdvanceRef.current) startAutoAdvanceRef.current();
+      }, 50);
+    }, 500);
+  }, [facetIndex]);
 
   advanceToNextRef.current = advanceToNext;
 
@@ -659,15 +659,19 @@ export default function Intro() {
     setTimeout(() => { scrollLocked.current = false; }, 1200);
 
     if (phase === 2 && !isZooming) {
-      // First scroll: zoom into first star
-      setZoomTarget(STAR_POSITIONS[0]);
       setIsZooming(true);
+      setShowBenefit(false);
       setTimeout(() => {
+        setFacetIndex(0);
+        setDisplayFacetIndex(0);
+        setZoomTarget(STAR_POSITIONS[0]);
         setIsZooming(false);
-        setShowBenefit(true);
         setPhase(3);
-        if (startAutoAdvanceRef.current) startAutoAdvanceRef.current();
-      }, 1200);
+        setTimeout(() => {
+          setShowBenefit(true);
+          if (startAutoAdvanceRef.current) startAutoAdvanceRef.current();
+        }, 50);
+      }, 500);
     } else if (phase === 3 && showBenefit) {
       // Next scroll: advance to next benefit
       if (advanceToNextRef.current) advanceToNextRef.current();
@@ -684,17 +688,20 @@ export default function Intro() {
 
   // ---- Click on a specific star ----
   const handleStarClick = useCallback((index) => {
-    if (isZooming || phase < 2) return; // disabled during intro phases
-    setZoomTarget(STAR_POSITIONS[index]);
-    setFacetIndex(index);
-    setIsZooming(true);
+    if (isZooming || phase < 2) return;
     setShowBenefit(false);
+    setIsZooming(true);
     setTimeout(() => {
+      setFacetIndex(index);
+      setDisplayFacetIndex(index);
+      setZoomTarget(STAR_POSITIONS[index]);
       setIsZooming(false);
-      setShowBenefit(true);
       setPhase(3);
-      startAutoAdvance();
-    }, 1200);
+      setTimeout(() => {
+        setShowBenefit(true);
+        startAutoAdvance();
+      }, 50);
+    }, 500);
   }, [isZooming, phase, startAutoAdvance]);
 
   // ---- Navigation handlers ----
@@ -839,7 +846,7 @@ export default function Intro() {
             )}
 
             {/* Benefit card */}
-            <BenefitCard facet={FACETS[facetIndex]} visible={showBenefit && !isZooming} />
+            <BenefitCard facet={FACETS[displayFacetIndex]} visible={showBenefit && !isZooming} />
 
             {/* Navigation dots */}
             <div className="absolute bottom-[5%] left-1/2 -translate-x-1/2 flex gap-2 z-30">

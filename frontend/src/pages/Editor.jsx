@@ -1018,6 +1018,7 @@ export default function Editor() {
   const [title, setTitle] = useState("");
   const [designId, setDesignId] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState("idle"); // idle | saving | saved
   const [isPerspective, setIsPerspective] = useState(true);
   const [alignOverlayOpen, setAlignOverlayOpen] = useState(false);
   const [mirrorOverlayOpen, setMirrorOverlayOpen] = useState(false);
@@ -1046,7 +1047,6 @@ export default function Editor() {
 
   const idCounter = useRef(1);
   const skipHistory = useRef(false);
-  const autosaveTimer = useRef(null);
   const skipAutosaveRef = useRef(false);
 
   // Only ever open the template picker for a brand-new design. Never seed a
@@ -1095,8 +1095,12 @@ export default function Editor() {
       setDesignId(d.design_id);
       const saved = d.geometry?.objects || [];
       skipHistory.current = true;
+      skipAutosaveRef.current = true; // don't immediately re-save what we just loaded
       // Load the real saved shapes (or a clean empty canvas). Never seed a box.
+      // Also make the loaded state the undo baseline so Ctrl+Z can't wipe an
+      // existing design back to an empty canvas.
       setObjects(saved);
+      setHistoryState({ past: [JSON.stringify(saved)], future: [] });
       const numericIds = saved
         .map((o) => Number(o.id))
         .filter((n) => Number.isFinite(n) && n >= 0);
@@ -1105,6 +1109,42 @@ export default function Editor() {
     .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
   }, [routeId]);
+
+  // Always read the latest designId/objects/title inside the debounced callback.
+  const autosaveSnapshot = useRef({ designId, objects, title });
+  autosaveSnapshot.current = { designId, objects, title };
+  const untitledAutoRef = useRef(1);
+
+  // Debounced autosave (~1.2s) so shapes persist even if the user never clicks
+  // Save — this stops shapes from "disappearing once I stop editing".
+  useEffect(() => {
+    if (skipAutosaveRef.current) { skipAutosaveRef.current = false; return; }
+    if (!user) return;
+    const timer = setTimeout(() => {
+      const snap = autosaveSnapshot.current;
+      if (!snap.objects.length && !snap.title.trim()) return;
+      const finalTitle = snap.title.trim() || `Untitled Design ${untitledAutoRef.current}`;
+      const payload = {
+        title: finalTitle,
+        description: "Updated in Print Cosmos Designer",
+        geometry: { objects: snap.objects },
+        is_public: true,
+        model_path: null,
+        image_paths: [],
+      };
+      setSaveStatus("saving");
+      const req = snap.designId
+        ? api.put(`/designs/${snap.designId}`, payload)
+        : api.post("/designs", payload).then((r) => {
+            setDesignId(r.data.design_id);
+            untitledAutoRef.current += 1;
+            return r;
+          });
+      req.then(() => setSaveStatus("saved")).catch(() => setSaveStatus("idle"));
+    }, 1200);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [objects, title, user]);
 
   const selected = useMemo(() => objects.find((o) => o.id === selectedIds[0]), [objects, selectedIds]);
 
@@ -1427,6 +1467,12 @@ export default function Editor() {
   useEffect(() => {
     const onKeyDown = (e) => {
       const mod = e.ctrlKey || e.metaKey;
+      // Escape deselects so the transform gizmo never traps the user — they can
+      // immediately pick another shape.
+      if (e.key === "Escape" && !(document.activeElement?.tagName === "INPUT" || document.activeElement?.tagName === "TEXTAREA")) {
+        setSelectedIds([]);
+        return;
+      }
       if (mod && e.key.toLowerCase() === "c") { e.preventDefault(); copySelected(); return; }
       if (mod && e.key.toLowerCase() === "v") { e.preventDefault(); pasteClipboard(); return; }
       if (mod && e.key.toLowerCase() === "d") { e.preventDefault(); duplicateRepeat(); return; }
@@ -1520,8 +1566,9 @@ export default function Editor() {
           <input ref={fileInputRef} type="file" accept=".stl,.obj,.ply,.gltf,.glb" onChange={importMesh} className="hidden" />
           <div className="ml-auto flex items-center gap-2">
             <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Design title" className="h-8 w-56 font-tech text-xs" />
-            <Button onClick={saveDesign} disabled={saving} className="h-8 rounded-xl font-tech text-xs uppercase tracking-wider">
-              <Save className="h-3.5 w-3.5 mr-1" /> {saving ? "Saving..." : "Save"}
+            <Button onClick={saveDesign} disabled={saving} className="h-8 rounded-xl font-tech text-xs uppercase tracking-wider" title="Changes are auto-saved">
+              <Save className="h-3.5 w-3.5 mr-1" />
+              {saving ? "Saving..." : saveStatus === "saved" ? "Saved" : saveStatus === "saving" ? "Saving…" : "Save"}
             </Button>
             <Button variant="outline" onClick={() => navigate("/designer")} className="h-8 rounded-xl font-tech text-xs uppercase tracking-wider">
               <ArrowLeft className="h-3.5 w-3.5 mr-1" /> Workshop

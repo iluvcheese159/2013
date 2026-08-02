@@ -168,7 +168,7 @@ export default function CampfireScene({ lookUp = false }) {
         </g>
 
         {/* ══ CAMPFIRE ══ */}
-        <g transform="translate(295, 380)">
+        <g transform="translate(230, 380)">
           <ellipse id="glow2" cx="0" cy="22" rx="88" ry="38" fill="#f97316" opacity="0.3" />
           <ellipse id="glow1" cx="0" cy="12" rx="52" ry="28" fill="#fbbf24" opacity="0.45" />
           <line x1="-42" y1="20" x2="42" y2="8"  stroke="#5a3010" strokeWidth="11" strokeLinecap="round" />
@@ -195,14 +195,14 @@ export default function CampfireScene({ lookUp = false }) {
 
         {/* ══ SMOKE ══ */}
         <g opacity="0.12">
-          <path d="M292 335 Q285 308 294 290 Q300 276 292 260"
+          <path d="M227 335 Q220 308 229 290 Q235 276 227 260"
             fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round" />
-          <path d="M300 332 Q308 305 302 287 Q298 273 306 256"
+          <path d="M235 332 Q243 305 237 287 Q233 273 241 256"
             fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
         </g>
 
         {/* ══ FIRE LIGHT ON GROUND ══ */}
-        <ellipse cx="295" cy="450" rx="140" ry="14" fill="#f97316" opacity="0.07" />
+        <ellipse cx="230" cy="450" rx="140" ry="14" fill="#f97316" opacity="0.07" />
       </svg>
     </div>
   );
