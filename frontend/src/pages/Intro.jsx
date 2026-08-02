@@ -278,21 +278,25 @@ function TreeSilhouettes({ opacity = 0.5 }) {
     <polygon points={`${x},${60 - h} ${x - h * 0.28},60 ${x + h * 0.28},60`} fill={col} />
   );
   return (
-    <div className="fixed bottom-0 left-0 right-0 pointer-events-none z-10" style={{ height: "35vh", opacity }}>
-      <svg viewBox="0 0 100 60" preserveAspectRatio="none" style={{ width: "100%", height: "100%", display: "block" }}>
+    <div className="fixed bottom-0 left-0 right-0 pointer-events-none z-10" style={{ height: "40vh", opacity }}>
+      <svg viewBox="0 0 100 60" preserveAspectRatio="none" style={{ width: "100%", height: "100%", display: "block", verticalAlign: "bottom" }}>
+        {/* Ground fill so no gap at bottom */}
+        <rect x="0" y="55" width="100" height="5" fill="#020602" />
         {back.map(([x, h], i)  => <Pine key={"b"+i} x={x} h={h} col="#020602" />)}
         {mid.map(([x, h], i)   => <Pine key={"m"+i} x={x} h={h} col="#030803" />)}
         {front.map(([x, h], i) => <Pine key={"f"+i} x={x} h={h} col="#040a04" />)}
+        {/* Solid ground strip */}
+        <rect x="0" y="57" width="100" height="3" fill="#020602" />
       </svg>
     </div>
   );
 }
 
 /**
- * A single interactive star — looks like a real star (tiny white dot
- * with a faint glow), not a colored blob. Clicking zooms into it.
+ * A single interactive star — colored per facet's starColor.
  */
 function ZoomStar({ facet, index, active, onClick, position }) {
+  const { r, g, b } = facet.starColor;
   return (
     <button
       className="absolute pointer-events-auto cursor-pointer z-20"
@@ -303,19 +307,18 @@ function ZoomStar({ facet, index, active, onClick, position }) {
         opacity: active ? 0.4 : 1,
         background: "none",
         border: "none",
-        padding: "12px", // large hit area, tiny visual
+        padding: "12px",
       }}
       onClick={onClick}
       title={facet.label}
     >
-      {/* Tiny star dot — 3px white circle with subtle glow */}
       <div
         className="rounded-full"
         style={{
           width: "4px",
           height: "4px",
-          backgroundColor: "#ffffff",
-          boxShadow: `0 0 6px 2px rgba(255,255,255,0.7), 0 0 12px 4px rgba(255,255,255,0.25)`,
+          backgroundColor: `rgb(${r},${g},${b})`,
+          boxShadow: `0 0 6px 2px rgba(${r},${g},${b},0.8), 0 0 14px 5px rgba(${r},${g},${b},0.3)`,
           animation: "twinkle " + (2.5 + index * 0.4) + "s ease-in-out infinite",
           animationDelay: index * 0.3 + "s",
         }}
@@ -325,49 +328,68 @@ function ZoomStar({ facet, index, active, onClick, position }) {
 }
 
 /**
- * Benefit detail card shown when zooming into a star.
+ * Benefit detail card — text centered inside the star halo.
  */
-function BenefitCard({ facet, visible }) {
+function BenefitCard({ facet, visible, zoomingOut }) {
   if (!facet) return null;
+  const { r, g, b } = facet.starColor;
 
   return (
     <div
       className="absolute inset-0 flex items-center justify-center z-30 pointer-events-none"
       style={{
-        opacity: visible ? 1 : 0,
-        transition: "opacity 0.8s ease, transform 0.8s ease",
-        transform: visible ? "scale(1)" : "scale(0.8)",
+        opacity: visible && !zoomingOut ? 1 : 0,
+        transition: "opacity 0.6s ease",
       }}
     >
-      {/* Text content — crossfades smoothly when the facet changes */}
+      {/* Star halo — large radial glow centered on screen */}
+      <div
+        className="absolute"
+        style={{
+          left: "50%", top: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "520px", height: "520px",
+          borderRadius: "50%",
+          background: `radial-gradient(circle, rgba(${r},${g},${b},0.22) 0%, rgba(${r},${g},${b},0.10) 35%, rgba(${r},${g},${b},0.03) 65%, transparent 100%)`,
+          animation: visible && !zoomingOut ? "star-zoom-in 1.2s cubic-bezier(0.16,1,0.3,1) both" : "none",
+        }}
+      />
+      {/* Bright core pinpoint */}
+      <div
+        className="absolute rounded-full"
+        style={{
+          left: "50%", top: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "8px", height: "8px",
+          backgroundColor: `rgb(${r},${g},${b})`,
+          boxShadow: `0 0 20px 8px rgba(${r},${g},${b},0.6), 0 0 60px 20px rgba(${r},${g},${b},0.2)`,
+        }}
+      />
+      {/* Text centered in halo */}
       <div
         key={facet.id}
         className="relative max-w-2xl mx-auto px-8 text-center"
         style={{
-          animation: visible ? "text-crossfade-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) both" : "none",
+          animation: visible && !zoomingOut ? "text-crossfade-in 0.8s cubic-bezier(0.16,1,0.3,1) 0.3s both" : "none",
         }}
       >
         <div
           className="inline-block px-4 py-1.5 rounded-full mb-6 text-[10px] font-tech uppercase tracking-[0.3em]"
           style={{
-            backgroundColor: "rgba(255,255,255,0.08)",
-            color: "rgba(255,255,255,0.7)",
-            border: "1px solid rgba(255,255,255,0.18)",
+            backgroundColor: `rgba(${r},${g},${b},0.12)`,
+            color: `rgba(${r},${g},${b},0.9)`,
+            border: `1px solid rgba(${r},${g},${b},0.3)`,
           }}
         >
           {"✦ " + facet.label}
         </div>
-
         <h2
           className="font-display text-4xl md:text-5xl lg:text-6xl font-light tracking-tighter leading-tight mb-6 text-white"
-          style={{
-            textShadow: "0 0 40px rgba(255,255,255,0.15), 0 0 80px rgba(255,255,255,0.08)",
-          }}
+          style={{ textShadow: `0 0 40px rgba(${r},${g},${b},0.4), 0 0 80px rgba(${r},${g},${b},0.15)` }}
         >
           {facet.title}
         </h2>
-
-        <p className="text-base md:text-lg text-white/70 leading-relaxed max-w-lg mx-auto backdrop-blur-sm px-4 py-2 rounded-2xl">
+        <p className="text-base md:text-lg text-white/70 leading-relaxed max-w-lg mx-auto">
           {facet.text}
         </p>
       </div>
@@ -575,6 +597,7 @@ export default function Intro() {
   const [zoomTarget, setZoomTarget] = useState(null);
   const [showBenefit, setShowBenefit] = useState(false);
   const [autoAdvanceTimer, setAutoAdvanceTimer] = useState(null);
+  const [zoomingOut, setZoomingOut] = useState(false);
 
   const stars = useMemo(() => generateMilkyWayStars(2500, 42), []);
   const timers = useRef([]);
@@ -616,20 +639,20 @@ export default function Intro() {
       return;
     }
     const nextIndex = facetIndex + 1;
-    // 1. Hide current content immediately
+    // 1. Zoom out current star
+    setZoomingOut(true);
     setShowBenefit(false);
-    setIsZooming(true);
-    // 2. After fade-out completes, swap content and fade in
+    // 2. After zoom-out, swap to next star and zoom in
     setTimeout(() => {
       setFacetIndex(nextIndex);
       setDisplayFacetIndex(nextIndex);
       setZoomTarget(STAR_POSITIONS[nextIndex]);
-      setIsZooming(false);
+      setZoomingOut(false);
       setTimeout(() => {
         setShowBenefit(true);
         if (startAutoAdvanceRef.current) startAutoAdvanceRef.current();
       }, 50);
-    }, 500);
+    }, 600);
   }, [facetIndex]);
 
   advanceToNextRef.current = advanceToNext;
@@ -656,7 +679,7 @@ export default function Intro() {
   const handleScroll = useCallback((e) => {
     if (scrollLocked.current) return;
     scrollLocked.current = true;
-    setTimeout(() => { scrollLocked.current = false; }, 1200);
+    setTimeout(() => { scrollLocked.current = false; }, 1400);
 
     if (phase === 2 && !isZooming) {
       setIsZooming(true);
@@ -672,11 +695,10 @@ export default function Intro() {
           if (startAutoAdvanceRef.current) startAutoAdvanceRef.current();
         }, 50);
       }, 500);
-    } else if (phase === 3 && showBenefit) {
-      // Next scroll: advance to next benefit
+    } else if (phase === 3 && showBenefit && !zoomingOut) {
       if (advanceToNextRef.current) advanceToNextRef.current();
     }
-  }, [phase, isZooming, showBenefit]);
+  }, [phase, isZooming, showBenefit, zoomingOut]);
 
   useEffect(() => {
     const handler = (e) => {
@@ -688,21 +710,21 @@ export default function Intro() {
 
   // ---- Click on a specific star ----
   const handleStarClick = useCallback((index) => {
-    if (isZooming || phase < 2) return;
+    if (isZooming || zoomingOut || phase < 2) return;
     setShowBenefit(false);
-    setIsZooming(true);
+    setZoomingOut(true);
     setTimeout(() => {
       setFacetIndex(index);
       setDisplayFacetIndex(index);
       setZoomTarget(STAR_POSITIONS[index]);
-      setIsZooming(false);
+      setZoomingOut(false);
       setPhase(3);
       setTimeout(() => {
         setShowBenefit(true);
         startAutoAdvance();
       }, 50);
-    }, 500);
-  }, [isZooming, phase, startAutoAdvance]);
+    }, 600);
+  }, [isZooming, zoomingOut, phase, startAutoAdvance]);
 
   // ---- Navigation handlers ----
   const handleGuest = () => { markIntroSeen(); navigate("/"); };
@@ -808,75 +830,41 @@ export default function Intro() {
       {/* ===== SCENE 3: Benefit Display (Zoomed into a star) ===== */}
       {phase === 3 && (
         <div className="absolute inset-0 z-20">
-          {/* Zoom effect container */}
-          <div
-            className="absolute inset-0"
-            style={{
-              animation: isZooming
-                ? "fadeOut 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards"
-                : "fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1)",
-            }}
-          >
-            {/* Background stars visible behind */}
-            <TreeSilhouettes opacity={0.2} />
-
-            {/* The zoom target — tiny star that expands into a soft white halo */}
-            {zoomTarget && (
-              <div
-                className="absolute z-10"
-                style={{
-                  left: zoomTarget.x + "%",
-                  top: zoomTarget.y + "%",
-                  transform: "translate(-50%, -50%)",
-                  animation: isZooming
-                    ? "star-zoom-out 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards"
-                    : "star-zoom-in 1.2s cubic-bezier(0.16, 1, 0.3, 1)",
-                }}
-              >
-                <div
-                  className="rounded-full"
-                  style={{
-                    width: "60px",
-                    height: "60px",
-                    background: "radial-gradient(circle, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.04) 60%, transparent 100%)",
-                    opacity: isZooming ? 0 : 1,
-                  }}
-                />
-              </div>
-            )}
-
-            {/* Benefit card */}
-            <BenefitCard facet={FACETS[displayFacetIndex]} visible={showBenefit && !isZooming} />
-
-            {/* Navigation dots */}
-            <div className="absolute bottom-[5%] left-1/2 -translate-x-1/2 flex gap-2 z-30">
-              {FACETS.map((_, i) => (
+          <TreeSilhouettes opacity={0.2} />
+          <BenefitCard
+            facet={FACETS[displayFacetIndex]}
+            visible={showBenefit}
+            zoomingOut={zoomingOut}
+          />
+          {/* Navigation dots */}
+          <div className="absolute bottom-[5%] left-1/2 -translate-x-1/2 flex gap-2 z-30">
+            {FACETS.map((f, i) => {
+              const { r, g, b } = f.starColor;
+              return (
                 <button
                   key={i}
                   className="rounded-full transition-all duration-300"
                   style={{
-                    backgroundColor: i === facetIndex ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.2)",
+                    backgroundColor: i === facetIndex ? `rgba(${r},${g},${b},0.9)` : "rgba(255,255,255,0.2)",
                     width: i === facetIndex ? "16px" : "6px",
                     height: "6px",
-                    boxShadow: i === facetIndex ? "0 0 8px rgba(255,255,255,0.6)" : "none",
+                    boxShadow: i === facetIndex ? `0 0 8px rgba(${r},${g},${b},0.7)` : "none",
                   }}
                   onClick={() => handleStarClick(i)}
                 />
-              ))}
-            </div>
-
-            {/* Scroll hint */}
-            {showBenefit && (
-              <div
-                className="absolute bottom-[12%] left-1/2 -translate-x-1/2 z-30"
-                style={{ animation: "text-crossfade-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both" }}
-              >
-                <p className="text-white/20 text-[9px] font-tech uppercase tracking-[0.3em]">
-                  Scroll to discover more
-                </p>
-              </div>
-            )}
+              );
+            })}
           </div>
+          {showBenefit && !zoomingOut && (
+            <div
+              className="absolute bottom-[12%] left-1/2 -translate-x-1/2 z-30"
+              style={{ animation: "text-crossfade-in 0.9s cubic-bezier(0.16,1,0.3,1) 0.6s both" }}
+            >
+              <p className="text-white/20 text-[9px] font-tech uppercase tracking-[0.3em]">
+                Scroll to discover more
+              </p>
+            </div>
+          )}
         </div>
       )}
 

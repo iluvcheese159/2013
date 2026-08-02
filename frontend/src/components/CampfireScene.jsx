@@ -20,6 +20,8 @@ export default function CampfireScene({ lookUp = false }) {
   const timeRef     = useRef(0);
   // lookUp tilts head back (negative = counter-clockwise = looking up-right toward sky)
   const tiltRef = useRef(15);
+  const lookUpRef = useRef(lookUp);
+  useEffect(() => { lookUpRef.current = lookUp; }, [lookUp]);
 
   const fireflies = useMemo(() => Array.from({ length: 8 }, (_, i) => ({
     id: i,
@@ -32,7 +34,7 @@ export default function CampfireScene({ lookUp = false }) {
   useEffect(() => {
     let last = 0;
     const tick = (ts) => {
-      const dt = last ? (ts - last) / 1000 : 0;
+      const dt = Math.min(last ? (ts - last) / 1000 : 0, 0.05);
       last = ts;
       timeRef.current += dt;
       const t = timeRef.current;
@@ -57,7 +59,7 @@ export default function CampfireScene({ lookUp = false }) {
       if (tg) tg.setAttribute("opacity", String(0.6 + Math.sin(t * 1.2) * 0.22));
 
       // Head tilt — smooth lerp toward target
-      const target = lookUp ? -42 : 15;
+      const target = lookUpRef.current ? -42 : 15;
       tiltRef.current += (target - tiltRef.current) * Math.min(dt * 2.2, 1);
       const head = svg.querySelector("#bob-head");
       if (head) head.setAttribute("transform",
@@ -85,7 +87,7 @@ export default function CampfireScene({ lookUp = false }) {
     };
     frameRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frameRef.current);
-  }, [fireflies, lookUp]);
+  }, [fireflies]);
 
   // SVG viewBox: 520 wide × 420 tall
   // Scene is anchored bottom-left of screen
@@ -155,10 +157,17 @@ export default function CampfireScene({ lookUp = false }) {
           <line x1="148" y1="387" x2="148" y2="359" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
           {/* Arm toward fire */}
           <line x1="148" y1="365" x2="162" y2="376" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-          {/* Stick toward fire */}
-          <line x1="162" y1="376" x2="224" y2="352" stroke="#c8a96e" strokeWidth="2" strokeLinecap="round" />
-          {/* Marshmallow on stick tip */}
-          <rect x="220" y="344" width="10" height="9" rx="3" fill="white" opacity="0.9" />
+          {/* Stick — tapered branch from hand toward fire */}
+          <path
+            d="M163 377 C172 373 182 369 192 366 C200 363 207 361 212 360 L214 358 C211 357 204 359 196 362 C186 365 176 369 166 373 Z"
+            fill="#7a4a1e"
+          />
+          <path d="M166 373 C176 369 186 365 196 362 C204 359 211 357 214 358"
+            fill="none" stroke="#a0622a" strokeWidth="0.7" opacity="0.5" strokeLinecap="round" />
+          <ellipse cx="188" cy="366" rx="2" ry="1.2" fill="#4a2810" opacity="0.6" transform="rotate(-15,188,366)" />
+          {/* Marshmallow just above fire edge */}
+          <rect x="210" y="353" width="9" height="8" rx="2.5" fill="white" opacity="0.95" />
+          <rect x="210" y="358" width="9" height="3" rx="1.5" fill="#f59e0b" opacity="0.7" />
           {/* Head */}
           <g id="bob-head" transform="rotate(15, 148, 359)">
             <circle cx="148" cy="348" r="10" fill="none" stroke="white" strokeWidth="2.5" />
