@@ -181,61 +181,14 @@ function StarCanvas({ stars }) {
 // Benefits / Facets Configuration
 // ====================================================================
 
+// warm-white for most, faint red tint for a couple
 const FACETS = [
-  {
-    id: "browse",
-    label: "Browse",
-    color: "#60a5fa",
-    title: "Discover Unique Prints",
-    text: "Explore a curated marketplace of thousands of 3D-printed creations from independent makers worldwide. Filter by category, material, print time, and more. Every print tells a story — find yours.",
-    systemBg: "radial-gradient(ellipse at center, #0a1628 0%, #060d1a 50%, #000 100%)",
-    starColor: { r: 96, g: 165, b: 250 },
-  },
-  {
-    id: "design",
-    label: "Design Workshop",
-    color: "#fbbf24",
-    title: "Create in Your Browser",
-    text: "Design, edit, and prepare 3D models for printing directly in your browser — no software installation needed. Supports STL, OBJ, 3MF, and more. From concept to print in minutes.",
-    systemBg: "radial-gradient(ellipse at center, #1a0a28 0%, #0d061a 50%, #000 100%)",
-    starColor: { r: 251, g: 191, b: 36 },
-  },
-  {
-    id: "sell",
-    label: "Sell Marketplace",
-    color: "#f472b6",
-    title: "Launch Your Storefront",
-    text: "Become a maker-entrepreneur with just 3.5% fees. List your prints, set your prices, and ship worldwide. Our platform handles discovery, payments, and customer communication.",
-    systemBg: "radial-gradient(ellipse at center, #280a1a 0%, #1a060d 50%, #000 100%)",
-    starColor: { r: 244, g: 114, b: 182 },
-  },
-  {
-    id: "hyperspace",
-    label: "Hyperspace",
-    color: "#a78bfa",
-    title: "Premium Subscription",
-    text: "Upgrade to Hyperspace for exclusive benefits: reduced 2% seller fees, priority customer support, advanced analytics dashboard, early access to new features, and a special Hyperspace badge on your profile.",
-    systemBg: "radial-gradient(ellipse at center, #1a0a3a 0%, #0d0620 50%, #000 100%)",
-    starColor: { r: 167, g: 139, b: 250 },
-  },
-  {
-    id: "community",
-    label: "Community",
-    color: "#34d399",
-    title: "Mission Control & Clubs",
-    text: "Join Mission Control forums to connect with fellow makers, share tips, and showcase your work. Create and join clubs, participate in design challenges, and collaborate on projects.",
-    systemBg: "radial-gradient(ellipse at center, #0a2818 0%, #061a0d 50%, #000 100%)",
-    starColor: { r: 52, g: 211, b: 153 },
-  },
-  {
-    id: "tools",
-    label: "Tools",
-    color: "#fb923c",
-    title: "Filament Calculator & More",
-    text: "Access powerful tools: calculate filament usage and costs, browse the print failure database for troubleshooting tips, compare materials and printers, and use our design validation tools.",
-    systemBg: "radial-gradient(ellipse at center, #28180a 0%, #1a0d06 50%, #000 100%)",
-    starColor: { r: 251, g: 146, b: 60 },
-  },
+  { id: "browse",     label: "Browse",            color: "#ffffff", title: "Discover Unique Prints",      text: "Explore a curated marketplace of thousands of 3D-printed creations from independent makers worldwide. Filter by category, material, print time, and more. Every print tells a story — find yours.",                                                                                                                                          starColor: { r: 255, g: 255, b: 255 } },
+  { id: "design",     label: "Design Workshop",    color: "#fff5f5", title: "Create in Your Browser",      text: "Design, edit, and prepare 3D models for printing directly in your browser — no software installation needed. Supports STL, OBJ, 3MF, and more. From concept to print in minutes.",                                                                                                                                                       starColor: { r: 255, g: 235, b: 225 } },
+  { id: "sell",       label: "Sell Marketplace",   color: "#ffffff", title: "Launch Your Storefront",      text: "Become a maker-entrepreneur with just 3.5% fees. List your prints, set your prices, and ship worldwide. Our platform handles discovery, payments, and customer communication.",                                                                                                                                                          starColor: { r: 255, g: 255, b: 255 } },
+  { id: "hyperspace", label: "Hyperspace",          color: "#ffe8e8", title: "Premium Subscription",        text: "Upgrade to Hyperspace for exclusive benefits: reduced 2% seller fees, priority customer support, advanced analytics dashboard, early access to new features, and a special Hyperspace badge on your profile.",                                                                                                                          starColor: { r: 255, g: 210, b: 200 } },
+  { id: "community",  label: "Community",           color: "#ffffff", title: "Mission Control & Clubs",     text: "Join Mission Control forums to connect with fellow makers, share tips, and showcase your work. Create and join clubs, participate in design challenges, and collaborate on projects.",                                                                                                                                                  starColor: { r: 255, g: 255, b: 255 } },
+  { id: "tools",      label: "Tools",               color: "#fff0ee", title: "Filament Calculator & More",  text: "Access powerful tools: calculate filament usage and costs, browse the print failure database for troubleshooting tips, compare materials and printers, and use our design validation tools.",                                                                                                                                          starColor: { r: 255, g: 225, b: 215 } },
 ];
 
 // ====================================================================
@@ -297,6 +250,7 @@ function TreeSilhouettes({ opacity = 0.5 }) {
  */
 function ZoomStar({ facet, index, active, onClick, position }) {
   const { r, g, b } = facet.starColor;
+  const isWarm = r > 250 && b < 240;
   return (
     <button
       className="absolute pointer-events-auto cursor-pointer z-20"
@@ -317,8 +271,10 @@ function ZoomStar({ facet, index, active, onClick, position }) {
         style={{
           width: "4px",
           height: "4px",
-          backgroundColor: `rgb(${r},${g},${b})`,
-          boxShadow: `0 0 6px 2px rgba(${r},${g},${b},0.8), 0 0 14px 5px rgba(${r},${g},${b},0.3)`,
+          backgroundColor: isWarm ? `rgb(${r},${g},${b})` : "#ffffff",
+          boxShadow: isWarm
+            ? `0 0 6px 2px rgba(${r},${g},${b},0.9), 0 0 14px 5px rgba(${r},${g},${b},0.4)`
+            : `0 0 6px 2px rgba(255,255,255,0.9), 0 0 14px 5px rgba(255,255,255,0.3)`,
           animation: "twinkle " + (2.5 + index * 0.4) + "s ease-in-out infinite",
           animationDelay: index * 0.3 + "s",
         }}
@@ -333,59 +289,51 @@ function ZoomStar({ facet, index, active, onClick, position }) {
 function BenefitCard({ facet, visible, zoomingOut }) {
   if (!facet) return null;
   const { r, g, b } = facet.starColor;
+  const isWarm = b < 240;
+  const show = visible && !zoomingOut;
 
   return (
     <div
       className="absolute inset-0 flex items-center justify-center z-30 pointer-events-none"
-      style={{
-        opacity: visible && !zoomingOut ? 1 : 0,
-        transition: "opacity 0.6s ease",
-      }}
+      style={{ opacity: show ? 1 : 0, transition: "opacity 0.5s ease" }}
     >
-      {/* Star halo — large radial glow centered on screen */}
-      <div
-        className="absolute"
-        style={{
-          left: "50%", top: "50%",
-          transform: "translate(-50%, -50%)",
-          width: "520px", height: "520px",
-          borderRadius: "50%",
-          background: `radial-gradient(circle, rgba(${r},${g},${b},0.22) 0%, rgba(${r},${g},${b},0.10) 35%, rgba(${r},${g},${b},0.03) 65%, transparent 100%)`,
-          animation: visible && !zoomingOut ? "star-zoom-in 1.2s cubic-bezier(0.16,1,0.3,1) both" : "none",
-        }}
-      />
-      {/* Bright core pinpoint */}
-      <div
-        className="absolute rounded-full"
-        style={{
-          left: "50%", top: "50%",
-          transform: "translate(-50%, -50%)",
-          width: "8px", height: "8px",
-          backgroundColor: `rgb(${r},${g},${b})`,
-          boxShadow: `0 0 20px 8px rgba(${r},${g},${b},0.6), 0 0 60px 20px rgba(${r},${g},${b},0.2)`,
-        }}
-      />
-      {/* Text centered in halo */}
-      <div
-        key={facet.id}
-        className="relative max-w-2xl mx-auto px-8 text-center"
-        style={{
-          animation: visible && !zoomingOut ? "text-crossfade-in 0.8s cubic-bezier(0.16,1,0.3,1) 0.3s both" : "none",
-        }}
+      {/* Dark vignette — makes text readable over the star field */}
+      <div className="absolute inset-0" style={{
+        background: "radial-gradient(ellipse 75% 65% at 50% 50%, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.88) 55%, rgba(0,0,0,0.97) 100%)",
+      }} />
+      {/* Halo glow — expands from pinpoint */}
+      <div className="absolute" style={{
+        left: "50%", top: "50%",
+        transform: "translate(-50%, -50%)",
+        width: "580px", height: "580px",
+        borderRadius: "50%",
+        background: isWarm
+          ? `radial-gradient(circle, rgba(${r},${g},${b},0.60) 0%, rgba(${r},${g},${b},0.28) 18%, rgba(${r},${g},${b},0.10) 45%, transparent 70%)`
+          : `radial-gradient(circle, rgba(255,255,255,0.60) 0%, rgba(255,255,255,0.28) 18%, rgba(255,255,255,0.10) 45%, transparent 70%)`,
+        animation: show ? "star-zoom-in 0.9s cubic-bezier(0.16,1,0.3,1) both" : "none",
+        pointerEvents: "none",
+      }} />
+      {/* Bright core */}
+      <div className="absolute rounded-full" style={{
+        left: "50%", top: "50%",
+        transform: "translate(-50%, -50%)",
+        width: "12px", height: "12px",
+        backgroundColor: isWarm ? `rgb(${r},${g},${b})` : "#ffffff",
+        boxShadow: isWarm
+          ? `0 0 28px 12px rgba(${r},${g},${b},0.9), 0 0 90px 35px rgba(${r},${g},${b},0.35)`
+          : `0 0 28px 12px rgba(255,255,255,0.9), 0 0 90px 35px rgba(255,255,255,0.3)`,
+      }} />
+      {/* Text */}
+      <div key={facet.id} className="relative max-w-2xl mx-auto px-8 text-center"
+        style={{ animation: show ? "text-crossfade-in 0.8s cubic-bezier(0.16,1,0.3,1) 0.25s both" : "none" }}
       >
-        <div
-          className="inline-block px-4 py-1.5 rounded-full mb-6 text-[10px] font-tech uppercase tracking-[0.3em]"
-          style={{
-            backgroundColor: `rgba(${r},${g},${b},0.12)`,
-            color: `rgba(${r},${g},${b},0.9)`,
-            border: `1px solid rgba(${r},${g},${b},0.3)`,
-          }}
+        <div className="inline-block px-4 py-1.5 rounded-full mb-6 text-[10px] font-tech uppercase tracking-[0.3em]"
+          style={{ backgroundColor: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.55)", border: "1px solid rgba(255,255,255,0.14)" }}
         >
           {"✦ " + facet.label}
         </div>
-        <h2
-          className="font-display text-4xl md:text-5xl lg:text-6xl font-light tracking-tighter leading-tight mb-6 text-white"
-          style={{ textShadow: `0 0 40px rgba(${r},${g},${b},0.4), 0 0 80px rgba(${r},${g},${b},0.15)` }}
+        <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-light tracking-tighter leading-tight mb-6 text-white"
+          style={{ textShadow: "0 0 40px rgba(255,255,255,0.35), 0 0 80px rgba(255,255,255,0.12)" }}
         >
           {facet.title}
         </h2>
@@ -749,21 +697,26 @@ export default function Intro() {
       ref={containerRef}
       className="fixed inset-0 bg-black overflow-hidden"
     >
-      {/* ===== BACKGROUND: Canvas Star Field + Milky Way ===== */}
-      <StarBackground stars={stars} />
+      {/* ===== BACKGROUND: Canvas Star Field — zooms toward target star in phase 3 ===== */}
+      <div
+        className="absolute inset-0 overflow-hidden"
+        style={{
+          transformOrigin: zoomTarget ? `${zoomTarget.x}% ${zoomTarget.y}%` : "50% 50%",
+          transform: (phase === 3 && !zoomingOut) ? "scale(4)" : "scale(1)",
+          transition: zoomingOut
+            ? "transform 0.55s cubic-bezier(0.55,0,1,0.45)"
+            : (phase === 3 ? "transform 0.9s cubic-bezier(0,0,0.2,1)" : "none"),
+        }}
+      >
+        <StarBackground stars={stars} />
+      </div>
 
-      {/* ===== FROSTED BLUR — only behind text panels (phase 3+), not over the sky ===== */}
-      {phase >= 3 && (
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            zIndex: 15,
-            background: "rgba(2, 4, 14, 0.45)",
-            backdropFilter: "blur(4px)",
-            WebkitBackdropFilter: "blur(4px)",
-            transition: "opacity 0.8s ease",
-          }}
-        />
+      {/* ===== FROSTED BLUR — only in phase 3 ===== */}
+      {phase === 3 && (
+        <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 15,
+          backdropFilter: "blur(2px)", WebkitBackdropFilter: "blur(2px)",
+          transition: "opacity 0.8s ease",
+        }} />
       )}
 
       {/* ===== SCENE 0: Campsite — 7 seconds, Bob sits by fire ===== */}
@@ -838,22 +791,19 @@ export default function Intro() {
           />
           {/* Navigation dots */}
           <div className="absolute bottom-[5%] left-1/2 -translate-x-1/2 flex gap-2 z-30">
-            {FACETS.map((f, i) => {
-              const { r, g, b } = f.starColor;
-              return (
-                <button
-                  key={i}
-                  className="rounded-full transition-all duration-300"
-                  style={{
-                    backgroundColor: i === facetIndex ? `rgba(${r},${g},${b},0.9)` : "rgba(255,255,255,0.2)",
-                    width: i === facetIndex ? "16px" : "6px",
-                    height: "6px",
-                    boxShadow: i === facetIndex ? `0 0 8px rgba(${r},${g},${b},0.7)` : "none",
-                  }}
-                  onClick={() => handleStarClick(i)}
-                />
-              );
-            })}
+            {FACETS.map((f, i) => (
+              <button
+                key={i}
+                className="rounded-full transition-all duration-300"
+                style={{
+                  backgroundColor: i === facetIndex ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.2)",
+                  width: i === facetIndex ? "16px" : "6px",
+                  height: "6px",
+                  boxShadow: i === facetIndex ? "0 0 8px rgba(255,255,255,0.6)" : "none",
+                }}
+                onClick={() => handleStarClick(i)}
+              />
+            ))}
           </div>
           {showBenefit && !zoomingOut && (
             <div
