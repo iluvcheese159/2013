@@ -136,36 +136,28 @@ export default function CampfireScene({ lookUp = false }) {
           <ellipse cx="370" cy="402" rx="60" ry="9" fill="#fbbf24" opacity="0.18" />
         </g>
 
-        {/* ══ LOG — butt-end facing user (circle cross-section) ══ */}
+        {/* ══ LOG — butt-end facing user, smaller ══ */}
         <g>
-          {/* Shadow */}
-          <ellipse cx="148" cy="426" rx="32" ry="6" fill="#010201" opacity="0.5" />
-          {/* Cylinder depth — short side peek behind the face */}
-          <ellipse cx="155" cy="412" rx="28" ry="10" fill="#2a1206" />
-          {/* Log face — circle end grain */}
-          <circle cx="148" cy="408" r="28" fill="#3d1f0a" stroke="#5c3010" strokeWidth="2" />
-          {/* Growth rings */}
-          <circle cx="148" cy="408" r="20" fill="none" stroke="#2a1206" strokeWidth="1" opacity="0.6" />
-          <circle cx="148" cy="408" r="13" fill="none" stroke="#2a1206" strokeWidth="1" opacity="0.5" />
-          <circle cx="148" cy="408" r="7"  fill="none" stroke="#2a1206" strokeWidth="1" opacity="0.4" />
-          <circle cx="148" cy="408" r="3"  fill="#4e2810" opacity="0.7" />
-          {/* Top highlight arc */}
-          <path d="M122 400 Q148 392 174 400" fill="none" stroke="#5c3010" strokeWidth="2" opacity="0.5" />
+          <ellipse cx="148" cy="414" rx="18" ry="4" fill="#010201" opacity="0.5" />
+          <ellipse cx="152" cy="406" rx="15" ry="6" fill="#2a1206" />
+          <circle cx="148" cy="403" r="16" fill="#3d1f0a" stroke="#5c3010" strokeWidth="1.5" />
+          <circle cx="148" cy="403" r="11" fill="none" stroke="#2a1206" strokeWidth="1" opacity="0.6" />
+          <circle cx="148" cy="403" r="6"  fill="none" stroke="#2a1206" strokeWidth="1" opacity="0.5" />
+          <circle cx="148" cy="403" r="2"  fill="#4e2810" opacity="0.7" />
+          <path d="M133 397 Q148 391 163 397" fill="none" stroke="#5c3010" strokeWidth="1.5" opacity="0.5" />
         </g>
 
-        {/* ══ BOB — side view, sitting ON TOP of log (log top = y=380) ══ */}
+        {/* ══ BOB — side view, ONE leg (right/front only), sitting on log top y=387 ══ */}
         <g id="bob-all">
-          {/* Back leg — hangs down from hip */}
-          <line x1="148" y1="380" x2="138" y2="400" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-          {/* Front leg — hangs down from hip */}
-          <line x1="148" y1="380" x2="162" y2="400" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+          {/* Single front leg hangs down from hip */}
+          <line x1="148" y1="387" x2="158" y2="405" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
           {/* Torso */}
-          <line x1="148" y1="380" x2="148" y2="352" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+          <line x1="148" y1="387" x2="148" y2="359" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
           {/* Arm toward fire */}
-          <line x1="148" y1="358" x2="162" y2="370" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-          {/* Head — rotates around neck (148, 352) */}
-          <g id="bob-head" transform="rotate(15, 148, 352)">
-            <circle cx="148" cy="341" r="10" fill="none" stroke="white" strokeWidth="2.5" />
+          <line x1="148" y1="365" x2="162" y2="376" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+          {/* Head */}
+          <g id="bob-head" transform="rotate(15, 148, 359)">
+            <circle cx="148" cy="348" r="10" fill="none" stroke="white" strokeWidth="2.5" />
           </g>
         </g>
 
