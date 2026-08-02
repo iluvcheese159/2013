@@ -19,7 +19,7 @@ export default function CampfireScene({ lookUp = false }) {
   const frameRef    = useRef(null);
   const timeRef     = useRef(0);
   // lookUp tilts head back (negative = counter-clockwise = looking up-right toward sky)
-  const tiltRef = useRef(15);
+  const tiltRef = useRef(lookUp ? -42 : 15);
   const lookUpRef = useRef(lookUp);
   useEffect(() => { lookUpRef.current = lookUp; }, [lookUp]);
 
@@ -112,8 +112,12 @@ export default function CampfireScene({ lookUp = false }) {
         {/* ══ FOREST — drawn first so it's behind everything ══ */}
         <Forest />
 
-        {/* ══ GROUND ══ */}
-        <ellipse cx="200" cy="452" rx="210" ry="14" fill="#050a05" />
+        {/* ══ GROUND — brown earth ══ */}
+        <rect x="-20" y="418" width="560" height="60" fill="#2a1a0a" />
+        {/* Grass edge */}
+        <rect x="-20" y="416" width="560" height="6" fill="#1a2e0e" />
+        {/* Fire-lit dirt patch */}
+        <ellipse cx="230" cy="422" rx="110" ry="8" fill="#3a2210" />
 
         {/* ══ TENT — yellow glowing A-frame ══ */}
         <g id="tent">

@@ -233,13 +233,15 @@ function TreeSilhouettes({ opacity = 0.5 }) {
   return (
     <div className="fixed bottom-0 left-0 right-0 pointer-events-none z-10" style={{ height: "40vh", opacity }}>
       <svg viewBox="0 0 100 60" preserveAspectRatio="none" style={{ width: "100%", height: "100%", display: "block", verticalAlign: "bottom" }}>
-        {/* Ground fill so no gap at bottom */}
-        <rect x="0" y="55" width="100" height="5" fill="#020602" />
+        {/* Brown earth ground */}
+        <rect x="0" y="52" width="100" height="8" fill="#2a1a0a" />
+        {/* Grass edge */}
+        <rect x="0" y="50" width="100" height="4" fill="#1a2e0e" />
         {back.map(([x, h], i)  => <Pine key={"b"+i} x={x} h={h} col="#020602" />)}
         {mid.map(([x, h], i)   => <Pine key={"m"+i} x={x} h={h} col="#030803" />)}
         {front.map(([x, h], i) => <Pine key={"f"+i} x={x} h={h} col="#040a04" />)}
-        {/* Solid ground strip */}
-        <rect x="0" y="57" width="100" height="3" fill="#020602" />
+        {/* Solid ground fill to screen edge */}
+        <rect x="0" y="57" width="100" height="3" fill="#2a1a0a" />
       </svg>
     </div>
   );
@@ -590,7 +592,7 @@ export default function Intro() {
     // 1. Zoom out current star
     setZoomingOut(true);
     setShowBenefit(false);
-    // 2. After zoom-out, swap to next star and zoom in
+    // 2. After zoom-out completes, swap to next star and zoom in
     setTimeout(() => {
       setFacetIndex(nextIndex);
       setDisplayFacetIndex(nextIndex);
@@ -600,7 +602,7 @@ export default function Intro() {
         setShowBenefit(true);
         if (startAutoAdvanceRef.current) startAutoAdvanceRef.current();
       }, 50);
-    }, 600);
+    }, 1500);
   }, [facetIndex]);
 
   advanceToNextRef.current = advanceToNext;
@@ -671,7 +673,7 @@ export default function Intro() {
         setShowBenefit(true);
         startAutoAdvance();
       }, 50);
-    }, 600);
+    }, 1500);
   }, [isZooming, zoomingOut, phase, startAutoAdvance]);
 
   // ---- Navigation handlers ----
@@ -704,8 +706,8 @@ export default function Intro() {
           transformOrigin: zoomTarget ? `${zoomTarget.x}% ${zoomTarget.y}%` : "50% 50%",
           transform: (phase === 3 && !zoomingOut) ? "scale(4)" : "scale(1)",
           transition: zoomingOut
-            ? "transform 0.55s cubic-bezier(0.55,0,1,0.45)"
-            : (phase === 3 ? "transform 0.9s cubic-bezier(0,0,0.2,1)" : "none"),
+            ? "transform 1.4s cubic-bezier(0.4, 0, 0.2, 1)"
+            : (phase === 3 ? "transform 2.2s cubic-bezier(0.0, 0.0, 0.2, 1)" : "none"),
         }}
       >
         <StarBackground stars={stars} />
