@@ -632,6 +632,7 @@ export default function Intro() {
     setTimeout(() => { scrollLocked.current = false; }, 1400);
 
     if (phase === 2 && !isZooming) {
+      // First scroll from star field: zoom into first star
       setIsZooming(true);
       setShowBenefit(false);
       setTimeout(() => {
@@ -642,13 +643,18 @@ export default function Intro() {
         setPhase(3);
         setTimeout(() => {
           setShowBenefit(true);
-          if (startAutoAdvanceRef.current) startAutoAdvanceRef.current();
         }, 50);
       }, 500);
-    } else if (phase === 3 && showBenefit && !zoomingOut) {
-      if (advanceToNextRef.current) advanceToNextRef.current();
+    } else if (phase === 3 && !zoomingOut) {
+      // Scroll while zoomed in: zoom back out to star field
+      setShowBenefit(false);
+      setZoomingOut(true);
+      setTimeout(() => {
+        setZoomingOut(false);
+        setPhase(2);
+      }, 1500);
     }
-  }, [phase, isZooming, showBenefit, zoomingOut]);
+  }, [phase, isZooming, zoomingOut]);
 
   useEffect(() => {
     const handler = (e) => {
@@ -813,7 +819,7 @@ export default function Intro() {
               style={{ animation: "text-crossfade-in 0.9s cubic-bezier(0.16,1,0.3,1) 0.6s both" }}
             >
               <p className="text-white/20 text-[9px] font-tech uppercase tracking-[0.3em]">
-                Scroll to discover more
+                Scroll to zoom out
               </p>
             </div>
           )}
