@@ -257,44 +257,52 @@ function StarBackground({ stars }) {
  * Tree silhouettes at the bottom of the screen.
  */
 function TreeSilhouettes({ opacity = 0.5 }) {
-  // Dense forest: 3 depth layers, back-to-front, spanning full width
-  // Each tree: [xPct, heightPx, widthScale, colorDark]
+  // viewBox is 0 0 100 200. x is in viewBox units (0-100).
+  // h is tree height in viewBox units (NOT pixels). Keep small relative to 200.
+  // Each entry: [x, h, ws] where x=0-100, h=20-45, ws=width multiplier
   const back = [
-    [1,90,1.0],[5,80,0.9],[9,95,1.1],[13,75,0.85],[17,88,1.0],[21,82,0.95],
-    [25,92,1.05],[29,78,0.9],[33,86,1.0],[37,94,1.1],[41,80,0.95],[45,90,1.0],
-    [49,76,0.88],[53,88,1.0],[57,84,0.95],[61,92,1.05],[65,79,0.9],[69,87,1.0],
-    [73,93,1.1],[77,81,0.92],[81,89,1.0],[85,77,0.88],[89,91,1.05],[93,83,0.95],[97,88,1.0],
+    [0,22,1],[4,19,0.9],[8,24,1.1],[12,20,0.95],[16,23,1],[20,21,0.9],
+    [24,25,1.1],[28,20,1],[32,22,0.95],[36,24,1.1],[40,21,1],[44,23,0.95],
+    [48,20,0.9],[52,22,1],[56,21,0.95],[60,24,1.1],[64,20,0.9],[68,22,1],
+    [72,25,1.1],[76,21,0.95],[80,23,1],[84,20,0.9],[88,24,1.05],[92,22,0.95],[96,23,1],
   ];
   const mid = [
-    [0,115,1.1],[4,105,1.0],[8,118,1.15],[12,108,1.05],[16,122,1.2],[20,110,1.1],
-    [24,116,1.1],[28,104,1.0],[32,120,1.15],[36,112,1.1],[40,118,1.15],[44,106,1.05],
-    [48,114,1.1],[52,122,1.2],[56,108,1.05],[60,116,1.1],[64,110,1.1],[68,120,1.15],
-    [72,105,1.0],[76,118,1.15],[80,112,1.1],[84,106,1.05],[88,120,1.15],[92,114,1.1],[96,108,1.05],
+    [0,30,1.1],[4,27,1],[8,31,1.1],[12,28,1.05],[16,33,1.15],[20,29,1.1],
+    [24,31,1.1],[28,27,1],[32,32,1.15],[36,29,1.1],[40,31,1.1],[44,28,1.05],
+    [48,30,1.1],[52,33,1.15],[56,28,1.05],[60,30,1.1],[64,29,1.1],[68,32,1.15],
+    [72,27,1],[76,31,1.1],[80,29,1.1],[84,28,1.05],[88,32,1.15],[92,30,1.1],[96,28,1.05],
   ];
   const front = [
-    [0,148,1.3],[5,138,1.2],[10,152,1.35],[15,142,1.25],[20,156,1.4],[26,144,1.3],
-    [32,150,1.35],[38,140,1.25],[44,154,1.38],[50,146,1.3],[56,152,1.35],[62,138,1.2],
-    [68,148,1.3],[74,156,1.4],[80,142,1.25],[86,150,1.35],[92,144,1.3],[97,152,1.35],
+    [0,40,1.2],[5,37,1.1],[10,41,1.2],[15,38,1.15],[20,43,1.25],[26,39,1.2],
+    [32,41,1.2],[38,37,1.1],[44,42,1.25],[50,39,1.2],[56,41,1.2],[62,37,1.1],
+    [68,40,1.2],[74,43,1.25],[80,38,1.15],[86,41,1.2],[92,39,1.2],[97,41,1.2],
   ];
 
-  const Pine = ({ x, h, ws, col }) => (
-    <g transform={`translate(${x}, ${200 - h})`}>
-      <rect x={-1.5*ws} y={h*0.72} width={3*ws} height={h*0.28} fill={col} />
-      {[0,0.22,0.42,0.60,0.75,0.87,0.95].map((t, li) => {
-        const py = h * t;
-        const pw = h * ws * 0.38 * (1 - t * 0.55);
-        const ph = h * 0.18;
-        return <polygon key={li} points={`0,${py} ${-pw},${py+ph} ${pw},${py+ph}`} fill={col} />;
-      })}
-    </g>
-  );
+  // Pine drawn bottom-anchored: tip at (x, 200-h), base at (x, 200)
+  const Pine = ({ x, h, ws, col }) => {
+    const tip = 200 - h;
+    const base = 200;
+    const layers = Math.max(3, Math.round(h / 6));
+    return (
+      <g>
+        <rect x={x - 0.4} y={base - h * 0.25} width={0.8} height={h * 0.25} fill={col} />
+        {Array.from({ length: layers }).map((_, li) => {
+          const t = li / (layers - 1);
+          const py = tip + t * (base - h * 0.2 - tip);
+          const pw = h * ws * 0.12 * (1 - t * 0.5);
+          const ph = (h / layers) * 1.3;
+          return <polygon key={li} points={`${x},${py} ${x - pw},${py + ph} ${x + pw},${py + ph}`} fill={col} />;
+        })}
+      </g>
+    );
+  };
 
   return (
     <div className="fixed bottom-0 left-0 right-0 pointer-events-none z-10" style={{ height: "200px", opacity }}>
       <svg viewBox="0 0 100 200" preserveAspectRatio="xMidYMax meet" className="w-full h-full">
-        {back.map(([x,h,ws],i)  => <Pine key={"b"+i} x={x} h={h}  ws={ws}  col="#030703" />)}
-        {mid.map(([x,h,ws],i)   => <Pine key={"m"+i} x={x} h={h}  ws={ws}  col="#040904" />)}
-        {front.map(([x,h,ws],i) => <Pine key={"f"+i} x={x} h={h}  ws={ws}  col="#050b05" />)}
+        {back.map(([x, h, ws], i)  => <Pine key={"b"+i} x={x} h={h} ws={ws} col="#030703" />)}
+        {mid.map(([x, h, ws], i)   => <Pine key={"m"+i} x={x} h={h} ws={ws} col="#040904" />)}
+        {front.map(([x, h, ws], i) => <Pine key={"f"+i} x={x} h={h} ws={ws} col="#060e06" />)}
       </svg>
     </div>
   );
@@ -587,7 +595,7 @@ export default function Intro() {
   const [showBenefit, setShowBenefit] = useState(false);
   const [autoAdvanceTimer, setAutoAdvanceTimer] = useState(null);
 
-  const stars = useMemo(() => generateMilkyWayStars(1200, 42), []);
+  const stars = useMemo(() => generateMilkyWayStars(2500, 42), []);
   const timers = useRef([]);
   const containerRef = useRef(null);
   const scrollLocked = useRef(false);

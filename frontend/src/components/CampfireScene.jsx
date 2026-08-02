@@ -61,7 +61,7 @@ export default function CampfireScene({ lookUp = false }) {
       tiltRef.current += (target - tiltRef.current) * Math.min(dt * 2.2, 1);
       const head = svg.querySelector("#bob-head");
       if (head) head.setAttribute("transform",
-        `rotate(${tiltRef.current.toFixed(2)}, 148, 372)`);
+        `rotate(${tiltRef.current.toFixed(2)}, 148, 352)`);
 
       // Body breathe
       const body = svg.querySelector("#bob-all");
@@ -153,21 +153,19 @@ export default function CampfireScene({ lookUp = false }) {
           <path d="M122 400 Q148 392 174 400" fill="none" stroke="#5c3010" strokeWidth="2" opacity="0.5" />
         </g>
 
-        {/* ══ BOB — side view, sitting on log top (y=400) ══
-             Side view: head tilts toward fire (right), one arm forward,
-             one leg forward one back. Hip at (148, 400). ══ */}
+        {/* ══ BOB — side view, sitting ON TOP of log (log top = y=380) ══ */}
         <g id="bob-all">
-          {/* Back leg — goes back-down from hip */}
-          <line x1="148" y1="400" x2="138" y2="420" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-          {/* Front leg — goes forward-down from hip */}
-          <line x1="148" y1="400" x2="162" y2="420" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-          {/* Torso — vertical from hip up to shoulder */}
-          <line x1="148" y1="400" x2="148" y2="372" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-          {/* Arm toward fire (forward) */}
-          <line x1="148" y1="378" x2="162" y2="390" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-          {/* Head — rotates around neck point (148, 372) */}
-          <g id="bob-head" transform="rotate(15, 148, 372)">
-            <circle cx="148" cy="361" r="10" fill="none" stroke="white" strokeWidth="2.5" />
+          {/* Back leg — hangs down from hip */}
+          <line x1="148" y1="380" x2="138" y2="400" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+          {/* Front leg — hangs down from hip */}
+          <line x1="148" y1="380" x2="162" y2="400" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+          {/* Torso */}
+          <line x1="148" y1="380" x2="148" y2="352" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+          {/* Arm toward fire */}
+          <line x1="148" y1="358" x2="162" y2="370" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+          {/* Head — rotates around neck (148, 352) */}
+          <g id="bob-head" transform="rotate(15, 148, 352)">
+            <circle cx="148" cy="341" r="10" fill="none" stroke="white" strokeWidth="2.5" />
           </g>
         </g>
 
