@@ -79,15 +79,38 @@ function StarCanvas({ stars }) {
       const H = canvas.height;
       ctx.clearRect(0, 0, W, H);
 
-      // Milky Way glow band
-      const mwGrad = ctx.createLinearGradient(0, H, W, 0);
-      mwGrad.addColorStop(0,   "rgba(0,0,0,0)");
-      mwGrad.addColorStop(0.3, "rgba(80,70,140,0.07)");
-      mwGrad.addColorStop(0.5, "rgba(160,140,220,0.13)");
-      mwGrad.addColorStop(0.65,"rgba(200,180,255,0.10)");
-      mwGrad.addColorStop(0.75,"rgba(255,220,160,0.06)");
-      mwGrad.addColorStop(1,   "rgba(0,0,0,0)");
-      ctx.fillStyle = mwGrad;
+      // ── Milky Way: diagonal arc from bottom-left to upper-right ──
+      // Outer haze — blue-purple
+      const mw1 = ctx.createLinearGradient(0, H, W * 0.85, 0);
+      mw1.addColorStop(0,    "rgba(0,0,0,0)");
+      mw1.addColorStop(0.25, "rgba(40,35,90,0.08)");
+      mw1.addColorStop(0.42, "rgba(100,85,180,0.14)");
+      mw1.addColorStop(0.55, "rgba(160,140,230,0.18)");
+      mw1.addColorStop(0.65, "rgba(190,170,255,0.14)");
+      mw1.addColorStop(0.78, "rgba(80,70,140,0.08)");
+      mw1.addColorStop(1,    "rgba(0,0,0,0)");
+      ctx.fillStyle = mw1;
+      ctx.fillRect(0, 0, W, H);
+
+      // Warm galactic core glow — orange-gold, upper-center
+      const coreX = W * 0.52;
+      const coreY = H * 0.28;
+      const core = ctx.createRadialGradient(coreX, coreY, 0, coreX, coreY, W * 0.28);
+      core.addColorStop(0,    "rgba(255,200,100,0.18)");
+      core.addColorStop(0.25, "rgba(220,160,80,0.12)");
+      core.addColorStop(0.5,  "rgba(180,120,60,0.07)");
+      core.addColorStop(1,    "rgba(0,0,0,0)");
+      ctx.fillStyle = core;
+      ctx.fillRect(0, 0, W, H);
+
+      // Dense star cluster along band
+      const band = ctx.createLinearGradient(0, H, W * 0.85, 0);
+      band.addColorStop(0,    "rgba(0,0,0,0)");
+      band.addColorStop(0.45, "rgba(255,255,255,0.04)");
+      band.addColorStop(0.55, "rgba(255,255,255,0.07)");
+      band.addColorStop(0.65, "rgba(255,255,255,0.04)");
+      band.addColorStop(1,    "rgba(0,0,0,0)");
+      ctx.fillStyle = band;
       ctx.fillRect(0, 0, W, H);
 
       // Stars
@@ -530,19 +553,19 @@ export default function Intro() {
   const [showBenefit, setShowBenefit] = useState(false);
   const [autoAdvanceTimer, setAutoAdvanceTimer] = useState(null);
 
-  const stars = useMemo(() => generateMilkyWayStars(600, 42), []);
+  const stars = useMemo(() => generateMilkyWayStars(1200, 42), []);
   const timers = useRef([]);
   const containerRef = useRef(null);
   const scrollLocked = useRef(false);
+  const [bobLookUp, setBobLookUp] = useState(false);
 
   // ---- Auto-advance through scenes 0-1 ----
   useEffect(() => {
-    // Phase 0 (campsite + Bob) gets a generous hold so the scene and
-    // our stick figure are clearly visible and paced. Phase 1 (camera
-    // drift) then runs for ~4.5s so the "look up" transition breathes.
+    // Phase 0: campsite 7s. At 5s Bob tilts head up. Phase 1: camera pan 4.5s.
+    const tLook = setTimeout(() => { setBobLookUp(true); }, 5000);
     const t0 = setTimeout(() => { setPhase(1); }, 7000);
     const t1 = setTimeout(() => { setPhase(2); }, 11500);
-    timers.current = [t0, t1];
+    timers.current = [tLook, t0, t1];
     return () => timers.current.forEach(clearTimeout);
   }, []);
 
@@ -698,7 +721,7 @@ export default function Intro() {
           className="absolute inset-0 z-20"
           style={{ animation: "fadeIn 1.5s ease" }}
         >
-          <CampfireScene />
+          <CampfireScene lookUp={bobLookUp} />
           <div className="absolute bottom-[3%] left-1/2 -translate-x-1/2 text-center">
             <p
               className="text-white/30 text-[10px] font-tech uppercase tracking-[0.4em]"
@@ -717,7 +740,7 @@ export default function Intro() {
           style={{ animation: "camera-drift 4s cubic-bezier(0.45, 0, 0.25, 1) forwards" }}
         >
           {/* Keep campsite visible at bottom as camera pans up */}
-          <CampfireScene />
+          <CampfireScene lookUp={true} />
           <div className="absolute inset-0 flex items-center justify-center">
             <p
               className="text-white/40 text-sm font-tech uppercase tracking-[0.5em]"
