@@ -257,52 +257,32 @@ function StarBackground({ stars }) {
  * Tree silhouettes at the bottom of the screen.
  */
 function TreeSilhouettes({ opacity = 0.5 }) {
-  // viewBox is 0 0 100 200. x is in viewBox units (0-100).
-  // h is tree height in viewBox units (NOT pixels). Keep small relative to 200.
-  // Each entry: [x, h, ws] where x=0-100, h=20-45, ws=width multiplier
   const back = [
-    [0,22,1],[4,19,0.9],[8,24,1.1],[12,20,0.95],[16,23,1],[20,21,0.9],
-    [24,25,1.1],[28,20,1],[32,22,0.95],[36,24,1.1],[40,21,1],[44,23,0.95],
-    [48,20,0.9],[52,22,1],[56,21,0.95],[60,24,1.1],[64,20,0.9],[68,22,1],
-    [72,25,1.1],[76,21,0.95],[80,23,1],[84,20,0.9],[88,24,1.05],[92,22,0.95],[96,23,1],
+    [0,10],[3,9],[6,11],[9,9.5],[12,10],[15,9],[18,11],[21,9.5],[24,10.5],
+    [27,9],[30,11],[33,10],[36,9.5],[39,11],[42,9],[45,10.5],[48,9.5],[51,10],
+    [54,11],[57,9],[60,10.5],[63,9.5],[66,11],[69,9],[72,10],[75,11],[78,9.5],
+    [81,10],[84,9],[87,11],[90,10],[93,9.5],[96,10.5],[99,9],
   ];
   const mid = [
-    [0,30,1.1],[4,27,1],[8,31,1.1],[12,28,1.05],[16,33,1.15],[20,29,1.1],
-    [24,31,1.1],[28,27,1],[32,32,1.15],[36,29,1.1],[40,31,1.1],[44,28,1.05],
-    [48,30,1.1],[52,33,1.15],[56,28,1.05],[60,30,1.1],[64,29,1.1],[68,32,1.15],
-    [72,27,1],[76,31,1.1],[80,29,1.1],[84,28,1.05],[88,32,1.15],[92,30,1.1],[96,28,1.05],
+    [0,15],[3.5,13],[7,16],[10.5,14],[14,16.5],[17.5,14.5],[21,15.5],[24.5,13.5],
+    [28,16],[31.5,14],[35,16],[38.5,14.5],[42,15],[45.5,16.5],[49,14],[52.5,15.5],
+    [56,16],[59.5,14],[63,15.5],[66.5,16],[70,14.5],[73.5,15],[77,16.5],[80.5,14],
+    [84,15.5],[87.5,16],[91,14.5],[94.5,15],[98,16],
   ];
   const front = [
-    [0,40,1.2],[5,37,1.1],[10,41,1.2],[15,38,1.15],[20,43,1.25],[26,39,1.2],
-    [32,41,1.2],[38,37,1.1],[44,42,1.25],[50,39,1.2],[56,41,1.2],[62,37,1.1],
-    [68,40,1.2],[74,43,1.25],[80,38,1.15],[86,41,1.2],[92,39,1.2],[97,41,1.2],
+    [0,20],[4,18],[8,21],[12,19],[16,22],[20,19.5],[24,21],[28,18.5],[32,21],
+    [36,19],[40,22],[44,19.5],[48,21],[52,20],[56,22],[60,18.5],[64,21],[68,19.5],
+    [72,22],[76,20],[80,21.5],[84,19],[88,22],[92,20],[96,21],
   ];
-
-  // Pine drawn bottom-anchored: tip at (x, 200-h), base at (x, 200)
-  const Pine = ({ x, h, ws, col }) => {
-    const tip = 200 - h;
-    const base = 200;
-    const layers = Math.max(3, Math.round(h / 6));
-    return (
-      <g>
-        <rect x={x - 0.4} y={base - h * 0.25} width={0.8} height={h * 0.25} fill={col} />
-        {Array.from({ length: layers }).map((_, li) => {
-          const t = li / (layers - 1);
-          const py = tip + t * (base - h * 0.2 - tip);
-          const pw = h * ws * 0.12 * (1 - t * 0.5);
-          const ph = (h / layers) * 1.3;
-          return <polygon key={li} points={`${x},${py} ${x - pw},${py + ph} ${x + pw},${py + ph}`} fill={col} />;
-        })}
-      </g>
-    );
-  };
-
+  const Pine = ({ x, h, col }) => (
+    <polygon points={`${x},${60 - h} ${x - h * 0.28},60 ${x + h * 0.28},60`} fill={col} />
+  );
   return (
-    <div className="fixed bottom-0 left-0 right-0 pointer-events-none z-10" style={{ height: "200px", opacity }}>
-      <svg viewBox="0 0 100 200" preserveAspectRatio="xMidYMax meet" className="w-full h-full">
-        {back.map(([x, h, ws], i)  => <Pine key={"b"+i} x={x} h={h} ws={ws} col="#030703" />)}
-        {mid.map(([x, h, ws], i)   => <Pine key={"m"+i} x={x} h={h} ws={ws} col="#040904" />)}
-        {front.map(([x, h, ws], i) => <Pine key={"f"+i} x={x} h={h} ws={ws} col="#060e06" />)}
+    <div className="fixed bottom-0 left-0 right-0 pointer-events-none z-10" style={{ height: "180px", opacity }}>
+      <svg viewBox="0 0 100 60" preserveAspectRatio="none" style={{ width: "100%", height: "100%", display: "block" }}>
+        {back.map(([x, h], i)  => <Pine key={"b"+i} x={x} h={h} col="#020602" />)}
+        {mid.map(([x, h], i)   => <Pine key={"m"+i} x={x} h={h} col="#030803" />)}
+        {front.map(([x, h], i) => <Pine key={"f"+i} x={x} h={h} col="#040a04" />)}
       </svg>
     </div>
   );
@@ -775,17 +755,18 @@ export default function Intro() {
         </div>
       )}
 
-      {/* ===== SCENE 1: Camera pans up from campsite to star-filled sky ===== */}
+      {/* ===== SCENE 1: Camera pans up — campsite fades out slowly ===== */}
       {phase === 1 && (
         <>
-          {/* Campsite stays fixed at bottom — NOT inside the animated div */}
-          <div className="absolute inset-0 z-20 pointer-events-none">
+          <div
+            className="absolute inset-0 z-20 pointer-events-none"
+            style={{ animation: "fadeOut 4s cubic-bezier(0.45, 0, 0.25, 1) forwards" }}
+          >
             <CampfireScene lookUp={true} />
           </div>
-          {/* Only the text pans up with camera-drift */}
           <div
-            className="absolute inset-0 z-21"
-            style={{ animation: "camera-drift 4s cubic-bezier(0.45, 0, 0.25, 1) forwards" }}
+            className="absolute inset-0"
+            style={{ zIndex: 21, animation: "camera-drift 4s cubic-bezier(0.45, 0, 0.25, 1) forwards" }}
           >
             <div className="absolute inset-0 flex items-center justify-center">
               <p
