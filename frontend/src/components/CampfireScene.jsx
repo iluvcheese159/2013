@@ -1,36 +1,31 @@
 import { useRef, useEffect, useMemo } from "react";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// CampfireScene
+// HOW BOB IS DRAWN (matching the reference sheet exactly):
 //
-// Layout (all in a 900×500 SVG viewBox):
-//   • Dense diverse forest fills the ENTIRE back layer (z-order: drawn first)
-//   • Glowing yellow tent (middle-left, behind Bob)
-//   • Log Bob sits on
-//   • Campfire (bigger, to Bob's right)
-//   • Chibi Bob sitting on log, facing fire, then tilts head up
+// The reference shows a chibi figure where:
+//   1. Every body part is a FILLED WHITE SHAPE with ONE dark outline
+//   2. Where parts overlap (arm over torso, head over body) the overlap is
+//      CLIPPED so you never see a stroke line at the joint
+//   3. The whole figure looks like a single clean silhouette
 //
-// Bob style — exactly matching the reference sheet:
-//   • Very large round head (no face lines, just two small dot eyes + tiny mouth)
-//   • Short stubby body — NO separate neck line, head sits directly on body
-//   • Limbs are THICK FILLED ROUNDED SHAPES, not lines
-//   • No joints visible — smooth continuous silhouette
-//   • Sitting pose: body upright, legs folded in front, arms resting on knees
+// Technique: draw each part as a filled+stroked shape, then use a white
+// filled shape on top (no stroke) to cover the joint line where parts meet.
+// This is the standard SVG "painter's algorithm" trick.
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Bob's head tilt angle is driven by the parent via a prop (0 = looking at fire, -30 = looking up)
 export default function CampfireScene({ lookUp = false }) {
-  const svgRef   = useRef(null);
-  const frameRef = useRef(null);
-  const timeRef  = useRef(0);
-  const headTiltRef = useRef(0); // current animated tilt angle
+  const svgRef      = useRef(null);
+  const frameRef    = useRef(null);
+  const timeRef     = useRef(0);
+  const tiltRef     = useRef(15); // current head tilt (degrees)
 
   const fireflies = useMemo(() => Array.from({ length: 10 }, (_, i) => ({
     id: i,
-    x: 80 + Math.random() * 200,
-    y: 60 + Math.random() * 120,
+    x: 60 + Math.random() * 220,
+    y: 40 + Math.random() * 130,
     phase: Math.random() * Math.PI * 2,
-    speed: 0.2 + Math.random() * 0.3,
+    speed: 0.18 + Math.random() * 0.28,
   })), []);
 
   useEffect(() => {
@@ -43,59 +38,45 @@ export default function CampfireScene({ lookUp = false }) {
       const svg = svgRef.current;
       if (!svg) { frameRef.current = requestAnimationFrame(tick); return; }
 
-      // ── Flame flicker ──
-      const flame = svg.querySelector("#flame-group");
+      // Flame flicker
+      const flame = svg.querySelector("#flame");
       if (flame) {
-        const sx = 1 + Math.sin(t * 11) * 0.06;
-        const sy = 1 + Math.sin(t * 8)  * 0.09;
-        const tx = Math.sin(t * 7) * 2;
+        const sx = 1 + Math.sin(t * 13) * 0.07;
+        const sy = 1 + Math.sin(t * 9)  * 0.11;
+        const tx = Math.sin(t * 7) * 2.5;
         flame.setAttribute("transform", `translate(${tx},0) scale(${sx},${sy})`);
       }
+      // Glow pulse
+      ["#glow1","#glow2"].forEach((id, i) => {
+        const el = svg.querySelector(id);
+        if (el) el.setAttribute("opacity", String(0.3 + Math.sin(t * (1.8 + i * 0.4)) * 0.15));
+      });
+      // Tent glow
+      const tg = svg.querySelector("#tglow");
+      if (tg) tg.setAttribute("opacity", String(0.6 + Math.sin(t * 1.2) * 0.22));
 
-      // ── Fire glow pulse ──
-      const glow = svg.querySelector("#fire-glow");
-      if (glow) {
-        const op = 0.55 + Math.sin(t * 2.1) * 0.18;
-        glow.setAttribute("opacity", String(op));
-      }
-      const glowBig = svg.querySelector("#fire-glow-big");
-      if (glowBig) {
-        const op = 0.22 + Math.sin(t * 1.7) * 0.08;
-        glowBig.setAttribute("opacity", String(op));
-      }
+      // Head tilt — smooth lerp toward target
+      const target = lookUp ? -42 : 15;
+      tiltRef.current += (target - tiltRef.current) * Math.min(dt * 2.2, 1);
+      const head = svg.querySelector("#bob-head");
+      if (head) head.setAttribute("transform",
+        `rotate(${tiltRef.current.toFixed(2)}, 148, 268)`);
 
-      // ── Tent glow pulse ──
-      const tentGlow = svg.querySelector("#tent-glow");
-      if (tentGlow) {
-        const op = 0.55 + Math.sin(t * 1.3 + 1) * 0.2;
-        tentGlow.setAttribute("opacity", String(op));
-      }
-
-      // ── Bob head tilt animation ──
-      const targetTilt = lookUp ? -38 : 18; // 18 = looking slightly down at fire
-      headTiltRef.current += (targetTilt - headTiltRef.current) * Math.min(dt * 1.8, 1);
-      const bobHead = svg.querySelector("#bob-head-group");
-      if (bobHead) {
-        // Rotate head around neck attachment point (cx=310, cy=310)
-        bobHead.setAttribute("transform", `rotate(${headTiltRef.current}, 310, 310)`);
+      // Body breathe
+      const body = svg.querySelector("#bob-all");
+      if (body) {
+        const b = Math.sin(t * 1.1) * 1.2;
+        body.setAttribute("transform", `translate(0,${b.toFixed(2)})`);
       }
 
-      // ── Bob body gentle breathe ──
-      const bobBody = svg.querySelector("#bob-body-group");
-      if (bobBody) {
-        const breathe = Math.sin(t * 1.2) * 1.5;
-        bobBody.setAttribute("transform", `translate(0, ${breathe})`);
-      }
-
-      // ── Fireflies ──
-      const ffg = svg.querySelector("#fireflies");
+      // Fireflies
+      const ffg = svg.querySelector("#fflies");
       if (ffg) {
-        const circles = ffg.querySelectorAll("circle");
-        circles.forEach((c, i) => {
+        ffg.querySelectorAll("circle").forEach((c, i) => {
           const f = fireflies[i]; if (!f) return;
-          c.setAttribute("cx", String(f.x + Math.cos(t * f.speed + f.phase) * 6));
-          c.setAttribute("cy", String(f.y + Math.sin(t * f.speed * 0.7 + f.phase) * 8));
-          c.setAttribute("opacity", String(Math.max(0, 0.25 + Math.sin(t * 1.6 + f.phase) * 0.4)));
+          c.setAttribute("cx", String((f.x + Math.cos(t * f.speed + f.phase) * 7).toFixed(1)));
+          c.setAttribute("cy", String((f.y + Math.sin(t * f.speed * 0.8 + f.phase) * 9).toFixed(1)));
+          c.setAttribute("opacity", String(Math.max(0, 0.2 + Math.sin(t * 1.5 + f.phase) * 0.45).toFixed(2)));
         });
       }
 
@@ -105,317 +86,278 @@ export default function CampfireScene({ lookUp = false }) {
     return () => cancelAnimationFrame(frameRef.current);
   }, [fireflies, lookUp]);
 
+  // SVG viewBox: 520 wide × 420 tall
+  // Scene is anchored bottom-left of screen
   return (
     <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 10 }}>
       <svg
         ref={svgRef}
-        viewBox="0 0 900 500"
-        preserveAspectRatio="xMidYMax meet"
-        className="absolute bottom-0 left-0 w-full"
-        style={{ height: "75vh" }}
+        viewBox="0 0 520 420"
+        preserveAspectRatio="xMinYMax meet"
+        className="absolute bottom-0 left-0"
+        style={{ width: "min(580px, 58vw)", height: "auto" }}
         fill="none"
       >
-        {/* ══════════════════════════════════════════════════════════
-            LAYER 1 — FOREST (drawn first = behind everything)
-            Diverse trees: tall pines, short round pines, wide pines,
-            dead trees, layered at different depths/sizes/shades.
-        ══════════════════════════════════════════════════════════ */}
-        <g id="forest">
-          {/* ── Far background trees (darkest, smallest) ── */}
-          {[
-            [30,  320, 90,  3, "#040804"],
-            [80,  290, 110, 4, "#050a05"],
-            [140, 310, 95,  3, "#040804"],
-            [195, 280, 120, 4, "#050a05"],
-            [255, 300, 100, 3, "#040804"],
-            [310, 270, 130, 5, "#060c06"],
-            [370, 295, 105, 3, "#040804"],
-            [430, 265, 140, 5, "#060c06"],
-            [490, 285, 115, 4, "#050a05"],
-            [550, 275, 125, 4, "#060c06"],
-            [610, 290, 108, 3, "#040804"],
-            [665, 260, 145, 5, "#060c06"],
-            [720, 280, 120, 4, "#050a05"],
-            [775, 295, 102, 3, "#040804"],
-            [830, 270, 132, 5, "#060c06"],
-            [880, 285, 115, 4, "#050a05"],
-          ].map(([cx, base, h, layers, col], i) => (
-            <PineTree key={"bg"+i} cx={cx} base={base} h={h} layers={layers} col={col} wFactor={0.5} />
-          ))}
+        <defs>
+          {/* Clip the head's stroke where it overlaps the body */}
+          <clipPath id="head-clip">
+            <circle cx="148" cy="220" r="58" />
+          </clipPath>
+        </defs>
 
-          {/* ── Mid trees (medium size, varied shapes) ── */}
-          {[
-            [15,  370, 130, 4, "#060e06"],
-            [65,  355, 150, 5, "#081208"],
-            [120, 365, 138, 4, "#060e06"],
-            [175, 345, 165, 6, "#0a1a0a"],
-            [235, 360, 142, 4, "#081208"],
-            [290, 340, 175, 6, "#0a1a0a"],
-            [350, 355, 148, 5, "#060e06"],
-            [410, 335, 180, 6, "#0a1a0a"],
-            [470, 350, 155, 5, "#081208"],
-            [530, 342, 168, 5, "#0a1a0a"],
-            [590, 358, 140, 4, "#060e06"],
-            [645, 330, 185, 6, "#0a1a0a"],
-            [700, 348, 158, 5, "#081208"],
-            [755, 338, 172, 5, "#0a1a0a"],
-            [810, 355, 145, 4, "#060e06"],
-            [860, 332, 178, 6, "#0a1a0a"],
-            [900, 350, 152, 5, "#081208"],
-          ].map(([cx, base, h, layers, col], i) => (
-            <PineTree key={"mid"+i} cx={cx} base={base} h={h} layers={layers} col={col} wFactor={0.58} />
-          ))}
+        {/* ══ FOREST — drawn first so it's behind everything ══ */}
+        <Forest />
 
-          {/* ── Round/bushy trees (variety) ── */}
-          {[
-            [50,  400, "#070f07"],
-            [160, 390, "#090d09"],
-            [320, 395, "#070f07"],
-            [480, 388, "#090d09"],
-            [640, 392, "#070f07"],
-            [800, 385, "#090d09"],
-          ].map(([cx, base, col], i) => (
-            <RoundTree key={"round"+i} cx={cx} base={base} col={col} />
-          ))}
+        {/* ══ GROUND ══ */}
+        <ellipse cx="200" cy="412" rx="210" ry="14" fill="#050a05" />
 
-          {/* ── Foreground trees (tallest, left & right flanks) ── */}
-          {[
-            [0,   430, 200, 7, "#0a1a0a"],
-            [45,  420, 185, 6, "#081208"],
-            [100, 435, 195, 7, "#0a1a0a"],
-            // right flank — leave center-left open for campsite
-            [560, 440, 190, 6, "#081208"],
-            [615, 425, 205, 7, "#0a1a0a"],
-            [670, 438, 188, 6, "#081208"],
-            [725, 422, 210, 7, "#0a1a0a"],
-            [780, 435, 195, 6, "#081208"],
-            [835, 420, 208, 7, "#0a1a0a"],
-            [885, 432, 192, 6, "#081208"],
-          ].map(([cx, base, h, layers, col], i) => (
-            <PineTree key={"fg"+i} cx={cx} base={base} h={h} layers={layers} col={col} wFactor={0.65} />
-          ))}
-        </g>
-
-        {/* ══════════════════════════════════════════════════════════
-            LAYER 2 — GROUND
-        ══════════════════════════════════════════════════════════ */}
-        <ellipse cx="450" cy="490" rx="450" ry="22" fill="#060c06" />
-        <rect x="0" y="478" width="900" height="22" fill="#050a05" />
-
-        {/* ══════════════════════════════════════════════════════════
-            LAYER 3 — TENT (yellow, glowing, behind Bob)
-            Big A-frame tent, warm yellow canvas, bright interior glow
-        ══════════════════════════════════════════════════════════ */}
-        <g id="tent" transform="translate(340, 290)">
-          {/* Tent glow halo behind */}
-          <ellipse cx="90" cy="185" rx="110" ry="30" fill="#fbbf24" opacity="0.18" />
-          {/* Main tent body */}
-          <path d="M0 190 L90 0 L180 190 Z" fill="#d97706" stroke="#92400e" strokeWidth="3" strokeLinejoin="round" />
-          {/* Right panel shading */}
-          <path d="M90 0 L135 190 L180 190 Z" fill="#b45309" />
-          {/* Left panel highlight */}
-          <path d="M90 0 L45 190 L0 190 Z" fill="#f59e0b" opacity="0.6" />
-          {/* Door arch */}
-          <path d="M62 190 Q90 130 118 190 Z" fill="#78350f" />
-          {/* Interior glow through door */}
-          <path id="tent-glow" d="M65 190 Q90 135 115 190 Z" fill="#fef08a" opacity="0.55" />
-          {/* Tent ridge line */}
-          <line x1="90" y1="0" x2="90" y2="190" stroke="#fbbf24" strokeWidth="1.5" opacity="0.4" />
+        {/* ══ TENT — yellow glowing A-frame ══ */}
+        <g id="tent">
+          {/* Glow halo */}
+          <ellipse cx="370" cy="355" rx="105" ry="28" fill="#fbbf24" opacity="0.15" />
+          {/* Main body */}
+          <path d="M270 360 L370 195 L470 360 Z" fill="#d97706" stroke="#92400e" strokeWidth="2.5" strokeLinejoin="round" />
+          {/* Right shading */}
+          <path d="M370 195 L420 360 L470 360 Z" fill="#b45309" />
+          {/* Left highlight */}
+          <path d="M270 360 L320 360 L370 195 Z" fill="#f59e0b" opacity="0.5" />
+          {/* Door */}
+          <path d="M342 360 Q370 300 398 360 Z" fill="#78350f" />
+          {/* Interior glow */}
+          <path id="tglow" d="M346 360 Q370 305 394 360 Z" fill="#fef08a" opacity="0.6" />
           {/* Guy ropes */}
-          <line x1="90" y1="5" x2="-20" y2="90" stroke="#d97706" strokeWidth="1.2" opacity="0.5" />
-          <line x1="90" y1="5" x2="200" y2="90" stroke="#d97706" strokeWidth="1.2" opacity="0.5" />
-          {/* Stakes */}
-          <line x1="-20" y1="90" x2="-16" y2="108" stroke="#92400e" strokeWidth="2.5" strokeLinecap="round" />
-          <line x1="200" y1="90" x2="196" y2="108" stroke="#92400e" strokeWidth="2.5" strokeLinecap="round" />
-          {/* Warm glow spill on ground */}
-          <ellipse cx="90" cy="192" rx="55" ry="10" fill="#fbbf24" opacity="0.2" />
+          <line x1="370" y1="198" x2="248" y2="268" stroke="#d97706" strokeWidth="1.2" opacity="0.5" />
+          <line x1="370" y1="198" x2="492" y2="268" stroke="#d97706" strokeWidth="1.2" opacity="0.5" />
+          <line x1="248" y1="268" x2="252" y2="285" stroke="#92400e" strokeWidth="2.5" strokeLinecap="round" />
+          <line x1="492" y1="268" x2="488" y2="285" stroke="#92400e" strokeWidth="2.5" strokeLinecap="round" />
+          {/* Ground glow spill */}
+          <ellipse cx="370" cy="362" rx="60" ry="9" fill="#fbbf24" opacity="0.18" />
         </g>
 
-        {/* ══════════════════════════════════════════════════════════
-            LAYER 4 — LOG Bob sits on
-        ══════════════════════════════════════════════════════════ */}
-        <g transform="translate(155, 400)">
-          {/* Log shadow */}
-          <ellipse cx="75" cy="52" rx="78" ry="12" fill="#020402" opacity="0.5" />
-          {/* Log body */}
-          <rect x="0" y="20" width="150" height="32" rx="16" fill="#3d1f0a" stroke="#5c3010" strokeWidth="2" />
-          {/* Log top face */}
-          <rect x="2" y="20" width="146" height="14" rx="14" fill="#4e2810" />
-          {/* Bark grain lines */}
-          <line x1="25"  y1="22" x2="25"  y2="50" stroke="#2a1206" strokeWidth="1" opacity="0.5" />
-          <line x1="55"  y1="22" x2="55"  y2="50" stroke="#2a1206" strokeWidth="1" opacity="0.4" />
-          <line x1="85"  y1="22" x2="85"  y2="50" stroke="#2a1206" strokeWidth="1" opacity="0.5" />
-          <line x1="115" y1="22" x2="115" y2="50" stroke="#2a1206" strokeWidth="1" opacity="0.4" />
-          {/* End grain circles */}
-          <ellipse cx="8"   cy="36" rx="7" ry="14" fill="#3d1f0a" stroke="#5c3010" strokeWidth="1.5" />
-          <ellipse cx="142" cy="36" rx="7" ry="14" fill="#3d1f0a" stroke="#5c3010" strokeWidth="1.5" />
-          <ellipse cx="8"   cy="36" rx="4" ry="9"  fill="#2a1206" opacity="0.6" />
-          <ellipse cx="142" cy="36" rx="4" ry="9"  fill="#2a1206" opacity="0.6" />
+        {/* ══ LOG ══ */}
+        <g transform="translate(52, 340)">
+          <ellipse cx="96" cy="58" rx="98" ry="13" fill="#020402" opacity="0.4" />
+          <rect x="0" y="22" width="192" height="36" rx="18" fill="#3d1f0a" stroke="#5c3010" strokeWidth="2" />
+          <rect x="2" y="22" width="188" height="16" rx="16" fill="#4e2810" />
+          {[30,65,100,135,165].map(x => (
+            <line key={x} x1={x} y1="24" x2={x} y2="56" stroke="#2a1206" strokeWidth="1" opacity="0.45" />
+          ))}
+          <ellipse cx="10"  cy="40" rx="9" ry="17" fill="#3d1f0a" stroke="#5c3010" strokeWidth="1.5" />
+          <ellipse cx="182" cy="40" rx="9" ry="17" fill="#3d1f0a" stroke="#5c3010" strokeWidth="1.5" />
         </g>
 
-        {/* ══════════════════════════════════════════════════════════
-            LAYER 5 — CAMPFIRE (bigger)
-        ══════════════════════════════════════════════════════════ */}
-        <g transform="translate(370, 390)">
-          {/* Big ground glow */}
-          <ellipse id="fire-glow-big" cx="0" cy="20" rx="80" ry="35" fill="#f97316" opacity="0.22" />
-          {/* Inner glow */}
-          <ellipse id="fire-glow" cx="0" cy="10" rx="45" ry="25" fill="#fbbf24" opacity="0.55" />
-          {/* Logs */}
-          <line x1="-38" y1="18" x2="38"  y2="8"  stroke="#5a3010" strokeWidth="10" strokeLinecap="round" />
-          <line x1="-32" y1="8"  x2="32"  y2="18" stroke="#4a2808" strokeWidth="10" strokeLinecap="round" />
-          <line x1="-20" y1="13" x2="20"  y2="13" stroke="#3a1f08" strokeWidth="8"  strokeLinecap="round" />
-          {/* Ember bed */}
-          <ellipse cx="0" cy="14" rx="22" ry="9" fill="#f59e0b" opacity="0.6" />
-          <ellipse cx="0" cy="14" rx="14" ry="5" fill="#fef08a" opacity="0.4" />
-          {/* Flame */}
-          <g id="flame-group" style={{ transformOrigin: "0px 10px" }}>
-            {/* Outer flame — orange */}
-            <path d="M0 12 C-18 -5 -12 -35 -4 -50 C0 -60 0 -52 0 -45 C0 -52 4 -60 8 -50 C16 -35 18 -5 0 12Z"
-              fill="#f97316" opacity="0.9" />
-            {/* Mid flame — amber */}
-            <path d="M0 10 C-10 -2 -7 -25 -2 -36 C0 -42 0 -36 0 -30 C0 -36 2 -42 4 -36 C9 -25 10 -2 0 10Z"
-              fill="#fbbf24" opacity="0.95" />
-            {/* Inner core — yellow-white */}
-            <path d="M0 8 C-4 0 -3 -14 0 -20 C3 -14 4 0 0 8Z"
-              fill="#fef9c3" opacity="1" />
-            {/* Sparks */}
-            <circle cx="-10" cy="-48" r="2"   fill="#fbbf24" opacity="0.8" />
-            <circle cx="8"   cy="-44" r="1.5" fill="#fef08a" opacity="0.7" />
-            <circle cx="-2"  cy="-58" r="1.2" fill="#fef9c3" opacity="0.6" />
-            <circle cx="14"  cy="-38" r="1"   fill="#fbbf24" opacity="0.5" />
-            <circle cx="-14" cy="-40" r="1"   fill="#fbbf24" opacity="0.5" />
+        {/* ══ CAMPFIRE ══ */}
+        <g transform="translate(295, 340)">
+          <ellipse id="glow2" cx="0" cy="22" rx="88" ry="38" fill="#f97316" opacity="0.3" />
+          <ellipse id="glow1" cx="0" cy="12" rx="52" ry="28" fill="#fbbf24" opacity="0.45" />
+          <line x1="-42" y1="20" x2="42" y2="8"  stroke="#5a3010" strokeWidth="11" strokeLinecap="round" />
+          <line x1="-36" y1="8"  x2="36" y2="20" stroke="#4a2808" strokeWidth="11" strokeLinecap="round" />
+          <line x1="-22" y1="14" x2="22" y2="14" stroke="#3a1f08" strokeWidth="9"  strokeLinecap="round" />
+          <ellipse cx="0" cy="16" rx="26" ry="10" fill="#f59e0b" opacity="0.65" />
+          <g id="flame" style={{ transformOrigin: "0px 8px" }}>
+            <path d="M0 10 C-22-8 -14-42 -5-58 C0-70 0-60 0-52 C0-60 5-70 8-58 C18-42 22-8 0 10Z" fill="#f97316" opacity="0.92" />
+            <path d="M0 8 C-12-4 -8-30 -2-42 C0-50 0-42 0-36 C0-42 2-50 5-42 C10-30 12-4 0 8Z" fill="#fbbf24" opacity="0.96" />
+            <path d="M0 6 C-5 0 -3-16 0-24 C3-16 5 0 0 6Z" fill="#fef9c3" />
+            <circle cx="-12" cy="-55" r="2.2" fill="#fbbf24" opacity="0.8" />
+            <circle cx="10"  cy="-50" r="1.8" fill="#fef08a" opacity="0.7" />
+            <circle cx="-2"  cy="-66" r="1.4" fill="#fef9c3" opacity="0.6" />
+            <circle cx="16"  cy="-44" r="1.2" fill="#fbbf24" opacity="0.5" />
           </g>
         </g>
 
-        {/* ══════════════════════════════════════════════════════════
-            LAYER 6 — CHIBI BOB
-            Sitting on log, facing right (toward fire).
-            Style: reference sheet — big round head, NO visible joints,
-            thick filled rounded limbs, tiny dot eyes, small mouth.
-            Head tilts up when lookUp=true.
-        ══════════════════════════════════════════════════════════ */}
-        <g id="bob-body-group" transform="translate(0,0)">
-          {/* ── Legs (sitting, folded forward) ── */}
-          {/* Left leg — thick rounded pill shape */}
-          <path d="M268 418 Q252 430 248 445 Q246 455 258 458 Q270 460 276 448 Q282 435 280 420 Z"
-            fill="white" stroke="#1a1a1a" strokeWidth="2.5" strokeLinejoin="round" />
-          {/* Left foot */}
-          <ellipse cx="254" cy="454" rx="14" ry="8" fill="white" stroke="#1a1a1a" strokeWidth="2.5" />
+        {/* ══ BOB ══
+            Drawing order (painter's algorithm — later = on top):
+            1. Legs (behind body)
+            2. Body (covers leg tops)
+            3. Arms (behind body overlap covered by body redraw)
+            4. Body redraw (white fill no stroke) to erase arm-body joint lines
+            5. Head (on top of body, joint covered by white fill)
 
-          {/* Right leg */}
-          <path d="M318 418 Q334 430 338 445 Q340 455 328 458 Q316 460 310 448 Q304 435 306 420 Z"
-            fill="white" stroke="#1a1a1a" strokeWidth="2.5" strokeLinejoin="round" />
-          {/* Right foot */}
-          <ellipse cx="332" cy="454" rx="14" ry="8" fill="white" stroke="#1a1a1a" strokeWidth="2.5" />
+            Key: wherever two stroked shapes meet, we paint a white
+            filled (no-stroke) version of the TOP shape to erase the
+            underlying stroke line. Result = zero visible joint lines.
+        ══ */}
+        <g id="bob-all">
 
-          {/* ── Body — short wide rounded rectangle ── */}
-          <rect x="252" y="355" width="82" height="68" rx="22" ry="22"
-            fill="white" stroke="#1a1a1a" strokeWidth="2.5" />
+          {/* ── 1. LEFT LEG ── */}
+          {/* Thigh going down-left */}
+          <ellipse cx="122" cy="348" rx="22" ry="14" fill="white" stroke="#1a1a1a" strokeWidth="2.8"
+            transform="rotate(-30,122,348)" />
+          {/* Shin */}
+          <ellipse cx="100" cy="372" rx="18" ry="12" fill="white" stroke="#1a1a1a" strokeWidth="2.8"
+            transform="rotate(-15,100,372)" />
+          {/* Foot */}
+          <ellipse cx="88" cy="390" rx="20" ry="10" fill="white" stroke="#1a1a1a" strokeWidth="2.8" />
+          {/* Cover thigh-shin joint */}
+          <ellipse cx="110" cy="362" rx="16" ry="11" fill="white" stroke="none"
+            transform="rotate(-22,110,362)" />
+          {/* Cover shin-foot joint */}
+          <ellipse cx="94" cy="382" rx="15" ry="10" fill="white" stroke="none" />
 
-          {/* ── Left arm (resting on left knee, pointing down-left) ── */}
-          <path d="M258 375 Q240 392 236 410 Q234 420 244 422 Q254 424 260 412 Q266 398 268 380 Z"
-            fill="white" stroke="#1a1a1a" strokeWidth="2.5" strokeLinejoin="round" />
-          {/* Left hand — round blob */}
-          <circle cx="240" cy="418" r="10" fill="white" stroke="#1a1a1a" strokeWidth="2.5" />
+          {/* ── 2. RIGHT LEG ── */}
+          <ellipse cx="174" cy="348" rx="22" ry="14" fill="white" stroke="#1a1a1a" strokeWidth="2.8"
+            transform="rotate(30,174,348)" />
+          <ellipse cx="196" cy="372" rx="18" ry="12" fill="white" stroke="#1a1a1a" strokeWidth="2.8"
+            transform="rotate(15,196,372)" />
+          <ellipse cx="208" cy="390" rx="20" ry="10" fill="white" stroke="#1a1a1a" strokeWidth="2.8" />
+          {/* Cover joints */}
+          <ellipse cx="186" cy="362" rx="16" ry="11" fill="white" stroke="none"
+            transform="rotate(22,186,362)" />
+          <ellipse cx="202" cy="382" rx="15" ry="10" fill="white" stroke="none" />
 
-          {/* ── Right arm (resting on right knee) ── */}
-          <path d="M328 375 Q346 392 350 410 Q352 420 342 422 Q332 424 326 412 Q320 398 318 380 Z"
-            fill="white" stroke="#1a1a1a" strokeWidth="2.5" strokeLinejoin="round" />
-          {/* Right hand */}
-          <circle cx="346" cy="418" r="10" fill="white" stroke="#1a1a1a" strokeWidth="2.5" />
+          {/* ── 3. LEFT ARM ── */}
+          <ellipse cx="108" cy="290" rx="14" ry="22" fill="white" stroke="#1a1a1a" strokeWidth="2.8"
+            transform="rotate(25,108,290)" />
+          {/* Forearm */}
+          <ellipse cx="96" cy="318" rx="12" ry="18" fill="white" stroke="#1a1a1a" strokeWidth="2.8"
+            transform="rotate(10,96,318)" />
+          {/* Hand */}
+          <circle cx="90" cy="338" r="13" fill="white" stroke="#1a1a1a" strokeWidth="2.8" />
+          {/* Cover arm joints */}
+          <ellipse cx="102" cy="306" rx="11" ry="16" fill="white" stroke="none"
+            transform="rotate(18,102,306)" />
+          <ellipse cx="93" cy="328" rx="11" ry="14" fill="white" stroke="none" />
 
-          {/* ── Head group (rotates for look-up animation) ── */}
-          <g id="bob-head-group" transform="rotate(18, 310, 310)">
-            {/* Big round chibi head */}
-            <circle cx="293" cy="310" r="52" fill="white" stroke="#1a1a1a" strokeWidth="2.8" />
-            {/* Cheek blush — soft pink ovals */}
-            <ellipse cx="258" cy="322" rx="11" ry="8" fill="#ffb3b3" opacity="0.5" />
-            <ellipse cx="328" cy="322" rx="11" ry="8" fill="#ffb3b3" opacity="0.5" />
-            {/* Eyes — two small filled dots, no lines */}
-            <circle cx="278" cy="308" r="5" fill="#1a1a1a" />
-            <circle cx="308" cy="308" r="5" fill="#1a1a1a" />
-            {/* Eye shine — tiny white dot top-right of each eye */}
-            <circle cx="281" cy="305" r="2" fill="white" />
-            <circle cx="311" cy="305" r="2" fill="white" />
-            {/* Mouth — tiny happy arc, no lines */}
-            <path d="M281 324 Q293 333 305 324"
+          {/* ── 4. RIGHT ARM ── */}
+          <ellipse cx="188" cy="290" rx="14" ry="22" fill="white" stroke="#1a1a1a" strokeWidth="2.8"
+            transform="rotate(-25,188,290)" />
+          <ellipse cx="200" cy="318" rx="12" ry="18" fill="white" stroke="#1a1a1a" strokeWidth="2.8"
+            transform="rotate(-10,200,318)" />
+          <circle cx="206" cy="338" r="13" fill="white" stroke="#1a1a1a" strokeWidth="2.8" />
+          {/* Cover joints */}
+          <ellipse cx="194" cy="306" rx="11" ry="16" fill="white" stroke="none"
+            transform="rotate(-18,194,306)" />
+          <ellipse cx="203" cy="328" rx="11" ry="14" fill="white" stroke="none" />
+
+          {/* ── 5. BODY ── short wide rounded rect */}
+          <rect x="108" y="268" width="80" height="72" rx="26" fill="white" stroke="#1a1a1a" strokeWidth="2.8" />
+          {/* White fill over arm-body joints (no stroke = erases lines) */}
+          <rect x="110" y="270" width="76" height="68" rx="24" fill="white" stroke="none" />
+
+          {/* ── 6. HEAD (rotates for look-up) ── */}
+          <g id="bob-head" transform="rotate(15, 148, 268)">
+            {/* Head circle */}
+            <circle cx="148" cy="220" r="58" fill="white" stroke="#1a1a1a" strokeWidth="2.8" />
+            {/* White fill over head-body joint */}
+            <circle cx="148" cy="220" r="56" fill="white" stroke="none" />
+            {/* Cheeks */}
+            <ellipse cx="108" cy="232" rx="13" ry="9" fill="#ffb3b3" opacity="0.55" />
+            <ellipse cx="188" cy="232" rx="13" ry="9" fill="#ffb3b3" opacity="0.55" />
+            {/* Eyes — ONLY filled dots, zero lines */}
+            <circle cx="132" cy="218" r="5.5" fill="#1a1a1a" />
+            <circle cx="164" cy="218" r="5.5" fill="#1a1a1a" />
+            {/* Eye shine */}
+            <circle cx="135" cy="215" r="2.2" fill="white" />
+            <circle cx="167" cy="215" r="2.2" fill="white" />
+            {/* Mouth — single arc, no lines */}
+            <path d="M136 236 Q148 246 160 236"
+              fill="none" stroke="#1a1a1a" strokeWidth="2.4" strokeLinecap="round" />
+            {/* Hair tufts — curved arcs only, no straight lines */}
+            <path d="M118 168 Q148 154 178 168"
+              fill="none" stroke="#1a1a1a" strokeWidth="2.8" strokeLinecap="round" />
+            <path d="M133 162 Q148 152 163 162"
               fill="none" stroke="#1a1a1a" strokeWidth="2.2" strokeLinecap="round" />
-            {/* Hair — two small curved tufts on top, no straight lines */}
-            <path d="M272 262 Q293 250 314 262"
-              fill="none" stroke="#1a1a1a" strokeWidth="2.5" strokeLinecap="round" />
-            <path d="M283 257 Q293 248 303 257"
-              fill="none" stroke="#1a1a1a" strokeWidth="2" strokeLinecap="round" />
           </g>
+
+          {/* White cover strip at head-body junction to erase overlap stroke */}
+          <rect x="110" y="268" width="76" height="18" fill="white" stroke="none" />
         </g>
 
-        {/* ══════════════════════════════════════════════════════════
-            LAYER 7 — FIREFLIES
-        ══════════════════════════════════════════════════════════ */}
-        <g id="fireflies">
-          {fireflies.map((f) => (
-            <circle key={f.id} cx={f.x} cy={f.y} r="2.2" fill="#fef08a" opacity="0.3" />
+        {/* ══ FIREFLIES ══ */}
+        <g id="fflies">
+          {fireflies.map(f => (
+            <circle key={f.id} cx={f.x} cy={f.y} r="2.4" fill="#fef08a" opacity="0.25" />
           ))}
         </g>
 
-        {/* ══════════════════════════════════════════════════════════
-            LAYER 8 — SMOKE WISPS above fire
-        ══════════════════════════════════════════════════════════ */}
-        <g opacity="0.15">
-          <path d="M368 340 Q362 315 372 298 Q378 285 370 272"
-            fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" />
-          <path d="M374 338 Q382 312 376 295 Q372 282 380 268"
-            fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" />
-          <path d="M380 336 Q390 310 384 293 Q380 280 388 265"
-            fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+        {/* ══ SMOKE ══ */}
+        <g opacity="0.12">
+          <path d="M292 295 Q285 268 294 250 Q300 236 292 220"
+            fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round" />
+          <path d="M300 292 Q308 265 302 247 Q298 233 306 216"
+            fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
         </g>
 
-        {/* ══════════════════════════════════════════════════════════
-            LAYER 9 — CAMPFIRE LIGHT SPILL on ground
-        ══════════════════════════════════════════════════════════ */}
-        <ellipse cx="370" cy="488" rx="160" ry="18" fill="#f97316" opacity="0.08" />
+        {/* ══ FIRE LIGHT ON GROUND ══ */}
+        <ellipse cx="295" cy="410" rx="140" ry="14" fill="#f97316" opacity="0.07" />
       </svg>
     </div>
   );
 }
 
-// ─── Pine tree helper ────────────────────────────────────────────────────────
-function PineTree({ cx, base, h, layers, col, wFactor = 0.6 }) {
-  const trunkH = h * 0.28;
-  const trunkTop = base - trunkH;
-  const treeTop  = base - h;
-  const maxW = h * wFactor;
-  const alt = col === "#0a1a0a" ? "#0d220d" : col === "#081208" ? "#0a1a0a" : "#081208";
+// ─── Forest: diverse trees filling the full background ───────────────────────
+function Forest() {
+  // Pine trees: [cx, baseY, height, layers, colorIndex]
+  // Round/bushy trees: [cx, baseY, colorIndex]
+  // Dead/bare trees: [cx, baseY, height]
+  // Three depth layers drawn back-to-front
+
+  const C = ["#030703","#040904","#050b05","#060e06","#071007","#081208","#0a1508","#0a1a0a","#0c1e0c"];
+
+  const bgPines = [
+    [10,260,105,3,0],[45,245,120,4,1],[88,255,110,3,0],[130,240,130,4,2],
+    [172,250,115,3,1],[215,235,138,5,2],[258,248,118,3,0],[300,232,145,5,1],
+    [342,244,122,3,2],[385,228,150,5,0],[428,240,128,4,1],[470,232,142,5,2],
+    [510,245,112,3,0],[520,238,125,4,1],
+  ];
+  const midPines = [
+    [0,310,155,5,3],[38,298,170,6,4],[80,308,158,5,3],[122,292,178,6,5],
+    [165,305,162,5,4],[208,288,185,6,5],[250,300,168,5,3],[292,285,190,6,4],
+    [335,298,172,5,5],[378,282,195,6,3],[420,295,175,5,4],[462,288,182,6,5],
+    [505,300,160,5,3],[520,292,172,5,4],
+  ];
+  const fgPines = [
+    // left flank (behind campsite)
+    [0,370,210,7,6],[35,358,195,6,7],[75,368,205,7,6],
+    // right side
+    [310,375,215,7,8],[348,362,198,6,7],[388,372,208,7,8],
+    [428,360,200,6,7],[468,370,212,7,8],[508,358,196,6,7],
+  ];
+  const roundTrees = [
+    [55,340,6],[170,332,7],[340,338,6],[455,330,7],
+  ];
 
   return (
+    <g id="forest">
+      {bgPines.map(([cx,base,h,layers,ci],i) =>
+        <Pine key={"b"+i} cx={cx} base={base} h={h} layers={layers} col={C[ci]} w={0.48} />)}
+      {midPines.map(([cx,base,h,layers,ci],i) =>
+        <Pine key={"m"+i} cx={cx} base={base} h={h} layers={layers} col={C[ci]} w={0.56} />)}
+      {roundTrees.map(([cx,base,ci],i) =>
+        <Round key={"r"+i} cx={cx} base={base} col={C[ci]} />)}
+      {fgPines.map(([cx,base,h,layers,ci],i) =>
+        <Pine key={"f"+i} cx={cx} base={base} h={h} layers={layers} col={C[ci]} w={0.64} />)}
+    </g>
+  );
+}
+
+function Pine({ cx, base, h, layers, col, w }) {
+  const trunkH = h * 0.26;
+  const alt = col === "#0a1a0a" ? "#0d220d" : "#0a1a0a";
+  return (
     <g>
-      <rect x={cx - 3} y={trunkTop} width={6} height={trunkH} fill={col} />
-      {Array.from({ length: layers }).map((_, li) => {
-        const t   = li / (layers - 1);
-        const y   = treeTop + t * (trunkTop - treeTop) * 0.88;
-        const w   = maxW * (1 - t * 0.52);
-        const th  = (h / layers) * 1.35;
-        return (
-          <polygon
-            key={li}
-            points={`${cx},${y} ${cx - w/2},${y + th} ${cx + w/2},${y + th}`}
-            fill={li % 2 === 0 ? col : alt}
-          />
-        );
+      <rect x={cx-3} y={base-trunkH} width={6} height={trunkH} fill={col} />
+      {Array.from({length:layers}).map((_,li) => {
+        const t  = li / (layers - 1);
+        const y  = (base - h) + t * (base - trunkH - (base - h)) * 0.86;
+        const pw = h * w * (1 - t * 0.5);
+        const ph = (h / layers) * 1.4;
+        return <polygon key={li}
+          points={`${cx},${y} ${cx-pw/2},${y+ph} ${cx+pw/2},${y+ph}`}
+          fill={li%2===0 ? col : alt} />;
       })}
     </g>
   );
 }
 
-// ─── Round/bushy tree helper ─────────────────────────────────────────────────
-function RoundTree({ cx, base, col }) {
+function Round({ cx, base, col }) {
   return (
     <g>
-      <rect x={cx - 4} y={base - 55} width={8} height={55} fill={col} />
-      <circle cx={cx}      cy={base - 75} r={38} fill={col} />
-      <circle cx={cx - 18} cy={base - 65} r={28} fill={col} />
-      <circle cx={cx + 18} cy={base - 65} r={28} fill={col} />
-      <circle cx={cx}      cy={base - 95} r={25} fill={col} />
+      <rect x={cx-4} y={base-52} width={8} height={52} fill={col} />
+      <circle cx={cx}    cy={base-72} r={36} fill={col} />
+      <circle cx={cx-16} cy={base-62} r={26} fill={col} />
+      <circle cx={cx+16} cy={base-62} r={26} fill={col} />
+      <circle cx={cx}    cy={base-90} r={22} fill={col} />
     </g>
   );
 }
