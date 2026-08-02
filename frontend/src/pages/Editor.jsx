@@ -433,6 +433,9 @@ function ThreeCanvas({
     transform.setTranslationSnap(snap);
     transform.setScaleSnap(Math.max(snap * 0.1, 0.05));
     transform.setRotationSnap(THREE.MathUtils.degToRad(22.5));
+    // Keep the gizmo compact so it doesn't dominate the view or swallow clicks
+    // meant for other shapes / the orbit camera.
+    transform.setSize(0.7);
 
     const onTransformDraggingChanged = (event) => { controls.enabled = !event.value; };
     const onTransformObjectChange = () => {
@@ -461,10 +464,10 @@ function ThreeCanvas({
     const raycaster = new THREE.Raycaster();
     const pointer = new THREE.Vector2();
 
-    const dragState = {
-      active: false, mesh: null, plane: new THREE.Plane(),
-      offset: new THREE.Vector3(), intersection: new THREE.Vector3(),
-      moved: false, pointerId: null,
+    // Track pointer-down position so a quick click can select while a real
+    // drag keeps OrbitControls in control (360° orbit / pan / zoom).
+    const clickState = {
+      pointerId: null, downX: 0, downY: 0, downTime: 0, active: false,
     };
 
     const boxSelectState = {
@@ -493,16 +496,19 @@ function ThreeCanvas({
       boxSelectState.element.style.height = `${Math.abs(endScreenY - startScreenY)}px`;
     };
 
+    // Click-to-select with a drag threshold: a quick click (or click+shift)
+    // selects/deselects; a real drag is left to OrbitControls so the camera can
+    // orbit 360°. TransformControls remains the way to move/rotate/scale shapes.
     const onPointerDown = (event) => {
       stateRef.current.lastActivityTime = Date.now();
       if (event.button !== 0) return;
       getPointer(event);
-      const activeCamera = stateRef.current.activeCamera;
-      raycaster.setFromCamera(pointer, activeCamera);
-      const meshes = Array.from(stateRef.current.meshes.values()).concat(Array.from(stateRef.current.imported.values()));
-      const intersects = raycaster.intersectObjects(meshes, true);
 
       if (stateRef.current.workplaneActive) {
+        // Click a face to reposition the workplane (existing behaviour).
+        const meshesForWp = Array.from(stateRef.current.meshes.values()).concat(Array.from(stateRef.current.imported.values()));
+        raycaster.setFromCamera(pointer, stateRef.current.activeCamera);
+        const intersects = raycaster.intersectObjects(meshesForWp, true);
         if (intersects.length) {
           const intersect = intersects[0];
           const wp = stateRef.current.workplane;
@@ -515,39 +521,27 @@ function ThreeCanvas({
         return;
       }
 
-      if (intersects.length) {
-        let target = intersects[0].object;
-        while (target && target.userData.id == null && target.parent) target = target.parent;
-        const id = target?.userData?.id;
-        if (id == null) return;
-        onSelect(id, event.shiftKey);
-        dragState.active = true;
-        dragState.mesh = target;
-        dragState.moved = false;
-        dragState.pointerId = event.pointerId;
-        dragState.plane.setFromNormalAndCoplanarPoint(new THREE.Vector3(0, 1, 0), target.position.clone());
-        raycaster.ray.intersectPlane(dragState.plane, dragState.intersection);
-        dragState.offset.copy(dragState.intersection).sub(target.position);
-        stateRef.current.controls.enabled = false;
-        try { renderer.domElement.setPointerCapture(event.pointerId); } catch { /* ignore */ }
-      } else {
-        if (event.shiftKey) {
-          boxSelectState.active = true;
-          boxSelectState.startPoint.set(pointer.x, pointer.y);
-          boxSelectState.endPoint.set(pointer.x, pointer.y);
-          if (!boxSelectState.element) {
-            boxSelectState.element = document.createElement('div');
-            boxSelectState.element.style.position = 'absolute';
-            boxSelectState.element.style.border = '1px dashed #f59e0b';
-            boxSelectState.element.style.backgroundColor = 'rgba(245, 158, 11, 0.1)';
-            boxSelectState.element.style.pointerEvents = 'none';
-            renderer.domElement.parentElement.appendChild(boxSelectState.element);
-          }
-          boxSelectState.element.style.display = 'block';
-          updateBoxSelectionElement();
-        } else {
-          onSelect(null, false);
+      clickState.pointerId = event.pointerId;
+      clickState.downX = event.clientX;
+      clickState.downY = event.clientY;
+      clickState.downTime = Date.now();
+      clickState.active = true;
+
+      if (event.shiftKey) {
+        // Shift-drag = box selection (drawn as an overlay rectangle).
+        boxSelectState.active = true;
+        boxSelectState.startPoint.set(pointer.x, pointer.y);
+        boxSelectState.endPoint.set(pointer.x, pointer.y);
+        if (!boxSelectState.element) {
+          boxSelectState.element = document.createElement('div');
+          boxSelectState.element.style.position = 'absolute';
+          boxSelectState.element.style.border = '1px dashed #f59e0b';
+          boxSelectState.element.style.backgroundColor = 'rgba(245, 158, 11, 0.1)';
+          boxSelectState.element.style.pointerEvents = 'none';
+          renderer.domElement.parentElement.appendChild(boxSelectState.element);
         }
+        boxSelectState.element.style.display = 'block';
+        updateBoxSelectionElement();
       }
     };
 
@@ -558,26 +552,18 @@ function ThreeCanvas({
       if (boxSelectState.active) {
         boxSelectState.endPoint.set(pointer.x, pointer.y);
         updateBoxSelectionElement();
-        return;
-      }
-      if (!dragState.active || !dragState.mesh) return;
-      raycaster.setFromCamera(pointer, stateRef.current.activeCamera);
-      if (raycaster.ray.intersectPlane(dragState.plane, dragState.intersection)) {
-        const next = dragState.intersection.clone().sub(dragState.offset);
-        dragState.mesh.position.x = next.x;
-        dragState.mesh.position.z = next.z;
-        dragState.moved = true;
       }
     };
 
     const onPointerUp = (event) => {
       stateRef.current.lastActivityTime = Date.now();
+      // Box select finished — gather shapes whose centers are inside the box.
       if (boxSelectState.active) {
         boxSelectState.active = false;
         if (boxSelectState.element) boxSelectState.element.style.display = 'none';
         const activeCamera = stateRef.current.activeCamera;
         const meshes = Array.from(stateRef.current.meshes.values()).concat(Array.from(stateRef.current.imported.values()));
-        const selectedIds = [];
+        const pickedIds = [];
         meshes.forEach((mesh) => {
           if (mesh.userData.id == null) return;
           const center = new THREE.Vector3();
@@ -588,30 +574,39 @@ function ThreeCanvas({
           const minY = Math.min(boxSelectState.startPoint.y, boxSelectState.endPoint.y);
           const maxY = Math.max(boxSelectState.startPoint.y, boxSelectState.endPoint.y);
           if (center.x >= minX && center.x <= maxX && center.y >= minY && center.y <= maxY) {
-            selectedIds.push(mesh.userData.id);
+            pickedIds.push(mesh.userData.id);
           }
         });
-        if (selectedIds.length > 0) {
-          onSelect(selectedIds[0], true);
-          selectedIds.slice(1).forEach(id => onSelect(id, true));
+        if (pickedIds.length > 0) {
+          onSelect(pickedIds[0], true);
+          pickedIds.slice(1).forEach((id) => onSelect(id, true));
         }
         return;
       }
-      if (!dragState.active) return;
-      try { renderer.domElement.releasePointerCapture(dragState.pointerId); } catch { /* ignore */ }
-      if (dragState.moved && dragState.mesh?.userData?.id != null) {
-        const m = dragState.mesh;
-        onObjectTransform?.(m.userData.id, {
-          position: [m.position.x, m.position.y, m.position.z],
-          rotation: [m.rotation.x, m.rotation.y, m.rotation.z],
-          scale: [m.scale.x, m.scale.y, m.scale.z],
-        });
+
+      // Only treat as a "click" if the pointer barely moved — otherwise it was
+      // an orbit drag and we must NOT change selection (and must not fight the
+      // camera). This is what restores the free 360° view.
+      if (!clickState.active || clickState.pointerId !== event.pointerId) return;
+      const dx = Math.abs(event.clientX - clickState.downX);
+      const dy = Math.abs(event.clientY - clickState.downY);
+      const dt = Date.now() - clickState.downTime;
+      clickState.active = false;
+      if (dx > 5 || dy > 5 || dt > 500) return;
+
+      getPointer(event);
+      raycaster.setFromCamera(pointer, stateRef.current.activeCamera);
+      const meshes = Array.from(stateRef.current.meshes.values()).concat(Array.from(stateRef.current.imported.values()));
+      const intersects = raycaster.intersectObjects(meshes, true);
+      if (intersects.length) {
+        let target = intersects[0].object;
+        while (target && target.userData.id == null && target.parent) target = target.parent;
+        const id = target?.userData?.id;
+        if (id == null) return;
+        onSelect(id, false);
+      } else {
+        onSelect(null, false);
       }
-      dragState.active = false;
-      dragState.mesh = null;
-      dragState.moved = false;
-      dragState.pointerId = null;
-      stateRef.current.controls.enabled = true;
     };
 
     renderer.domElement.addEventListener("pointerdown", onPointerDown);
@@ -622,7 +617,7 @@ function ThreeCanvas({
     stateRef.current = {
       ...stateRef.current, scene, camera, orthoCamera: ortho, activeCamera: camera,
       renderer, controls, transform, meshes: new Map(), imported: new Map(),
-      raycaster, pointer, handleGroup, dragState, workplane, rulerLine, rulerTextSprite,
+      raycaster, pointer, handleGroup, workplane, rulerLine, rulerTextSprite,
     };
 
     const onModifier = (e) => {
@@ -929,8 +924,7 @@ function ThreeCanvas({
       } else {
         mesh.visible = true;
       }
-      const isBeingDragged = s.dragState?.active && s.dragState.mesh === mesh;
-      if (!isBeingDragged) mesh.position.set(...obj.position);
+      mesh.position.set(...obj.position);
       mesh.rotation.set(...obj.rotation);
       mesh.scale.set(...obj.scale);
       mesh.material.color.set(obj.hole ? HOLE_COLOR : (obj.color || DEFAULT_COLOR));
@@ -943,7 +937,13 @@ function ThreeCanvas({
 
     if (selectedIds.length === 1) {
       const mesh = s.meshes.get(selectedIds[0]) || s.imported.get(selectedIds[0]);
-      if (mesh) { s.transform.attach(mesh); s.transform.setMode(mode); drawHandleOverlay(mesh); }
+      if (mesh) {
+        // Avoid re-attaching mid-drag: re-attach() resets world transforms and
+        // can cause jumpy/blocked gizmo interaction. Only attach if needed.
+        if (s.transform.object !== mesh) s.transform.attach(mesh);
+        if (s.transform.mode !== mode) s.transform.setMode(mode);
+        drawHandleOverlay(mesh);
+      }
     } else {
       s.transform.detach();
       drawHandleOverlay(null);
@@ -1029,7 +1029,7 @@ export default function Editor() {
   const [workplaneVisible, setWorkplaneVisible] = useState(false);
   const [rulerActive, setRulerActive] = useState(false);
 
-  const toggleWorkplane = () => {
+  const toggleWorkplane = useCallback(() => {
     setWorkplaneActive((v) => {
       const next = !v;
       if (next) {
@@ -1039,25 +1039,28 @@ export default function Editor() {
       }
       return next;
     });
-  };
+  }, []);
   const [projectActionOpen, setProjectActionOpen] = useState(false);
   const [untitledCount, setUntitledCount] = useState(1);
   const [loading, setLoading] = useState(false);
 
   const idCounter = useRef(1);
   const skipHistory = useRef(false);
+  const autosaveTimer = useRef(null);
+  const skipAutosaveRef = useRef(false);
 
+  // Only ever open the template picker for a brand-new design. Never seed a
+  // phantom default box on saved-design routes — that's what made shapes
+  // appear to "disappear" (a phantom box would flash first, then undo would
+  // revert to it after reload).
+  const templateOpenedRef = useRef(false);
   useEffect(() => {
-    if (objects.length) return;
+    if (templateOpenedRef.current) return;
     if (!routeId || routeId === "new") {
+      templateOpenedRef.current = true;
       setTemplatePickerOpen(true);
-      return;
     }
-    setObjects([{
-      id: idCounter.current++, key: "box", label: "Box", base: "box",
-      hole: false, position: [0, 0.5, 0], rotation: [0, 0, 0], scale: [1, 1, 1], color: DEFAULT_COLOR,
-    }]);
-  }, [objects.length, routeId]);
+  }, [routeId]);
 
   useEffect(() => {
     if (routeId && routeId !== "new" && designId && !projectActionOpen) {
@@ -1083,18 +1086,24 @@ export default function Editor() {
 
   useEffect(() => {
     if (!routeId || routeId === "new") return;
+    let cancelled = false;
     setLoading(true);
     api.get(`/designs/${routeId}`).then((r) => {
+      if (cancelled) return;
       const d = r.data;
       setTitle(d.title || "");
       setDesignId(d.design_id);
-      if (d.geometry?.objects?.length) {
-        setObjects(d.geometry.objects);
-        const maxId = Math.max(...d.geometry.objects.map((o) => Number(o.id || 0)), 0);
-        idCounter.current = maxId + 1;
-      }
-    }).catch(() => toast.error("Could not load design"))
-    .finally(() => setLoading(false));
+      const saved = d.geometry?.objects || [];
+      skipHistory.current = true;
+      // Load the real saved shapes (or a clean empty canvas). Never seed a box.
+      setObjects(saved);
+      const numericIds = saved
+        .map((o) => Number(o.id))
+        .filter((n) => Number.isFinite(n) && n >= 0);
+      idCounter.current = (numericIds.length ? Math.max(...numericIds) : 0) + 1;
+    }).catch(() => { if (!cancelled) toast.error("Could not load design"); })
+    .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   }, [routeId]);
 
   const selected = useMemo(() => objects.find((o) => o.id === selectedIds[0]), [objects, selectedIds]);
@@ -1168,18 +1177,24 @@ export default function Editor() {
   };
 
   const updateShapeFromTransform = useCallback((id, patch) => {
-    const applySnap = (arr) => arr.map((v, idx) => (idx === 1 ? Number(v.toFixed(3)) : Number((Math.round(v / snap) * snap).toFixed(3))));
+    // Snap=0 previously caused Math.round(v / 0) → Infinity (shapes "flying
+    // away"/disappearing). Treat 0 as "no snapping".
+    const applySnap = (arr) => arr.map((v, idx) => {
+      const raw = Number(v.toFixed(3));
+      if (idx === 1 || !snap) return raw;
+      return Number((Math.round(raw / snap) * snap).toFixed(3));
+    });
     setObjects((prev) => prev.map((o) => (o.id === id ? { ...o, ...patch, position: applySnap(patch.position || o.position) } : o)));
   }, [snap]);
 
-  const onSelect = (id, withAdditive) => {
+  const onSelect = useCallback((id, withAdditive) => {
     if (id == null) return setSelectedIds([]);
     if (withAdditive) {
       setSelectedIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
       return;
     }
     setSelectedIds((prev) => (prev.length === 1 && prev[0] === id ? prev : [id]));
-  };
+  }, []);
 
   const removeSelected = () => {
     if (!selectedIds.length) return;

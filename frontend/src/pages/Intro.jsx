@@ -278,7 +278,7 @@ function TreeSilhouettes({ opacity = 0.5 }) {
     <polygon points={`${x},${60 - h} ${x - h * 0.28},60 ${x + h * 0.28},60`} fill={col} />
   );
   return (
-    <div className="fixed bottom-0 left-0 right-0 pointer-events-none z-10" style={{ height: "180px", opacity }}>
+    <div className="fixed bottom-0 left-0 right-0 pointer-events-none z-10" style={{ height: "35vh", opacity }}>
       <svg viewBox="0 0 100 60" preserveAspectRatio="none" style={{ width: "100%", height: "100%", display: "block" }}>
         {back.map(([x, h], i)  => <Pine key={"b"+i} x={x} h={h} col="#020602" />)}
         {mid.map(([x, h], i)   => <Pine key={"m"+i} x={x} h={h} col="#030803" />)}
@@ -755,29 +755,14 @@ export default function Intro() {
         </div>
       )}
 
-      {/* ===== SCENE 1: Camera pans up — campsite fades out slowly ===== */}
+      {/* ===== SCENE 1: Fade campsite out smoothly, no heavy CSS transform ===== */}
       {phase === 1 && (
-        <>
-          <div
-            className="absolute inset-0 z-20 pointer-events-none"
-            style={{ animation: "fadeOut 4s cubic-bezier(0.45, 0, 0.25, 1) forwards" }}
-          >
-            <CampfireScene lookUp={true} />
-          </div>
-          <div
-            className="absolute inset-0"
-            style={{ zIndex: 21, animation: "camera-drift 4s cubic-bezier(0.45, 0, 0.25, 1) forwards" }}
-          >
-            <div className="absolute inset-0 flex items-center justify-center">
-              <p
-                className="text-white/40 text-sm font-tech uppercase tracking-[0.5em]"
-                style={{ animation: "text-crossfade-in 1.2s ease 0.8s both" }}
-              >
-                Look up at the stars...
-              </p>
-            </div>
-          </div>
-        </>
+        <div
+          className="absolute inset-0 z-20 pointer-events-none"
+          style={{ animation: "fadeOut 3.5s ease forwards" }}
+        >
+          <CampfireScene lookUp={true} />
+        </div>
       )}
 
       {/* ===== SCENE 2: Star Zoom Phase ===== */}

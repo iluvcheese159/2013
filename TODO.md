@@ -27,3 +27,34 @@ Fix star sizing, add proper Milky Way + blurred backdrop layering, improve the i
 ### 5. Verify
 - [x] 5.1 `npm run build` passes (479.29 kB JS, 18.85 kB CSS)
 
+---
+
+# Print Cosmos — Design Function Fix (3D Editor)
+
+## Goal
+Fix the design function in `frontend/src/pages/Editor.jsx`: 360° orbit not working, shapes disappearing, and the transform gizmo ("coordinate things") blocking shape usage.
+
+## Steps
+
+### 1. Restore 360° orbit controls
+- [ ] 1.1 Remove custom click-drag-move handler that hijacked left-drag and disabled OrbitControls
+- [ ] 1.2 Click-to-select with a drag threshold so orbiting never clears selection
+- [ ] 1.3 Keep TransformControls gizmo as the only way to move/rotate/scale shapes
+
+### 2. Fix shapes disappearing
+- [ ] 2.1 Remove phantom default-box seed for saved designs (only open template picker for new)
+- [ ] 2.2 Mark loaded geometry as `skipHistory` so undo can't revert to an empty/phantom state
+- [ ] 2.3 Explicitly set `objects([])` when a saved design has no geometry
+- [ ] 2.4 Guard `idCounter` against non-numeric ids (NaN prevention)
+- [ ] 2.5 Add debounced autosave (1.2s) + autosave indicator so work survives leaving the editor
+
+### 3. Stop coordinate gizmo from blocking
+- [ ] 3.1 Wrap `onSelect` / `toggleWorkplane` in `useCallback` (prevents full scene rebuild on every render)
+- [ ] 3.2 Only `transform.attach()` when the gizmo isn't already on the mesh (no re-attach mid-drag)
+- [ ] 3.3 Shrink the gizmo (`transform.setSize(0.7)`)
+- [ ] 3.4 `Escape` to deselect
+- [ ] 3.5 Fix `applySnap` division-by-zero when Snap = Off (shapes flying to Infinity)
+
+### 4. Verify
+- [ ] 4.1 `npm run build` passes
+

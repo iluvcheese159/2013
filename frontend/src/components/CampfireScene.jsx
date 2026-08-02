@@ -21,10 +21,10 @@ export default function CampfireScene({ lookUp = false }) {
   // lookUp tilts head back (negative = counter-clockwise = looking up-right toward sky)
   const tiltRef = useRef(15);
 
-  const fireflies = useMemo(() => Array.from({ length: 10 }, (_, i) => ({
+  const fireflies = useMemo(() => Array.from({ length: 8 }, (_, i) => ({
     id: i,
-    x: 60 + Math.random() * 220,
-    y: 40 + Math.random() * 130,
+    x: 180 + Math.random() * 160,
+    y: 300 + Math.random() * 80,
     phase: Math.random() * Math.PI * 2,
     speed: 0.18 + Math.random() * 0.28,
   })), []);
@@ -153,8 +153,14 @@ export default function CampfireScene({ lookUp = false }) {
           <line x1="148" y1="387" x2="158" y2="405" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
           {/* Torso */}
           <line x1="148" y1="387" x2="148" y2="359" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-          {/* Arm toward fire */}
+          {/* Arm toward fire + marshmallow stick */}
           <line x1="148" y1="365" x2="162" y2="376" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+          {/* Stick extending from hand toward fire */}
+          <line x1="162" y1="376" x2="230" y2="355" stroke="#c8a96e" strokeWidth="1.8" strokeLinecap="round" />
+          {/* Marshmallow on stick tip — white puffed square */}
+          <rect x="224" y="348" width="12" height="10" rx="3" fill="white" opacity="0.95" />
+          {/* Toasted bottom of marshmallow */}
+          <rect x="224" y="354" width="12" height="4" rx="2" fill="#f59e0b" opacity="0.7" />
           {/* Head */}
           <g id="bob-head" transform="rotate(15, 148, 359)">
             <circle cx="148" cy="348" r="10" fill="none" stroke="white" strokeWidth="2.5" />
