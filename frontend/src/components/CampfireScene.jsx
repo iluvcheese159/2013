@@ -1,238 +1,323 @@
 import { useRef, useEffect, useMemo } from "react";
 
-export default function CampfireScene({ bobRef }) {
+// ─── Chibi Bob SVG paths ────────────────────────────────────────────
+// Large round head (≈40% of body height), tiny stubby body, thick
+// stroked outlines — exactly matching the reference sheet style.
+// Drawn in a 120×160 local coordinate space, origin at top-left.
+// Bob is sitting on a log: legs folded forward, leaning slightly
+// toward the fire, one arm extended holding a s'more stick.
+
+function ChibiBob({ x, y, scale = 1, fireGlow = true }) {
+  // All coords are in the parent SVG's space after transform
+  const s = scale;
+  const glow = fireGlow
+    ? "drop-shadow(0 0 6px rgba(249,115,22,0.55)) drop-shadow(0 0 14px rgba(249,115,22,0.25))"
+    : "drop-shadow(0 0 4px rgba(255,255,255,0.3))";
+
+  return (
+    <g transform={`translate(${x},${y}) scale(${s})`} style={{ filter: glow }}>
+      {/* ── Log Bob sits on ── */}
+      <ellipse cx="60" cy="148" rx="52" ry="11" fill="#3a1f08" stroke="#5a3010" strokeWidth="1.5" />
+      <ellipse cx="60" cy="144" rx="50" ry="9" fill="#4a2810" />
+      {/* bark lines */}
+      <line x1="20" y1="143" x2="100" y2="143" stroke="#3a1f08" strokeWidth="0.8" opacity="0.6" />
+      <line x1="25" y1="147" x2="95" y2="147" stroke="#3a1f08" strokeWidth="0.8" opacity="0.4" />
+
+      {/* ── Body (sitting, leaning right toward fire) ── */}
+      {/* Torso — short rounded rectangle */}
+      <rect x="38" y="88" width="34" height="38" rx="10" ry="10"
+        fill="white" stroke="#222" strokeWidth="2.5" />
+
+      {/* ── Left leg (folded, foot sticking forward-left) ── */}
+      <path d="M42 122 Q36 132 30 138 Q26 142 28 145 Q30 148 36 145 Q42 140 46 132 Z"
+        fill="white" stroke="#222" strokeWidth="2.2" strokeLinejoin="round" />
+      {/* left foot */}
+      <ellipse cx="30" cy="144" rx="8" ry="5" fill="white" stroke="#222" strokeWidth="2" />
+
+      {/* ── Right leg (folded, foot sticking forward-right) ── */}
+      <path d="M68 122 Q74 132 80 138 Q84 142 82 145 Q80 148 74 145 Q68 140 64 132 Z"
+        fill="white" stroke="#222" strokeWidth="2.2" strokeLinejoin="round" />
+      {/* right foot */}
+      <ellipse cx="80" cy="144" rx="8" ry="5" fill="white" stroke="#222" strokeWidth="2" />
+
+      {/* ── Left arm (resting on knee) ── */}
+      <path d="M42 96 Q32 108 28 118 Q26 122 30 124 Q34 126 38 120 Q42 112 46 102 Z"
+        fill="white" stroke="#222" strokeWidth="2.2" strokeLinejoin="round" />
+      {/* left hand */}
+      <circle cx="29" cy="122" r="5" fill="white" stroke="#222" strokeWidth="2" />
+
+      {/* ── Right arm (extended, holding s'more stick toward fire) ── */}
+      <path d="M68 96 Q80 100 92 106 Q98 109 97 113 Q96 117 90 116 Q82 112 72 106 Z"
+        fill="white" stroke="#222" strokeWidth="2.2" strokeLinejoin="round" />
+      {/* right hand */}
+      <circle cx="96" cy="114" r="5" fill="white" stroke="#222" strokeWidth="2" />
+      {/* s'more stick */}
+      <line x1="100" y1="112" x2="130" y2="100" stroke="#8B5E3C" strokeWidth="2.5" strokeLinecap="round" />
+      {/* marshmallow on stick */}
+      <rect x="126" y="92" width="12" height="12" rx="3" fill="#fff9f0" stroke="#e8c88a" strokeWidth="1.5" />
+      {/* toasted top */}
+      <rect x="126" y="92" width="12" height="4" rx="2" fill="#f59e0b" opacity="0.7" />
+
+      {/* ── Neck ── */}
+      <rect x="50" y="78" width="10" height="12" rx="4"
+        fill="white" stroke="#222" strokeWidth="2" />
+
+      {/* ── Head — big round chibi head ── */}
+      {/* Head base */}
+      <circle cx="55" cy="52" r="34" fill="white" stroke="#222" strokeWidth="2.8" />
+      {/* Cheek blush left */}
+      <ellipse cx="30" cy="60" rx="7" ry="5" fill="#ffb3b3" opacity="0.45" />
+      {/* Cheek blush right */}
+      <ellipse cx="80" cy="60" rx="7" ry="5" fill="#ffb3b3" opacity="0.45" />
+      {/* Eyes — simple dots */}
+      <circle cx="43" cy="50" r="3.5" fill="#222" />
+      <circle cx="67" cy="50" r="3.5" fill="#222" />
+      {/* Eye shine */}
+      <circle cx="44.5" cy="48.5" r="1.2" fill="white" />
+      <circle cx="68.5" cy="48.5" r="1.2" fill="white" />
+      {/* Mouth — small happy curve */}
+      <path d="M47 62 Q55 68 63 62" fill="none" stroke="#222" strokeWidth="2" strokeLinecap="round" />
+      {/* Hair tuft on top */}
+      <path d="M40 22 Q55 10 70 22" fill="none" stroke="#222" strokeWidth="2.5" strokeLinecap="round" />
+      <path d="M50 18 Q55 8 60 18" fill="none" stroke="#222" strokeWidth="2" strokeLinecap="round" />
+    </g>
+  );
+}
+
+// ─── Chibi Tent ─────────────────────────────────────────────────────
+function ChibiTent({ x, y, scale = 1 }) {
+  return (
+    <g transform={`translate(${x},${y}) scale(${scale})`}>
+      {/* tent body */}
+      <path d="M0 120 L60 0 L120 120 Z" fill="#2d4a3e" stroke="#1a2e26" strokeWidth="3" strokeLinejoin="round" />
+      {/* tent shading panel */}
+      <path d="M60 0 L90 120 L120 120 Z" fill="#1e3329" />
+      {/* door opening */}
+      <path d="M45 120 Q60 80 75 120 Z" fill="#0d1f18" />
+      {/* door flap */}
+      <path d="M45 120 Q55 85 60 80 Q58 90 55 120 Z" fill="#3a5c4e" opacity="0.7" />
+      {/* tent pole line */}
+      <line x1="60" y1="0" x2="60" y2="120" stroke="#4a7060" strokeWidth="1.5" opacity="0.5" />
+      {/* guy ropes */}
+      <line x1="60" y1="0" x2="-15" y2="60" stroke="#6b8c7a" strokeWidth="1" opacity="0.6" />
+      <line x1="60" y1="0" x2="135" y2="60" stroke="#6b8c7a" strokeWidth="1" opacity="0.6" />
+      {/* stake left */}
+      <line x1="-15" y1="60" x2="-12" y2="75" stroke="#8B5E3C" strokeWidth="2" strokeLinecap="round" />
+      {/* stake right */}
+      <line x1="135" y1="60" x2="132" y2="75" stroke="#8B5E3C" strokeWidth="2" strokeLinecap="round" />
+      {/* warm glow inside tent */}
+      <ellipse cx="60" cy="110" rx="20" ry="8" fill="#fbbf24" opacity="0.12" />
+    </g>
+  );
+}
+
+// ─── Campfire ────────────────────────────────────────────────────────
+function Campfire({ x, y, scale = 1, svgRef: _svgRef }) {
+  return (
+    <g transform={`translate(${x},${y}) scale(${scale})`}>
+      {/* ground glow */}
+      <ellipse id="cf-glow-outer" cx="0" cy="8" rx="38" ry="18" fill="#f97316" opacity="0.18" />
+      <ellipse id="cf-glow" cx="0" cy="4" rx="24" ry="14" fill="#f97316" opacity="0.28" />
+      {/* logs */}
+      <line x1="-22" y1="8" x2="22" y2="2" stroke="#5a3010" strokeWidth="6" strokeLinecap="round" />
+      <line x1="-18" y1="2" x2="18" y2="8" stroke="#4a2808" strokeWidth="6" strokeLinecap="round" />
+      <line x1="-10" y1="5" x2="10" y2="5" stroke="#3a1f08" strokeWidth="5" strokeLinecap="round" />
+      {/* ember glow */}
+      <ellipse cx="0" cy="6" rx="14" ry="6" fill="#f59e0b" opacity="0.5" />
+      {/* flame group — animated via JS */}
+      <g id="cf-flame">
+        {/* outer flame */}
+        <path d="M0 6 Q-10 -8 -5 -22 Q0 -34 0 -28 Q3 -34 7 -22 Q10 -8 0 6 Z"
+          fill="#f97316" opacity="0.85" />
+        {/* mid flame */}
+        <path d="M0 6 Q-5 -4 -2 -14 Q0 -20 0 -16 Q2 -20 4 -14 Q5 -4 0 6 Z"
+          fill="#fbbf24" opacity="0.9" />
+        {/* inner core */}
+        <path d="M0 5 Q-2 0 0 -7 Q2 0 0 5 Z" fill="#fef08a" opacity="0.95" />
+        {/* spark particles */}
+        <circle cx="-6" cy="-26" r="1.2" fill="#fbbf24" opacity="0.7" />
+        <circle cx="5" cy="-24" r="1" fill="#fef08a" opacity="0.6" />
+        <circle cx="0" cy="-32" r="0.8" fill="#fef08a" opacity="0.5" />
+        <circle cx="-3" cy="-30" r="0.7" fill="#fbbf24" opacity="0.4" />
+      </g>
+    </g>
+  );
+}
+
+// ─── Full-width forest silhouette ────────────────────────────────────
+// Renders a dense row of pine trees across the entire bottom edge.
+// Trees vary in height and spacing for a natural look.
+const FOREST_TREES = [
+  // [cx, treeH, trunkH, layers] — all in a 1000×220 viewBox
+  [0,   160, 55, 5], [28,  130, 45, 4], [52,  175, 60, 5], [78,  145, 50, 4],
+  [102, 190, 65, 6], [130, 155, 52, 5], [155, 170, 58, 5], [178, 135, 46, 4],
+  [200, 185, 63, 6], [225, 150, 51, 5], [248, 165, 56, 5], [270, 140, 48, 4],
+  [292, 180, 62, 6], [318, 155, 53, 5], [342, 170, 58, 5], [365, 145, 50, 4],
+  [388, 188, 64, 6], [412, 158, 54, 5], [435, 172, 59, 5], [458, 148, 51, 4],
+  [480, 182, 62, 6], [505, 152, 52, 5], [528, 168, 57, 5], [550, 138, 47, 4],
+  [572, 185, 63, 6], [598, 155, 53, 5], [622, 172, 59, 5], [645, 148, 51, 4],
+  [668, 180, 61, 6], [692, 150, 51, 5], [715, 165, 56, 5], [738, 140, 48, 4],
+  [760, 185, 63, 6], [785, 155, 53, 5], [808, 170, 58, 5], [830, 145, 50, 4],
+  [852, 188, 64, 6], [876, 158, 54, 5], [900, 172, 59, 5], [922, 148, 51, 4],
+  [944, 182, 62, 6], [968, 152, 52, 5], [990, 168, 57, 5], [1010,138, 47, 4],
+];
+
+function ForestSilhouette() {
+  const VW = 1000; const VH = 220;
+  return (
+    <div className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{ height: "22vh", zIndex: 8 }}>
+      <svg viewBox={`0 0 ${VW} ${VH}`} preserveAspectRatio="xMidYMax slice" className="w-full h-full">
+        {/* ground fill */}
+        <rect x="0" y={VH - 30} width={VW} height="30" fill="#050a05" />
+        {FOREST_TREES.map(([cx, treeH, trunkH, layers], i) => {
+          const base = VH - 28;
+          const trunkTop = base - trunkH;
+          const treeTop = base - treeH;
+          const treeWidth = treeH * 0.55;
+          const dark = i % 3 === 0 ? "#060e06" : i % 3 === 1 ? "#081408" : "#0a1a0a";
+          const mid  = i % 2 === 0 ? "#0d1e0d" : "#0a1608";
+          return (
+            <g key={i}>
+              {/* trunk */}
+              <rect
+                x={cx - 3} y={trunkTop} width={6} height={trunkH}
+                fill={dark}
+              />
+              {/* layered pine tiers from bottom to top */}
+              {Array.from({ length: layers }).map((_, li) => {
+                const t = li / (layers - 1);
+                const tierY = treeTop + t * (trunkTop - treeTop) * 0.85;
+                const tierW = treeWidth * (1 - t * 0.55);
+                const tierH = (treeH / layers) * 1.3;
+                return (
+                  <polygon
+                    key={li}
+                    points={`${cx},${tierY} ${cx - tierW / 2},${tierY + tierH} ${cx + tierW / 2},${tierY + tierH}`}
+                    fill={li % 2 === 0 ? dark : mid}
+                  />
+                );
+              })}
+            </g>
+          );
+        })}
+      </svg>
+    </div>
+  );
+}
+
+// ─── Main CampfireScene ──────────────────────────────────────────────
+export default function CampfireScene() {
   const svgRef = useRef(null);
   const frameRef = useRef(null);
   const timeRef = useRef(0);
 
-  const fireflies = useMemo(() => {
-    const result = [];
-    for (let i = 0; i < 6; i++) {
-      result.push({
-        id: i,
-        x: 30 + Math.random() * 40,
-        y: 20 + Math.random() * 30,
-        phase: Math.random() * Math.PI * 2,
-        speed: 0.3 + Math.random() * 0.4,
-      });
-    }
-    return result;
-  }, []);
+  const fireflies = useMemo(() => Array.from({ length: 8 }, (_, i) => ({
+    id: i,
+    x: 15 + Math.random() * 35,
+    y: 30 + Math.random() * 40,
+    phase: Math.random() * Math.PI * 2,
+    speed: 0.25 + Math.random() * 0.35,
+  })), []);
 
   useEffect(() => {
-    let lastTime = 0;
-    const animate = (time) => {
-      const dt = (time - lastTime) / 1000;
-      lastTime = time;
+    let last = 0;
+    const tick = (time) => {
+      const dt = (time - last) / 1000; last = time;
       timeRef.current += dt;
+      const t = timeRef.current;
+      const svg = svgRef.current;
+      if (!svg) { frameRef.current = requestAnimationFrame(tick); return; }
 
-      if (svgRef.current) {
-        const t = timeRef.current;
-
-        const flame = svgRef.current.querySelector("#cf-flame");
-        if (flame) {
-          const flicker = Math.sin(t * 8) * 2 + Math.sin(t * 13) * 1.5;
-          const flickerX = Math.sin(t * 5) * 1.5;
-          flame.setAttribute("transform", "translate(" + flickerX + ", " + (-flicker * 0.3) + ")");
-        }
-
-        const glow = svgRef.current.querySelector("#cf-glow");
-        if (glow) {
-          const pulse = 0.6 + Math.sin(t * 2) * 0.2;
-          glow.setAttribute("opacity", pulse);
-        }
-
-        const flyGroup = svgRef.current.querySelector("#cf-fireflies");
-        if (flyGroup) {
-          const circles = flyGroup.querySelectorAll("circle");
-          circles.forEach((circle, i) => {
-            const fly = fireflies[i];
-            if (fly) {
-              const y = fly.y + Math.sin(t * fly.speed + fly.phase) * 4;
-              const x = fly.x + Math.cos(t * fly.speed * 0.7 + fly.phase) * 3;
-              circle.setAttribute("cx", x);
-              circle.setAttribute("cy", y);
-              const opacity = 0.3 + Math.sin(t * 2 + fly.phase) * 0.3;
-              circle.setAttribute("opacity", Math.max(0, opacity));
-            }
-          });
-        }
-
-        const trees = svgRef.current.querySelector("#cf-trees");
-        if (trees) {
-          const sway = Math.sin(t * 0.5) * 1.5;
-          trees.setAttribute("transform", "translate(" + sway + ", 0)");
-        }
-
-        // Gentle idle sway for Bob sitting in the bottom-left corner
-        const bob = svgRef.current.querySelector("#cf-bob");
-        if (bob) {
-          const bobSway = Math.sin(t * 1.1) * 1.5;
-          const bobRock = Math.sin(t * 0.7) * 0.8;
-          bob.setAttribute("transform", "translate(18, 195) rotate(" + bobRock + " 20 30) translate(" + bobSway * 0.3 + ", 0)");
-        }
+      // Flame flicker
+      const flame = svg.querySelector("#cf-flame");
+      if (flame) {
+        const fx = Math.sin(t * 7) * 1.8 + Math.sin(t * 13) * 0.9;
+        const fy = Math.sin(t * 9) * 1.2;
+        const fs = 0.92 + Math.sin(t * 11) * 0.08;
+        flame.setAttribute("transform", `translate(${fx},${fy}) scale(1,${fs})`);
       }
 
-      frameRef.current = requestAnimationFrame(animate);
+      // Glow pulse
+      const glow = svg.querySelector("#cf-glow");
+      if (glow) glow.setAttribute("opacity", String(0.22 + Math.sin(t * 2.2) * 0.1));
+      const glowO = svg.querySelector("#cf-glow-outer");
+      if (glowO) glowO.setAttribute("opacity", String(0.12 + Math.sin(t * 1.8) * 0.06));
+
+      // Bob gentle sway (head tilt looking at fire)
+      const bob = svg.querySelector("#cf-bob-group");
+      if (bob) {
+        const sway = Math.sin(t * 0.9) * 1.2;
+        const breathe = Math.sin(t * 1.4) * 0.5;
+        bob.setAttribute("transform", `translate(0,${breathe}) rotate(${sway}, 115, 200)`);
+      }
+
+      // Fireflies
+      const ffGroup = svg.querySelector("#cf-fireflies");
+      if (ffGroup) {
+        const circles = ffGroup.querySelectorAll("circle");
+        circles.forEach((c, i) => {
+          const f = fireflies[i];
+          if (!f) return;
+          c.setAttribute("cx", String(f.x + Math.cos(t * f.speed + f.phase) * 4));
+          c.setAttribute("cy", String(f.y + Math.sin(t * f.speed * 0.8 + f.phase) * 5));
+          c.setAttribute("opacity", String(Math.max(0, 0.3 + Math.sin(t * 1.8 + f.phase) * 0.35)));
+        });
+      }
+
+      frameRef.current = requestAnimationFrame(tick);
     };
-    frameRef.current = requestAnimationFrame(animate);
-    return () => {
-      if (frameRef.current) cancelAnimationFrame(frameRef.current);
-    };
+    frameRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frameRef.current);
   }, [fireflies]);
 
+  // The campsite SVG sits in the bottom-left quadrant.
+  // viewBox is 500×300, scene elements placed in left ~60%.
   return (
-    <div className="absolute inset-0 flex items-end justify-center pb-[15vh]">
-      <svg
-        ref={svgRef}
-        width="400"
-        height="300"
-        viewBox="0 0 400 300"
-        fill="none"
-        className="w-full max-w-lg"
-        style={{ filter: "drop-shadow(0 0 20px rgba(249, 115, 22, 0.15))" }}
+    <>
+      {/* Full-width forest across entire bottom */}
+      <ForestSilhouette />
+
+      {/* Campsite scene — bottom-left */}
+      <div
+        className="absolute pointer-events-none"
+        style={{ bottom: "18vh", left: "2vw", width: "min(480px, 48vw)", zIndex: 10 }}
       >
-        <ellipse cx="200" cy="270" rx="180" ry="30" fill="#1a1a1a" />
-        <ellipse cx="200" cy="268" rx="160" ry="20" fill="#222" />
+        <svg
+          ref={svgRef}
+          viewBox="0 0 480 320"
+          fill="none"
+          className="w-full h-auto"
+        >
+          {/* ── Ground patch ── */}
+          <ellipse cx="200" cy="305" rx="195" ry="18" fill="#0a1208" opacity="0.8" />
 
-        {/* Dense forest — left cluster (surrounds Bob) */}
-        <g id="cf-trees" opacity="0.85">
-          {/* Far-left background trees */}
-          <rect x="-5" y="170" width="5" height="80" fill="#060e06" />
-          <polygon points="-3,130 -22,175 16,175" fill="#060e06" />
-          <polygon points="-3,140 -18,170 12,170" fill="#081208" />
-          <polygon points="-3,150 -14,165 8,165" fill="#060e06" />
-
-          <rect x="12" y="155" width="6" height="95" fill="#0a1a0a" />
-          <polygon points="15,105 -8,160 38,160" fill="#0a1a0a" />
-          <polygon points="15,115 -4,155 34,155" fill="#0d220d" />
-          <polygon points="15,125 0,150 30,150" fill="#0a1a0a" />
-          <polygon points="15,135 4,145 26,145" fill="#0d220d" />
-
-          <rect x="32" y="148" width="7" height="102" fill="#0a1a0a" />
-          <polygon points="35,95 8,155 62,155" fill="#0a1a0a" />
-          <polygon points="35,107 12,150 58,150" fill="#0d220d" />
-          <polygon points="35,118 16,145 54,145" fill="#0a1a0a" />
-          <polygon points="35,128 20,140 50,140" fill="#0d220d" />
-
-          <rect x="52" y="158" width="5" height="92" fill="#060e06" />
-          <polygon points="54,118 36,163 72,163" fill="#060e06" />
-          <polygon points="54,128 40,158 68,158" fill="#081208" />
-          <polygon points="54,138 44,153 64,153" fill="#060e06" />
-
-          <rect x="68" y="145" width="8" height="105" fill="#0a1a0a" />
-          <polygon points="72,88 40,152 104,152" fill="#0a1a0a" />
-          <polygon points="72,100 44,147 100,147" fill="#0d220d" />
-          <polygon points="72,112 48,142 96,142" fill="#0a1a0a" />
-          <polygon points="72,122 52,137 92,137" fill="#0d220d" />
-
-          <rect x="88" y="152" width="6" height="98" fill="#060e06" />
-          <polygon points="91,112 70,157 112,157" fill="#060e06" />
-          <polygon points="91,122 74,152 108,152" fill="#081208" />
-          <polygon points="91,132 78,147 104,147" fill="#060e06" />
-
-          {/* Mid-left trees */}
-          <rect x="108" y="160" width="5" height="90" fill="#0a1a0a" />
-          <polygon points="110,125 92,165 128,165" fill="#0a1a0a" />
-          <polygon points="110,133 96,160 124,160" fill="#0d220d" />
-          <polygon points="110,141 100,155 120,155" fill="#0a1a0a" />
-
-          {/* Right side trees */}
-          <rect x="290" y="155" width="7" height="95" fill="#0a1a0a" />
-          <polygon points="293,108 265,160 321,160" fill="#0a1a0a" />
-          <polygon points="293,118 270,155 316,155" fill="#0d220d" />
-          <polygon points="293,128 275,150 311,150" fill="#0a1a0a" />
-
-          <rect x="315" y="148" width="8" height="102" fill="#0a1a0a" />
-          <polygon points="319,98 288,155 350,155" fill="#0a1a0a" />
-          <polygon points="319,110 292,150 346,150" fill="#0d220d" />
-          <polygon points="319,122 296,145 342,145" fill="#0a1a0a" />
-          <polygon points="319,132 300,140 338,140" fill="#0d220d" />
-
-          <rect x="340" y="158" width="6" height="92" fill="#060e06" />
-          <polygon points="343,120 322,163 364,163" fill="#060e06" />
-          <polygon points="343,130 326,158 360,158" fill="#081208" />
-          <polygon points="343,140 330,153 356,153" fill="#060e06" />
-
-          <rect x="358" y="165" width="5" height="85" fill="#0a1a0a" />
-          <polygon points="360,132 342,170 378,170" fill="#0a1a0a" />
-          <polygon points="360,140 346,165 374,165" fill="#0d220d" />
-
-          <rect x="375" y="155" width="7" height="95" fill="#060e06" />
-          <polygon points="378,112 356,160 400,160" fill="#060e06" />
-          <polygon points="378,122 360,155 396,155" fill="#081208" />
-          <polygon points="378,132 364,150 392,150" fill="#060e06" />
-        </g>
-
-        <g id="cf-tent" transform="translate(200, 140)">
-          <path d="M-40 100 L0 20 L40 100 Z" fill="#2a2a2a" stroke="#444" strokeWidth="1.5" />
-          <path d="M-20 100 L0 50 L20 100 Z" fill="#1a1a1a" />
-          <line x1="-25" y1="60" x2="0" y2="20" stroke="#444" strokeWidth="1" />
-          <line x1="25" y1="60" x2="0" y2="20" stroke="#444" strokeWidth="1" />
-          <ellipse cx="0" cy="80" rx="12" ry="15" fill="#fbbf24" opacity="0.15" />
-        </g>
-
-        <g id="cf-log" transform="translate(170, 230)">
-          <ellipse cx="0" cy="0" rx="30" ry="8" fill="#3a2010" stroke="#5a3a1a" strokeWidth="1" />
-          <ellipse cx="0" cy="-2" rx="28" ry="6" fill="#4a2a10" />
-          <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#3a2010" strokeWidth="0.5" opacity="0.5" />
-          <line x1="-15" y1="0" x2="15" y2="0" stroke="#3a2010" strokeWidth="0.5" opacity="0.5" />
-          <line x1="-10" y1="2" x2="10" y2="2" stroke="#3a2010" strokeWidth="0.5" opacity="0.5" />
-        </g>
-
-        <g id="cf-campfire" transform="translate(230, 220)">
-          <line x1="-15" y1="10" x2="15" y2="5" stroke="#5a3a1a" strokeWidth="4" strokeLinecap="round" />
-          <line x1="-12" y1="5" x2="12" y2="10" stroke="#4a2a10" strokeWidth="4" strokeLinecap="round" />
-          <line x1="-8" y1="8" x2="8" y2="8" stroke="#3a2010" strokeWidth="3" strokeLinecap="round" />
-          <ellipse id="cf-glow" cx="0" cy="0" rx="25" ry="20" fill="#f97316" opacity="0.3" />
-          <ellipse cx="0" cy="0" rx="15" ry="12" fill="#f59e0b" opacity="0.4" />
-          <g id="cf-flame">
-            <path d="M0 5 Q-6 -5 -3 -15 Q0 -25 0 -20 Q2 -25 5 -15 Q6 -5 0 5 Z" fill="#f97316" opacity="0.8" />
-            <path d="M0 5 Q-3 -3 -1 -10 Q0 -15 0 -12 Q1 -15 3 -10 Q3 -3 0 5 Z" fill="#fbbf24" opacity="0.9" />
-            <path d="M0 5 Q-1 0 0 -5 Q1 0 0 5 Z" fill="#fef08a" opacity="0.8" />
+          {/* ── Tent (behind Bob, larger) ── */}
+          <g transform="translate(220, 148) scale(1.05)">
+            <ChibiTent x={0} y={0} scale={1} />
           </g>
-          <circle cx="-4" cy="-18" r="1" fill="#fbbf24" opacity="0.6" />
-          <circle cx="3" cy="-16" r="0.8" fill="#fbbf24" opacity="0.5" />
-          <circle cx="0" cy="-22" r="0.6" fill="#fef08a" opacity="0.4" />
-        </g>
 
-        {/* Bob — sitting in the bottom-left corner, watching the fire */}
-        <g id="cf-bob" transform="translate(18, 195)" style={{ filter: "drop-shadow(0 0 5px rgba(255,255,255,0.35)) drop-shadow(0 0 12px rgba(249,115,22,0.25))" }}>
-          {/* Round head (chibi style matching reference) */}
-          <circle cx="20" cy="0" r="11" fill="none" stroke="#ffffff" strokeWidth="2" />
-          {/* Neck */}
-          <line x1="20" y1="11" x2="20" y2="18" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
-          {/* Torso leaning toward the fire */}
-          <line x1="20" y1="18" x2="28" y2="34" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
-          {/* Folded legs (sitting) */}
-          <line x1="28" y1="34" x2="18" y2="46" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
-          <line x1="28" y1="34" x2="36" y2="46" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
-          {/* Arm reaching toward fire */}
-          <line x1="22" y1="22" x2="36" y2="28" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
-          <line x1="36" y1="28" x2="40" y2="26" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
-          {/* Other arm resting */}
-          <line x1="18" y1="24" x2="10" y2="30" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
-        </g>
+          {/* ── Campfire ── */}
+          <Campfire x={175} y={258} scale={1.1} />
 
-        <g id="cf-fireflies">
-          {fireflies.map((fly) => (
-            <circle key={fly.id} cx={fly.x} cy={fly.y} r="1.5" fill="#fef08a" opacity="0.5" />
-          ))}
-        </g>
+          {/* ── Bob (chibi, sitting on log, left of fire) ── */}
+          <g id="cf-bob-group">
+            <ChibiBob x={18} y={148} scale={1.0} fireGlow={true} />
+          </g>
 
-        <g opacity="0.4">
-          <circle cx="50" cy="30" r="1" fill="white" />
-          <circle cx="120" cy="20" r="1.5" fill="white" />
-          <circle cx="180" cy="40" r="0.8" fill="white" />
-          <circle cx="250" cy="15" r="1.2" fill="white" />
-          <circle cx="310" cy="35" r="1" fill="white" />
-          <circle cx="350" cy="25" r="0.8" fill="white" />
-          <circle cx="80" cy="50" r="0.6" fill="white" />
-          <circle cx="280" cy="45" r="0.7" fill="white" />
-          <circle cx="150" cy="55" r="0.5" fill="white" />
-          <circle cx="330" cy="50" r="0.6" fill="white" />
-        </g>
-      </svg>
-    </div>
+          {/* ── Fireflies ── */}
+          <g id="cf-fireflies">
+            {fireflies.map((f) => (
+              <circle key={f.id} cx={f.x} cy={f.y} r="1.8" fill="#fef08a" opacity="0.4" />
+            ))}
+          </g>
+
+          {/* ── Smoke wisps ── */}
+          <g opacity="0.18">
+            <path d="M175 220 Q170 200 178 185 Q182 175 176 165" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" />
+            <path d="M178 218 Q185 198 180 183 Q177 173 183 162" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+          </g>
+        </svg>
+      </div>
+    </>
   );
 }

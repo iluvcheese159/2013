@@ -244,34 +244,35 @@ function TreeSilhouettes({ opacity = 0.5 }) {
 }
 
 /**
- * A single "zoom star" that the user clicks/scrolls into to reveal a benefit.
+ * A single interactive star — looks like a real star (tiny white dot
+ * with a faint glow), not a colored blob. Clicking zooms into it.
  */
 function ZoomStar({ facet, index, active, onClick, position }) {
-  // Natural sizing: 6px → 11px across facets, moderate glow
-  const size = 6 + index * 1.2;
-  const glowSize = size * 2.2;
-
   return (
     <button
-      className="absolute pointer-events-auto cursor-pointer transition-all duration-700 z-20"
+      className="absolute pointer-events-auto cursor-pointer z-20"
       style={{
         left: position.x + "%",
         top: position.y + "%",
         transform: "translate(-50%, -50%)",
-        opacity: active ? 0.3 : 1,
-        scale: active ? 0.8 : 1,
+        opacity: active ? 0.4 : 1,
+        background: "none",
+        border: "none",
+        padding: "12px", // large hit area, tiny visual
       }}
       onClick={onClick}
+      title={facet.label}
     >
+      {/* Tiny star dot — 3px white circle with subtle glow */}
       <div
         className="rounded-full"
         style={{
-          width: size + "px",
-          height: size + "px",
-          backgroundColor: facet.color,
-          boxShadow: `0 0 ${glowSize}px ${facet.color}55, 0 0 ${glowSize * 1.8}px ${facet.color}22`,
-          animation: "star-breathe 3s ease-in-out infinite",
-          animationDelay: index * 0.5 + "s",
+          width: "4px",
+          height: "4px",
+          backgroundColor: "#ffffff",
+          boxShadow: `0 0 6px 2px rgba(255,255,255,0.7), 0 0 12px 4px rgba(255,255,255,0.25)`,
+          animation: "twinkle " + (2.5 + index * 0.4) + "s ease-in-out infinite",
+          animationDelay: index * 0.3 + "s",
         }}
       />
     </button>
@@ -691,20 +692,17 @@ export default function Intro() {
         />
       )}
 
-      {/* ===== SCENE 0: Campsite ===== */}
+      {/* ===== SCENE 0: Campsite — 7 seconds, Bob sits by fire ===== */}
       {phase === 0 && (
         <div
           className="absolute inset-0 z-20"
-          style={{ animation: "fadeIn 2s cubic-bezier(0.16, 1, 0.3, 1)" }}
+          style={{ animation: "fadeIn 1.5s ease" }}
         >
-          {/* Campfire scene with Bob, tent, trees */}
           <CampfireScene />
-
-          {/* Hint text at bottom */}
-          <div className="absolute bottom-[5%] left-1/2 -translate-x-1/2 text-center">
+          <div className="absolute bottom-[3%] left-1/2 -translate-x-1/2 text-center">
             <p
-              className="text-white/25 text-[10px] font-tech uppercase tracking-[0.4em]"
-              style={{ animation: "text-crossfade-in 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both" }}
+              className="text-white/30 text-[10px] font-tech uppercase tracking-[0.4em]"
+              style={{ animation: "text-crossfade-in 1.2s ease 1s both" }}
             >
               A quiet night in the cosmos...
             </p>
@@ -712,22 +710,18 @@ export default function Intro() {
         </div>
       )}
 
-      {/* ===== SCENE 1: Camera Shift Up ===== */}
+      {/* ===== SCENE 1: Camera pans up from campsite to star-filled sky ===== */}
       {phase === 1 && (
         <div
           className="absolute inset-0 z-20"
-          style={{
-            animation: "camera-drift 4s cubic-bezier(0.45, 0, 0.25, 1) forwards",
-          }}
+          style={{ animation: "camera-drift 4s cubic-bezier(0.45, 0, 0.25, 1) forwards" }}
         >
-          {/* Trees at bottom */}
-          <TreeSilhouettes opacity={0.6} />
-
-          {/* Stars filling the sky - the camera pans up to reveal them */}
+          {/* Keep campsite visible at bottom as camera pans up */}
+          <CampfireScene />
           <div className="absolute inset-0 flex items-center justify-center">
             <p
               className="text-white/40 text-sm font-tech uppercase tracking-[0.5em]"
-              style={{ animation: "text-crossfade-in 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.8s both" }}
+              style={{ animation: "text-crossfade-in 1.2s ease 0.8s both" }}
             >
               Look up at the stars...
             </p>
@@ -783,7 +777,7 @@ export default function Intro() {
             {/* Background stars visible behind */}
             <TreeSilhouettes opacity={0.2} />
 
-            {/* The zoom target star */}
+            {/* The zoom target — tiny star that expands into a soft white halo */}
             {zoomTarget && (
               <div
                 className="absolute z-10"
@@ -799,11 +793,10 @@ export default function Intro() {
                 <div
                   className="rounded-full"
                   style={{
-                    width: "120px",
-                    height: "120px",
-                    backgroundColor: FACETS[facetIndex]?.color,
-                    boxShadow: `0 0 80px ${FACETS[facetIndex]?.color}88, 0 0 160px ${FACETS[facetIndex]?.color}44`,
-                    opacity: isZooming ? 0 : 0.6,
+                    width: "60px",
+                    height: "60px",
+                    background: "radial-gradient(circle, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.04) 60%, transparent 100%)",
+                    opacity: isZooming ? 0 : 1,
                   }}
                 />
               </div>
