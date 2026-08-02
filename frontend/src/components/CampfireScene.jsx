@@ -18,7 +18,8 @@ export default function CampfireScene({ lookUp = false }) {
   const svgRef      = useRef(null);
   const frameRef    = useRef(null);
   const timeRef     = useRef(0);
-  const tiltRef     = useRef(15); // current head tilt (degrees)
+  // lookUp tilts head back (negative = counter-clockwise = looking up-right toward sky)
+  const tiltRef = useRef(15);
 
   const fireflies = useMemo(() => Array.from({ length: 10 }, (_, i) => ({
     id: i,
@@ -60,7 +61,7 @@ export default function CampfireScene({ lookUp = false }) {
       tiltRef.current += (target - tiltRef.current) * Math.min(dt * 2.2, 1);
       const head = svg.querySelector("#bob-head");
       if (head) head.setAttribute("transform",
-        `rotate(${tiltRef.current.toFixed(2)}, 148, 333)`);
+        `rotate(${tiltRef.current.toFixed(2)}, 148, 372)`);
 
       // Body breathe
       const body = svg.querySelector("#bob-all");
@@ -95,7 +96,8 @@ export default function CampfireScene({ lookUp = false }) {
         viewBox="0 0 520 460"
         preserveAspectRatio="xMinYMax meet"
         className="absolute bottom-0 left-0"
-        style={{ width: "min(320px, 32vw)", height: "min(400px, 40vw)" }}
+        style={{ width: "min(320px, 32vw)", height: "auto", overflow: "visible" }}
+        overflow="visible"
         fill="none"
       >
         <defs>
@@ -134,35 +136,43 @@ export default function CampfireScene({ lookUp = false }) {
           <ellipse cx="370" cy="402" rx="60" ry="9" fill="#fbbf24" opacity="0.18" />
         </g>
 
-        {/* ══ LOG + BOB — scaled down 0.72×, anchored at bottom-left area ══ */}
-        <g transform="translate(41, 117) scale(0.72)">
-
-        {/* ══ LOG — end-on view ══ */}
+        {/* ══ LOG — side-view cylinder, Bob sits on top ══
+             Cylinder: rect body + ellipse caps. Top surface y=400, bottom y=420.
+             Left cap cx=100, right cap cx=200, ry=10 for roundness. ══ */}
         <g>
-          <ellipse cx="148" cy="438" rx="44" ry="7" fill="#010201" opacity="0.5" />
-          <path d="M110 418 Q148 432 186 418 L186 430 Q148 444 110 430 Z" fill="#2a1206" />
-          <ellipse cx="148" cy="418" rx="38" ry="14" fill="#3d1f0a" stroke="#5c3010" strokeWidth="2" />
-          <ellipse cx="148" cy="418" rx="26" ry="9" fill="none" stroke="#2a1206" strokeWidth="1" opacity="0.6" />
-          <ellipse cx="148" cy="418" rx="14" ry="5" fill="none" stroke="#2a1206" strokeWidth="1" opacity="0.5" />
-          <ellipse cx="148" cy="418" rx="5"  ry="2" fill="#4e2810" opacity="0.7" />
-          <ellipse cx="148" cy="415" rx="28" ry="8" fill="#4e2810" opacity="0.4" />
+          {/* Shadow */}
+          <ellipse cx="150" cy="428" rx="58" ry="6" fill="#010201" opacity="0.5" />
+          {/* Cylinder body */}
+          <rect x="100" y="400" width="100" height="20" fill="#3d1f0a" />
+          {/* Right cap (far end) */}
+          <ellipse cx="200" cy="410" rx="7" ry="10" fill="#2a1206" stroke="#5c3010" strokeWidth="1.5" />
+          {/* Left cap (near end, slightly lighter) */}
+          <ellipse cx="100" cy="410" rx="7" ry="10" fill="#4e2810" stroke="#5c3010" strokeWidth="1.5" />
+          {/* Top highlight */}
+          <rect x="100" y="400" width="100" height="7" fill="#4e2810" opacity="0.7" />
+          {/* Bark grain lines */}
+          {[120,140,160,180].map(x => (
+            <line key={x} x1={x} y1="401" x2={x} y2="419" stroke="#2a1206" strokeWidth="1" opacity="0.4" />
+          ))}
         </g>
 
-        {/* ══ BOB — sitting on log, stick figure ══ */}
+        {/* ══ BOB — side view, sitting on log top (y=400) ══
+             Side view: head tilts toward fire (right), one arm forward,
+             one leg forward one back. Hip at (148, 400). ══ */}
         <g id="bob-all">
-          <g id="bob-head" transform="rotate(15, 148, 333)">
-            <circle cx="148" cy="320" r="11" fill="none" stroke="white" strokeWidth="2.5" />
+          {/* Back leg — goes back-down from hip */}
+          <line x1="148" y1="400" x2="138" y2="420" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+          {/* Front leg — goes forward-down from hip */}
+          <line x1="148" y1="400" x2="162" y2="420" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+          {/* Torso — vertical from hip up to shoulder */}
+          <line x1="148" y1="400" x2="148" y2="372" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+          {/* Arm toward fire (forward) */}
+          <line x1="148" y1="378" x2="162" y2="390" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+          {/* Head — rotates around neck point (148, 372) */}
+          <g id="bob-head" transform="rotate(15, 148, 372)">
+            <circle cx="148" cy="361" r="10" fill="none" stroke="white" strokeWidth="2.5" />
           </g>
-          <line x1="148" y1="331" x2="148" y2="400" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-          <line x1="148" y1="345" x2="134" y2="360" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-          <line x1="148" y1="345" x2="164" y2="356" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-          <line x1="148" y1="400" x2="128" y2="400" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-          <line x1="128" y1="400" x2="122" y2="420" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-          <line x1="148" y1="400" x2="168" y2="400" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-          <line x1="168" y1="400" x2="174" y2="420" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
         </g>
-
-        </g> {/* end log+bob scale group */}
 
         {/* ══ CAMPFIRE ══ */}
         <g transform="translate(295, 380)">
