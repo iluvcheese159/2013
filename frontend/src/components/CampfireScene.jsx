@@ -136,24 +136,21 @@ export default function CampfireScene({ lookUp = false }) {
           <ellipse cx="370" cy="402" rx="60" ry="9" fill="#fbbf24" opacity="0.18" />
         </g>
 
-        {/* ══ LOG — side-view cylinder, Bob sits on top ══
-             Cylinder: rect body + ellipse caps. Top surface y=400, bottom y=420.
-             Left cap cx=100, right cap cx=200, ry=10 for roundness. ══ */}
+        {/* ══ LOG — butt-end facing user (circle cross-section) ══ */}
         <g>
           {/* Shadow */}
-          <ellipse cx="150" cy="428" rx="58" ry="6" fill="#010201" opacity="0.5" />
-          {/* Cylinder body */}
-          <rect x="100" y="400" width="100" height="20" fill="#3d1f0a" />
-          {/* Right cap (far end) */}
-          <ellipse cx="200" cy="410" rx="7" ry="10" fill="#2a1206" stroke="#5c3010" strokeWidth="1.5" />
-          {/* Left cap (near end, slightly lighter) */}
-          <ellipse cx="100" cy="410" rx="7" ry="10" fill="#4e2810" stroke="#5c3010" strokeWidth="1.5" />
-          {/* Top highlight */}
-          <rect x="100" y="400" width="100" height="7" fill="#4e2810" opacity="0.7" />
-          {/* Bark grain lines */}
-          {[120,140,160,180].map(x => (
-            <line key={x} x1={x} y1="401" x2={x} y2="419" stroke="#2a1206" strokeWidth="1" opacity="0.4" />
-          ))}
+          <ellipse cx="148" cy="426" rx="32" ry="6" fill="#010201" opacity="0.5" />
+          {/* Cylinder depth — short side peek behind the face */}
+          <ellipse cx="155" cy="412" rx="28" ry="10" fill="#2a1206" />
+          {/* Log face — circle end grain */}
+          <circle cx="148" cy="408" r="28" fill="#3d1f0a" stroke="#5c3010" strokeWidth="2" />
+          {/* Growth rings */}
+          <circle cx="148" cy="408" r="20" fill="none" stroke="#2a1206" strokeWidth="1" opacity="0.6" />
+          <circle cx="148" cy="408" r="13" fill="none" stroke="#2a1206" strokeWidth="1" opacity="0.5" />
+          <circle cx="148" cy="408" r="7"  fill="none" stroke="#2a1206" strokeWidth="1" opacity="0.4" />
+          <circle cx="148" cy="408" r="3"  fill="#4e2810" opacity="0.7" />
+          {/* Top highlight arc */}
+          <path d="M122 400 Q148 392 174 400" fill="none" stroke="#5c3010" strokeWidth="2" opacity="0.5" />
         </g>
 
         {/* ══ BOB — side view, sitting on log top (y=400) ══

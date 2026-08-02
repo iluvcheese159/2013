@@ -19,11 +19,11 @@ function generateMilkyWayStars(count, seed) {
   let s = seed;
   const r = () => { s = (s * 9301 + 49297) % 233280; return s / 233280; };
   const milkyWayAngle = Math.PI / 4;
-  const milkyWayWidth = 0.25;
+  const milkyWayWidth = 0.28;
 
   for (let i = 0; i < count; i++) {
     let x, y;
-    const inMilkyWay = r() < 0.35;
+    const inMilkyWay = r() < 0.4;
     if (inMilkyWay) {
       const bandPos = r();
       const bandOffset = (r() - 0.5) * milkyWayWidth;
@@ -35,18 +35,21 @@ function generateMilkyWayStars(count, seed) {
       x = r() * 100;
       y = r() * 100;
     }
-    // Size: power-3 so most are 0.5–1.2px, rare ones up to 2px
-    const size = 0.4 + Math.pow(r(), 3) * 1.6;
-    const opacity = 0.35 + r() * 0.65;
+    const size = 0.4 + Math.pow(r(), 2.5) * 1.8;
+    const opacity = 0.4 + r() * 0.6;
     const cr = r();
-    // Realistic palette: blue-white dominant
-    const color = cr < 0.5  ? [245, 248, 255]
-                : cr < 0.72 ? [255, 255, 255]
-                : cr < 0.87 ? [255, 252, 235]
-                : cr < 0.95 ? [255, 240, 200]
-                :              [210, 225, 255];
+    // Rich stellar palette: O/B blue-white, A white, F yellow-white, G yellow, K orange, M red
+    const color = cr < 0.28 ? [200, 220, 255]   // O/B: blue-white
+                : cr < 0.50 ? [240, 245, 255]   // A: white-blue
+                : cr < 0.65 ? [255, 255, 255]   // A: pure white
+                : cr < 0.75 ? [255, 253, 220]   // F: yellow-white
+                : cr < 0.83 ? [255, 244, 180]   // G: pale yellow
+                : cr < 0.90 ? [255, 220, 140]   // K: orange
+                : cr < 0.95 ? [255, 190, 100]   // K: deep orange
+                : cr < 0.98 ? [255, 160, 80]    // M: red-orange
+                :              [255, 130, 100];  // M: red
     stars.push({ x, y, size, opacity, color, inMilkyWay,
-      twinkleSpeed: 2 + r() * 5, twinklePhase: r() * Math.PI * 2 });
+      twinkleSpeed: 1.5 + r() * 5, twinklePhase: r() * Math.PI * 2 });
   }
   return stars;
 }
@@ -79,36 +82,52 @@ function StarCanvas({ stars }) {
       const H = canvas.height;
       ctx.clearRect(0, 0, W, H);
 
-      // ── Milky Way: diagonal arc from bottom-left to upper-right ──
-      // Outer haze — blue-purple
-      const mw1 = ctx.createLinearGradient(0, H, W * 0.85, 0);
+      // ── Milky Way band: diagonal bottom-left → upper-right ──
+      const mw1 = ctx.createLinearGradient(0, H, W * 0.9, 0);
       mw1.addColorStop(0,    "rgba(0,0,0,0)");
-      mw1.addColorStop(0.25, "rgba(40,35,90,0.08)");
-      mw1.addColorStop(0.42, "rgba(100,85,180,0.14)");
-      mw1.addColorStop(0.55, "rgba(160,140,230,0.18)");
-      mw1.addColorStop(0.65, "rgba(190,170,255,0.14)");
-      mw1.addColorStop(0.78, "rgba(80,70,140,0.08)");
+      mw1.addColorStop(0.18, "rgba(30,25,70,0.10)");
+      mw1.addColorStop(0.35, "rgba(80,65,160,0.20)");
+      mw1.addColorStop(0.50, "rgba(140,120,220,0.28)");
+      mw1.addColorStop(0.62, "rgba(170,150,255,0.22)");
+      mw1.addColorStop(0.75, "rgba(90,75,150,0.14)");
       mw1.addColorStop(1,    "rgba(0,0,0,0)");
       ctx.fillStyle = mw1;
       ctx.fillRect(0, 0, W, H);
 
-      // Warm galactic core glow — orange-gold, upper-center
-      const coreX = W * 0.52;
-      const coreY = H * 0.28;
-      const core = ctx.createRadialGradient(coreX, coreY, 0, coreX, coreY, W * 0.28);
-      core.addColorStop(0,    "rgba(255,200,100,0.18)");
-      core.addColorStop(0.25, "rgba(220,160,80,0.12)");
-      core.addColorStop(0.5,  "rgba(180,120,60,0.07)");
+      // Galactic core — warm amber/gold bulge
+      const coreX = W * 0.54;
+      const coreY = H * 0.30;
+      const core = ctx.createRadialGradient(coreX, coreY, 0, coreX, coreY, W * 0.32);
+      core.addColorStop(0,    "rgba(255,210,120,0.22)");
+      core.addColorStop(0.20, "rgba(240,170,80,0.16)");
+      core.addColorStop(0.45, "rgba(200,130,60,0.09)");
+      core.addColorStop(0.70, "rgba(120,80,40,0.04)");
       core.addColorStop(1,    "rgba(0,0,0,0)");
       ctx.fillStyle = core;
       ctx.fillRect(0, 0, W, H);
 
-      // Dense star cluster along band
-      const band = ctx.createLinearGradient(0, H, W * 0.85, 0);
+      // Nebula tint — faint reddish emission nebula patch upper-left
+      const neb = ctx.createRadialGradient(W*0.22, H*0.18, 0, W*0.22, H*0.18, W*0.18);
+      neb.addColorStop(0,   "rgba(180,60,60,0.07)");
+      neb.addColorStop(0.5, "rgba(140,40,80,0.04)");
+      neb.addColorStop(1,   "rgba(0,0,0,0)");
+      ctx.fillStyle = neb;
+      ctx.fillRect(0, 0, W, H);
+
+      // Blue reflection nebula patch upper-right
+      const neb2 = ctx.createRadialGradient(W*0.78, H*0.12, 0, W*0.78, H*0.12, W*0.14);
+      neb2.addColorStop(0,   "rgba(60,100,200,0.08)");
+      neb2.addColorStop(0.5, "rgba(40,70,160,0.04)");
+      neb2.addColorStop(1,   "rgba(0,0,0,0)");
+      ctx.fillStyle = neb2;
+      ctx.fillRect(0, 0, W, H);
+
+      // Dense dust lane — slightly brighter star density along core
+      const band = ctx.createLinearGradient(0, H, W * 0.9, 0);
       band.addColorStop(0,    "rgba(0,0,0,0)");
-      band.addColorStop(0.45, "rgba(255,255,255,0.04)");
-      band.addColorStop(0.55, "rgba(255,255,255,0.07)");
-      band.addColorStop(0.65, "rgba(255,255,255,0.04)");
+      band.addColorStop(0.42, "rgba(255,255,255,0.03)");
+      band.addColorStop(0.52, "rgba(255,255,255,0.08)");
+      band.addColorStop(0.60, "rgba(255,255,255,0.03)");
       band.addColorStop(1,    "rgba(0,0,0,0)");
       ctx.fillStyle = band;
       ctx.fillRect(0, 0, W, H);
@@ -238,29 +257,44 @@ function StarBackground({ stars }) {
  * Tree silhouettes at the bottom of the screen.
  */
 function TreeSilhouettes({ opacity = 0.5 }) {
-  const trees = [
-    { x: 2, scale: 1.4 }, { x: 10, scale: 1.1 }, { x: 18, scale: 1.6 },
-    { x: 28, scale: 1.0 }, { x: 36, scale: 1.5 }, { x: 46, scale: 1.2 },
-    { x: 54, scale: 1.7 }, { x: 64, scale: 1.1 }, { x: 72, scale: 1.4 },
-    { x: 82, scale: 1.0 }, { x: 90, scale: 1.3 }, { x: 96, scale: 1.2 },
+  // Dense forest: 3 depth layers, back-to-front, spanning full width
+  // Each tree: [xPct, heightPx, widthScale, colorDark]
+  const back = [
+    [1,90,1.0],[5,80,0.9],[9,95,1.1],[13,75,0.85],[17,88,1.0],[21,82,0.95],
+    [25,92,1.05],[29,78,0.9],[33,86,1.0],[37,94,1.1],[41,80,0.95],[45,90,1.0],
+    [49,76,0.88],[53,88,1.0],[57,84,0.95],[61,92,1.05],[65,79,0.9],[69,87,1.0],
+    [73,93,1.1],[77,81,0.92],[81,89,1.0],[85,77,0.88],[89,91,1.05],[93,83,0.95],[97,88,1.0],
+  ];
+  const mid = [
+    [0,115,1.1],[4,105,1.0],[8,118,1.15],[12,108,1.05],[16,122,1.2],[20,110,1.1],
+    [24,116,1.1],[28,104,1.0],[32,120,1.15],[36,112,1.1],[40,118,1.15],[44,106,1.05],
+    [48,114,1.1],[52,122,1.2],[56,108,1.05],[60,116,1.1],[64,110,1.1],[68,120,1.15],
+    [72,105,1.0],[76,118,1.15],[80,112,1.1],[84,106,1.05],[88,120,1.15],[92,114,1.1],[96,108,1.05],
+  ];
+  const front = [
+    [0,148,1.3],[5,138,1.2],[10,152,1.35],[15,142,1.25],[20,156,1.4],[26,144,1.3],
+    [32,150,1.35],[38,140,1.25],[44,154,1.38],[50,146,1.3],[56,152,1.35],[62,138,1.2],
+    [68,148,1.3],[74,156,1.4],[80,142,1.25],[86,150,1.35],[92,144,1.3],[97,152,1.35],
   ];
 
+  const Pine = ({ x, h, ws, col }) => (
+    <g transform={`translate(${x}, ${200 - h})`}>
+      <rect x={-1.5*ws} y={h*0.72} width={3*ws} height={h*0.28} fill={col} />
+      {[0,0.22,0.42,0.60,0.75,0.87,0.95].map((t, li) => {
+        const py = h * t;
+        const pw = h * ws * 0.38 * (1 - t * 0.55);
+        const ph = h * 0.18;
+        return <polygon key={li} points={`0,${py} ${-pw},${py+ph} ${pw},${py+ph}`} fill={col} />;
+      })}
+    </g>
+  );
+
   return (
-    <div
-      className="fixed bottom-0 left-0 right-0 pointer-events-none z-10"
-      style={{ height: "140px", opacity }}
-    >
-      <svg viewBox="0 0 100 140" preserveAspectRatio="xMidYMax meet" className="w-full h-full">
-        {trees.map((tree, i) => (
-          <g key={i} transform={`translate(${tree.x}, 0) scale(${tree.scale})`}>
-            <rect x="-1" y="20" width="2" height="80" fill="#050a05" />
-            <polygon points="0,0 -8,20 8,20" fill="#050a05" />
-            <polygon points="0,5 -7,22 7,22" fill="#071007" />
-            <polygon points="0,10 -6,24 6,24" fill="#050a05" />
-            <polygon points="0,15 -5,26 5,26" fill="#071007" />
-            <polygon points="0,18 -4,28 4,28" fill="#050a05" />
-          </g>
-        ))}
+    <div className="fixed bottom-0 left-0 right-0 pointer-events-none z-10" style={{ height: "200px", opacity }}>
+      <svg viewBox="0 0 100 200" preserveAspectRatio="xMidYMax meet" className="w-full h-full">
+        {back.map(([x,h,ws],i)  => <Pine key={"b"+i} x={x} h={h}  ws={ws}  col="#030703" />)}
+        {mid.map(([x,h,ws],i)   => <Pine key={"m"+i} x={x} h={h}  ws={ws}  col="#040904" />)}
+        {front.map(([x,h,ws],i) => <Pine key={"f"+i} x={x} h={h}  ws={ws}  col="#050b05" />)}
       </svg>
     </div>
   );
@@ -328,9 +362,9 @@ function BenefitCard({ facet, visible }) {
         <div
           className="inline-block px-4 py-1.5 rounded-full mb-6 text-[10px] font-tech uppercase tracking-[0.3em]"
           style={{
-            backgroundColor: facet.color + "22",
-            color: facet.color,
-            border: `1px solid ${facet.color}44`,
+            backgroundColor: "rgba(255,255,255,0.08)",
+            color: "rgba(255,255,255,0.7)",
+            border: "1px solid rgba(255,255,255,0.18)",
           }}
         >
           {"✦ " + facet.label}
@@ -339,7 +373,7 @@ function BenefitCard({ facet, visible }) {
         <h2
           className="font-display text-4xl md:text-5xl lg:text-6xl font-light tracking-tighter leading-tight mb-6 text-white"
           style={{
-            textShadow: `0 0 40px ${facet.color}44, 0 0 80px ${facet.color}22`,
+            textShadow: "0 0 40px rgba(255,255,255,0.15), 0 0 80px rgba(255,255,255,0.08)",
           }}
         >
           {facet.title}
@@ -838,11 +872,12 @@ export default function Intro() {
               {FACETS.map((_, i) => (
                 <button
                   key={i}
-                  className="w-2 h-2 rounded-full transition-all duration-300"
+                  className="rounded-full transition-all duration-300"
                   style={{
-                    backgroundColor: i === facetIndex ? FACETS[facetIndex]?.color : "rgba(255,255,255,0.15)",
+                    backgroundColor: i === facetIndex ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.2)",
                     width: i === facetIndex ? "16px" : "6px",
-                    boxShadow: i === facetIndex ? `0 0 8px ${FACETS[facetIndex]?.color}` : "none",
+                    height: "6px",
+                    boxShadow: i === facetIndex ? "0 0 8px rgba(255,255,255,0.6)" : "none",
                   }}
                   onClick={() => handleStarClick(i)}
                 />
