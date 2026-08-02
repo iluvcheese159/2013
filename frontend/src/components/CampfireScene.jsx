@@ -94,9 +94,9 @@ export default function CampfireScene({ lookUp = false }) {
       <svg
         ref={svgRef}
         viewBox="0 0 520 460"
-        preserveAspectRatio="xMinYMax meet"
-        className="absolute bottom-0 left-0"
-        style={{ width: "min(320px, 32vw)", height: "auto", overflow: "visible" }}
+        preserveAspectRatio="xMidYMax meet"
+        className="absolute bottom-0 left-0 right-0 mx-auto"
+        style={{ width: "80vw", height: "auto", overflow: "visible", maxWidth: "900px" }}
         overflow="visible"
         fill="none"
       >
@@ -153,14 +153,24 @@ export default function CampfireScene({ lookUp = false }) {
           <line x1="148" y1="387" x2="158" y2="405" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
           {/* Torso */}
           <line x1="148" y1="387" x2="148" y2="359" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-          {/* Arm toward fire + marshmallow stick */}
+          {/* Arm toward fire */}
           <line x1="148" y1="365" x2="162" y2="376" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-          {/* Stick extending from hand toward fire */}
-          <line x1="162" y1="376" x2="230" y2="355" stroke="#c8a96e" strokeWidth="1.8" strokeLinecap="round" />
-          {/* Marshmallow on stick tip — white puffed square */}
-          <rect x="224" y="348" width="12" height="10" rx="3" fill="white" opacity="0.95" />
-          {/* Toasted bottom of marshmallow */}
-          <rect x="224" y="354" width="12" height="4" rx="2" fill="#f59e0b" opacity="0.7" />
+          {/* Stick — tapered branch, wider at hand end, narrower at tip */}
+          <path
+            d="M162 378 C175 372 195 364 215 356 C218 355 221 354 222 353 L224 351 C222 350 219 350 216 351 C196 359 176 368 163 374 Z"
+            fill="#6b3a1f"
+          />
+          {/* Bark highlight */}
+          <path
+            d="M163 374 C183 366 203 357 220 351"
+            fill="none" stroke="#8b5a2b" strokeWidth="0.8" opacity="0.6" strokeLinecap="round"
+          />
+          {/* Knot on stick */}
+          <ellipse cx="193" cy="363" rx="2.5" ry="1.5" fill="#4a2810" opacity="0.7" transform="rotate(-20, 193, 363)" />
+          {/* Marshmallow on stick tip */}
+          <rect x="220" y="344" width="13" height="11" rx="3.5" fill="white" opacity="0.95" />
+          {/* Toasted bottom */}
+          <rect x="220" y="351" width="13" height="4" rx="2" fill="#f59e0b" opacity="0.75" />
           {/* Head */}
           <g id="bob-head" transform="rotate(15, 148, 359)">
             <circle cx="148" cy="348" r="10" fill="none" stroke="white" strokeWidth="2.5" />
