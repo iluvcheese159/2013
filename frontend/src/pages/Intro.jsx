@@ -255,6 +255,73 @@ function TreeSilhouettes({ opacity = 0.5 }) {
   );
 }
 
+function LayeredPine({ cx, base, h, layers, col, w = 0.5, trunkWidth = 1.8, trunkColor = "#241408" }) {
+  const alt = col === "#040a04" ? "#061006" : "#040a04";
+  const trunkH = h * 0.2;
+  return (
+    <g>
+      <rect x={cx - trunkWidth / 2} y={base - trunkH} width={trunkWidth} height={trunkH} fill={trunkColor} />
+      {Array.from({ length: layers }).map((_, index) => {
+        const t = layers === 1 ? 0 : index / (layers - 1);
+        const y = base - h + t * h * 0.74;
+        const width = h * w * (1 - t * 0.42);
+        const height = Math.max(h / layers, 6) * 1.28;
+        return (
+          <polygon
+            key={index}
+            points={`${cx},${y} ${cx - width / 2},${y + height} ${cx + width / 2},${y + height}`}
+            fill={index % 2 === 0 ? col : alt}
+          />
+        );
+      })}
+    </g>
+  );
+}
+
+function CoverForestPass() {
+  const farPines = [
+    [8, 64, 24, 3, "#020602", 0.54],
+    [20, 61, 28, 4, "#030803", 0.56],
+    [33, 63, 25, 3, "#020602", 0.54],
+    [46, 60, 29, 4, "#030803", 0.58],
+    [59, 62, 24, 3, "#020602", 0.54],
+    [72, 59, 28, 4, "#030803", 0.58],
+    [84, 63, 25, 3, "#020602", 0.54],
+    [96, 61, 27, 4, "#030803", 0.58],
+  ];
+  const midPines = [
+    [5, 82, 38, 4, "#030803", 0.66],
+    [22, 80, 44, 5, "#040a04", 0.7],
+    [39, 83, 40, 4, "#030803", 0.66],
+    [77, 82, 42, 5, "#040a04", 0.7],
+    [94, 81, 39, 4, "#030803", 0.66],
+  ];
+
+  return (
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ width: "100%", height: "100%", display: "block" }}>
+      <rect x="0" y="0" width="100" height="100" fill="#02040a" opacity="0.18" />
+      {farPines.map(([cx, base, h, layers, col, w], index) => (
+        <LayeredPine key={`far-${index}`} cx={cx} base={base} h={h} layers={layers} col={col} w={w} trunkWidth={0.9} />
+      ))}
+      {midPines.map(([cx, base, h, layers, col, w], index) => (
+        <LayeredPine key={`mid-${index}`} cx={cx} base={base} h={h} layers={layers} col={col} w={w} trunkWidth={1.15} />
+      ))}
+
+      <LayeredPine cx={57} base={96} h={62} layers={5} col="#071007" w={0.82} trunkWidth={2.4} trunkColor="#2a1a0a" />
+
+      <g opacity="0.96">
+        <polygon points="-6,18 18,10 8,42 28,40 14,72 -6,68" fill="#061006" />
+        <polygon points="-3,28 16,22 10,50 23,48 12,78 -3,74" fill="#081208" opacity="0.92" />
+        <polygon points="82,14 104,8 94,38 106,34 100,72 80,62" fill="#061006" />
+        <polygon points="86,24 102,20 95,46 104,44 98,80 84,70" fill="#081208" opacity="0.92" />
+      </g>
+
+      <rect x="0" y="90" width="100" height="3" fill="#1a2e0e" />
+      <rect x="0" y="93" width="100" height="7" fill="#2a1a0a" />
+    </svg>
+  );
+}
+
 /**
  * A single interactive star — colored per facet's starColor.
  */
@@ -774,27 +841,22 @@ export default function Intro() {
             className="absolute inset-0 flex items-end justify-center"
             style={{ animation: "tree-cover 2.2s cubic-bezier(0.16, 1, 0.3, 1) 3.4s both" }}
           >
-            <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ width: "100%", height: "100%", display: "block" }}>
-              <polygon points="50,0 0,100 100,100" fill="#040a04" />
-              <polygon points="50,0 8,100 92,100" fill="#030803" />
-              <polygon points="50,0 16,100 84,100" fill="#020602" />
-              <rect x="0" y="92" width="100" height="8" fill="#2a1a0a" />
-            </svg>
+            <div
+              className="absolute inset-0"
+              style={{ animation: "camera-look-up 2.25s cubic-bezier(0.32, 0.04, 0.18, 1) 5.75s both" }}
+            >
+              <CoverForestPass />
+            </div>
           </div>
 
           {/* 3) Camera looks diagonally up — tree clears away, revealing the stars */}
-          <div
-            className="absolute inset-0"
-            style={{ animation: "camera-look-up 2.6s cubic-bezier(0.45, 0, 0.25, 1) 5.4s both" }}
-          >
-            <div className="absolute inset-0 flex items-center justify-center">
-              <p
-                className="text-white/40 text-sm font-tech uppercase tracking-[0.5em]"
-                style={{ animation: "text-crossfade-in 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.8s both" }}
-              >
-                Look up at the stars...
-              </p>
-            </div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <p
+              className="text-white/40 text-sm font-tech uppercase tracking-[0.5em]"
+              style={{ animation: "text-crossfade-in 1.2s cubic-bezier(0.16, 1, 0.3, 1) 6.6s both" }}
+            >
+              Look up at the stars...
+            </p>
           </div>
         </div>
       )}

@@ -181,18 +181,22 @@
 }
 /* Camera turns head right — scene pans left, Bob recedes into the distance */
 @keyframes camera-pan-right {
-    0%   { transform: translateX(0) scale(1); opacity: 1; }
-    100% { transform: translateX(-58%) scale(0.5); opacity: 0.85; }
+    0%   { transform: translate3d(0, 0, 0) scale(1); opacity: 1; }
+    28%  { transform: translate3d(-10%, 1.5%, 0) scale(0.95); opacity: 1; }
+    62%  { transform: translate3d(-32%, 4%, 0) scale(0.76); opacity: 0.96; }
+    100% { transform: translate3d(-50%, 7%, 0) scale(0.6); opacity: 0.9; }
 }
 /* A pine tree grows to fill the whole screen */
 @keyframes tree-cover {
-    0%   { transform: scale(0.08); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
+    0%   { transform: translateY(10%) scale(0.2); opacity: 0; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
 }
 /* Camera looks diagonally up — tree clears away, revealing the stars */
 @keyframes camera-look-up {
-    0%   { transform: translate(0, 0) scale(1); opacity: 1; }
-    100% { transform: translate(-28%, -48%) scale(1.35); opacity: 0; }
+    0%   { transform: translate3d(0, 0, 0) scale(1); opacity: 1; }
+    20%  { transform: translate3d(-3%, 2%, 0) scale(1.02); opacity: 1; }
+    58%  { transform: translate3d(-11%, 15%, 0) scale(1.1); opacity: 0.97; }
+    100% { transform: translate3d(-20%, 34%, 0) scale(1.2); opacity: 0; }
 }
 @keyframes star-zoom-in {
     0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0; }

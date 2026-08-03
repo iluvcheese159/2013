@@ -247,8 +247,8 @@ function Forest() {
     [310,375,215,7,8],[348,362,198,6,7],[388,372,208,7,8],
     [428,360,200,6,7],[468,370,212,7,8],[508,358,196,6,7],
   ];
-  const roundTrees = [
-    [55,340,6],[170,332,7],[340,338,6],[455,330,7],
+  const accentPines = [
+    [55,340,126,4,6],[170,332,134,4,7],[340,338,128,4,6],[455,330,136,4,7],
   ];
 
   return (
@@ -257,8 +257,8 @@ function Forest() {
         <Pine key={"b"+i} cx={cx} base={base} h={h} layers={layers} col={C[ci]} w={0.48} />)}
       {midPines.map(([cx,base,h,layers,ci],i) =>
         <Pine key={"m"+i} cx={cx} base={base} h={h} layers={layers} col={C[ci]} w={0.56} />)}
-      {roundTrees.map(([cx,base,ci],i) =>
-        <Round key={"r"+i} cx={cx} base={base} col={C[ci]} />)}
+      {accentPines.map(([cx,base,h,layers,ci],i) =>
+        <Pine key={"a"+i} cx={cx} base={base} h={h} layers={layers} col={C[ci]} w={0.58} />)}
       {fgPines.map(([cx,base,h,layers,ci],i) =>
         <Pine key={"f"+i} cx={cx} base={base} h={h} layers={layers} col={C[ci]} w={0.64} />)}
     </g>
@@ -284,14 +284,3 @@ function Pine({ cx, base, h, layers, col, w }) {
   );
 }
 
-function Round({ cx, base, col }) {
-  return (
-    <g>
-      <rect x={cx-4} y={base-52} width={8} height={52} fill={col} />
-      <circle cx={cx}    cy={base-72} r={36} fill={col} />
-      <circle cx={cx-16} cy={base-62} r={26} fill={col} />
-      <circle cx={cx+16} cy={base-62} r={26} fill={col} />
-      <circle cx={cx}    cy={base-90} r={22} fill={col} />
-    </g>
-  );
-}
