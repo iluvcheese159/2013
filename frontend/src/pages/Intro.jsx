@@ -66,8 +66,11 @@ function StarCanvas({ stars }) {
     const ctx = canvas.getContext("2d");
 
     const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      // Render the backing store at up to 1.5× DPR so the field stays crisp
+      // when CSS-zoomed, without paying a full 2× fill cost every frame.
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      canvas.width = Math.round(window.innerWidth * dpr);
+      canvas.height = Math.round(window.innerHeight * dpr);
     };
     resize();
     window.addEventListener("resize", resize);
@@ -549,7 +552,7 @@ export default function Intro() {
   const [autoAdvanceTimer, setAutoAdvanceTimer] = useState(null);
   const [zoomingOut, setZoomingOut] = useState(false);
 
-  const stars = useMemo(() => generateMilkyWayStars(2500, 42), []);
+  const stars = useMemo(() => generateMilkyWayStars(2000, 42), []);
   const timers = useRef([]);
   const containerRef = useRef(null);
   const scrollLocked = useRef(false);
@@ -710,17 +713,18 @@ export default function Intro() {
         className="absolute inset-0 overflow-hidden"
         style={{
           transformOrigin: zoomTarget ? `${zoomTarget.x}% ${zoomTarget.y}%` : "50% 50%",
-          transform: (phase === 3 && !zoomingOut) ? "scale(4)" : "scale(1)",
+          transform: (phase === 3 && !zoomingOut) ? "scale(3)" : "scale(1)",
           transition: zoomingOut
-            ? "transform 1.4s cubic-bezier(0.4, 0, 0.2, 1)"
-            : (phase === 3 ? "transform 2.2s cubic-bezier(0.0, 0.0, 0.2, 1)" : "none"),
+            ? "transform 1s cubic-bezier(0.4, 0, 0.2, 1)"
+            : (phase === 3 ? "transform 1.8s cubic-bezier(0.0, 0.0, 0.2, 1)" : "none"),
+          willChange: "transform",
         }}
       >
         <StarBackground stars={stars} />
       </div>
 
-      {/* ===== FROSTED BLUR — only in phase 3 ===== */}
-      {phase === 3 && (
+      {/* ===== FROSTED BLUR — phase 3 only, deferred until zoom-in settles ===== */}
+      {phase === 3 && !zoomingOut && showBenefit && (
         <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 15,
           backdropFilter: "blur(2px)", WebkitBackdropFilter: "blur(2px)",
           transition: "opacity 0.8s ease",
@@ -733,6 +737,8 @@ export default function Intro() {
           className="absolute inset-0 z-20"
           style={{ animation: "fadeIn 1.5s ease" }}
         >
+          {/* Full-width forest + brown ground so the campsite sits inside a real forest */}
+          <TreeSilhouettes opacity={0.95} />
           <CampfireScene lookUp={bobLookUp} />
           <div className="absolute bottom-[3%] left-1/2 -translate-x-1/2 text-center">
             <p
@@ -745,13 +751,29 @@ export default function Intro() {
         </div>
       )}
 
-      {/* ===== SCENE 1: Camera pans RIGHT — campsite slides left, sky revealed ===== */}
+      {/* ===== SCENE 1: Camera pans up — campsite drifts up & fades, forest stays anchored ===== */}
       {phase === 1 && (
-        <div
-          className="absolute inset-0 z-20 pointer-events-none"
-          style={{ animation: "fadeOut 3.5s cubic-bezier(0.45, 0, 0.25, 1) forwards" }}
-        >
-          <CampfireScene lookUp={true} />
+        <div className="absolute inset-0 z-20 pointer-events-none">
+          {/* Campsite drifts up while fading as the camera lifts toward the sky */}
+          <div
+            className="absolute inset-0"
+            style={{ animation: "camera-drift 4s cubic-bezier(0.45, 0, 0.25, 1) forwards, fadeOut 3.5s cubic-bezier(0.45, 0, 0.25, 1) forwards" }}
+          >
+            <CampfireScene lookUp={true} />
+          </div>
+          {/* Prompt */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <p
+              className="text-white/40 text-sm font-tech uppercase tracking-[0.5em]"
+              style={{ animation: "text-crossfade-in 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.8s both" }}
+            >
+              Look up at the stars...
+            </p>
+          </div>
+          {/* Forest silhouettes stay anchored to the bottom — never cut off */}
+          <div className="absolute inset-0" style={{ animation: "fadeIn 1s ease both" }}>
+            <TreeSilhouettes opacity={0.7} />
+          </div>
         </div>
       )}
 
