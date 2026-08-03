@@ -213,38 +213,43 @@ function StarBackground({ stars }) {
  * Tree silhouettes at the bottom of the screen.
  */
 function TreeSilhouettes({ opacity = 0.5 }) {
+  // Dense pine forest spanning the full width of the screen — the arrays
+  // intentionally overshoot past both edges (negative x and >100) so the
+  // strip always covers edge-to-edge, with no gaps at any viewport size.
+  // Each entry is [x, height] in a 0..100 × 0..60 viewBox.
   const back = [
-    [0,10],[3,9],[6,11],[9,9.5],[12,10],[15,9],[18,11],[21,9.5],[24,10.5],
-    [27,9],[30,11],[33,10],[36,9.5],[39,11],[42,9],[45,10.5],[48,9.5],[51,10],
-    [54,11],[57,9],[60,10.5],[63,9.5],[66,11],[69,9],[72,10],[75,11],[78,9.5],
-    [81,10],[84,9],[87,11],[90,10],[93,9.5],[96,10.5],[99,9],
+    [-6,12],[-3,15],[1,13],[4,16],[7,12],[10,15],[13,17],[16,13],[19,15],[22,12],
+    [25,16],[28,14],[31,17],[34,13],[37,15],[40,12],[43,16],[46,14],[49,17],[52,13],
+    [55,15],[58,12],[61,16],[64,14],[67,17],[70,13],[73,15],[76,12],[79,16],[82,14],
+    [85,17],[88,13],[91,15],[94,12],[97,16],[100,14],[103,17],[106,13],
   ];
   const mid = [
-    [0,15],[3.5,13],[7,16],[10.5,14],[14,16.5],[17.5,14.5],[21,15.5],[24.5,13.5],
-    [28,16],[31.5,14],[35,16],[38.5,14.5],[42,15],[45.5,16.5],[49,14],[52.5,15.5],
-    [56,16],[59.5,14],[63,15.5],[66.5,16],[70,14.5],[73.5,15],[77,16.5],[80.5,14],
-    [84,15.5],[87.5,16],[91,14.5],[94.5,15],[98,16],
+    [-7,18],[-3,20],[1,17],[4,21],[7,18],[10,20],[13,17],[16,21],[19,18],[22,20],
+    [25,17],[28,21],[31,18],[34,20],[37,17],[40,21],[43,18],[46,20],[49,17],[52,21],
+    [55,18],[58,20],[61,17],[64,21],[67,18],[70,20],[73,17],[76,21],[79,18],[82,20],
+    [85,17],[88,21],[91,18],[94,20],[97,17],[100,21],[103,18],[106,20],
   ];
   const front = [
-    [0,20],[4,18],[8,21],[12,19],[16,22],[20,19.5],[24,21],[28,18.5],[32,21],
-    [36,19],[40,22],[44,19.5],[48,21],[52,20],[56,22],[60,18.5],[64,21],[68,19.5],
-    [72,22],[76,20],[80,21.5],[84,19],[88,22],[92,20],[96,21],
+    [-8,26],[-4,28],[0,25],[3,29],[6,26],[9,28],[12,25],[15,29],[18,26],[21,28],
+    [24,25],[27,29],[30,26],[33,28],[36,25],[39,29],[42,26],[45,28],[48,25],[51,29],
+    [54,26],[57,28],[60,25],[63,29],[66,26],[69,28],[72,25],[75,29],[78,26],[81,28],
+    [84,25],[87,29],[90,26],[93,28],[96,25],[99,29],[102,26],[105,28],
   ];
-  const Pine = ({ x, h, col }) => (
-    <polygon points={`${x},${60 - h} ${x - h * 0.28},60 ${x + h * 0.28},60`} fill={col} />
+  const Pine = ({ x, h, col, w = 0.44 }) => (
+    <polygon points={`${x},${60 - h} ${x - h * w},60 ${x + h * w},60`} fill={col} />
   );
   return (
-    <div className="fixed bottom-0 left-0 right-0 pointer-events-none z-10" style={{ height: "40vh", opacity }}>
+    <div className="fixed bottom-0 left-0 right-0 pointer-events-none z-10" style={{ height: "45vh", opacity }}>
       <svg viewBox="0 0 100 60" preserveAspectRatio="none" style={{ width: "100%", height: "100%", display: "block", verticalAlign: "bottom" }}>
-        {/* Brown earth ground */}
-        <rect x="0" y="52" width="100" height="8" fill="#2a1a0a" />
-        {/* Grass edge */}
-        <rect x="0" y="50" width="100" height="4" fill="#1a2e0e" />
         {back.map(([x, h], i)  => <Pine key={"b"+i} x={x} h={h} col="#020602" />)}
         {mid.map(([x, h], i)   => <Pine key={"m"+i} x={x} h={h} col="#030803" />)}
         {front.map(([x, h], i) => <Pine key={"f"+i} x={x} h={h} col="#040a04" />)}
+        {/* Grass edge */}
+        <rect x="-15" y="50" width="130" height="4" fill="#1a2e0e" />
+        {/* Brown earth ground */}
+        <rect x="-15" y="52" width="130" height="8" fill="#2a1a0a" />
         {/* Solid ground fill to screen edge */}
-        <rect x="0" y="57" width="100" height="3" fill="#2a1a0a" />
+        <rect x="-15" y="57" width="130" height="3" fill="#2a1a0a" />
       </svg>
     </div>
   );
@@ -560,10 +565,12 @@ export default function Intro() {
 
   // ---- Auto-advance through scenes 0-1 ----
   useEffect(() => {
-    // Phase 0: campsite 7s. At 5s Bob tilts head up. Phase 1: camera pan 4.5s.
+    // Phase 0: campsite 7s. At 5s Bob tilts head up.
+    // Phase 1: camera pans right (head turn) 8s — Bob recedes, a tree covers
+    // the screen, then the camera looks diagonally up to reveal the stars.
     const tLook = setTimeout(() => { setBobLookUp(true); }, 5000);
     const t0 = setTimeout(() => { setPhase(1); }, 7000);
-    const t1 = setTimeout(() => { setPhase(2); }, 11500);
+    const t1 = setTimeout(() => { setPhase(2); }, 15000);
     timers.current = [tLook, t0, t1];
     return () => timers.current.forEach(clearTimeout);
   }, []);
@@ -751,28 +758,43 @@ export default function Intro() {
         </div>
       )}
 
-      {/* ===== SCENE 1: Camera pans up — campsite drifts up & fades, forest stays anchored ===== */}
+      {/* ===== SCENE 1: Head turn — camera pans right, Bob recedes, a tree covers the screen, then the camera looks diagonally up to the stars ===== */}
       {phase === 1 && (
         <div className="absolute inset-0 z-20 pointer-events-none">
-          {/* Campsite drifts up while fading as the camera lifts toward the sky */}
+          {/* 1) Camera turns head right — scene pans left, Bob recedes into the distance */}
           <div
             className="absolute inset-0"
-            style={{ animation: "camera-drift 4s cubic-bezier(0.45, 0, 0.25, 1) forwards, fadeOut 3.5s cubic-bezier(0.45, 0, 0.25, 1) forwards" }}
+            style={{ animation: "camera-pan-right 4s cubic-bezier(0.45, 0, 0.25, 1) forwards" }}
           >
             <CampfireScene lookUp={true} />
           </div>
-          {/* Prompt */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <p
-              className="text-white/40 text-sm font-tech uppercase tracking-[0.5em]"
-              style={{ animation: "text-crossfade-in 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.8s both" }}
-            >
-              Look up at the stars...
-            </p>
+
+          {/* 2) A pine tree grows to fill the whole screen */}
+          <div
+            className="absolute inset-0 flex items-end justify-center"
+            style={{ animation: "tree-cover 2.2s cubic-bezier(0.16, 1, 0.3, 1) 3.4s both" }}
+          >
+            <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ width: "100%", height: "100%", display: "block" }}>
+              <polygon points="50,0 0,100 100,100" fill="#040a04" />
+              <polygon points="50,0 8,100 92,100" fill="#030803" />
+              <polygon points="50,0 16,100 84,100" fill="#020602" />
+              <rect x="0" y="92" width="100" height="8" fill="#2a1a0a" />
+            </svg>
           </div>
-          {/* Forest silhouettes stay anchored to the bottom — never cut off */}
-          <div className="absolute inset-0" style={{ animation: "fadeIn 1s ease both" }}>
-            <TreeSilhouettes opacity={0.7} />
+
+          {/* 3) Camera looks diagonally up — tree clears away, revealing the stars */}
+          <div
+            className="absolute inset-0"
+            style={{ animation: "camera-look-up 2.6s cubic-bezier(0.45, 0, 0.25, 1) 5.4s both" }}
+          >
+            <div className="absolute inset-0 flex items-center justify-center">
+              <p
+                className="text-white/40 text-sm font-tech uppercase tracking-[0.5em]"
+                style={{ animation: "text-crossfade-in 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.8s both" }}
+              >
+                Look up at the stars...
+              </p>
+            </div>
           </div>
         </div>
       )}

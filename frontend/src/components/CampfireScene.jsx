@@ -97,8 +97,8 @@ export default function CampfireScene({ lookUp = false }) {
         ref={svgRef}
         viewBox="0 0 520 460"
         preserveAspectRatio="xMidYMax meet"
-        className="absolute bottom-0 left-0"
-        style={{ width: "min(320px, 32vw)", height: "auto", overflow: "visible" }}
+        className="absolute bottom-0 left-1/2 -translate-x-1/2"
+        style={{ width: "min(58vh, 96vw)", height: "auto", overflow: "visible" }}
         overflow="visible"
         fill="none"
       >
