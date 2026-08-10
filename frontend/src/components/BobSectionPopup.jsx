@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
 import { X, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
-import Bob from "./Bob";
+import NovaMascot from "./NovaMascot";
 
 const POPUP_DURATION = 6000;
 const STORAGE_KEY = "pf_bob_section_dismissed";
@@ -70,7 +70,7 @@ export default function BobSectionPopup({
               <MessageCircle className="h-3 w-3 text-accent" />
             </div>
             <span className="text-xs font-tech uppercase tracking-wider text-accent">
-              Bob Says
+              Nova Tip
             </span>
           </div>
           <button
@@ -85,7 +85,9 @@ export default function BobSectionPopup({
         <p className="text-xs text-muted-foreground leading-relaxed">{text}</p>
       </div>
       <div className="relative">
-        <Bob state="introducing" position="popup" />
+        <div className="scale-[0.72] origin-bottom-left">
+          <NovaMascot />
+        </div>
       </div>
     </div>
   );

@@ -179,25 +179,36 @@
     0% { transform: translateY(0) scale(1); }
     100% { transform: translateY(-35%) scale(1.15); }
 }
-/* Camera turns head right — scene pans left, Bob recedes into the distance */
+/* Camera turns head right — Bob/campsite recedes left with a natural settle */
 @keyframes camera-pan-right {
-    0%   { transform: translate3d(0, 0, 0) scale(1); opacity: 1; }
-    28%  { transform: translate3d(-10%, 1.5%, 0) scale(0.95); opacity: 1; }
-    62%  { transform: translate3d(-32%, 4%, 0) scale(0.76); opacity: 0.96; }
-    100% { transform: translate3d(-50%, 7%, 0) scale(0.6); opacity: 0.9; }
+    0%   { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); opacity: 1; }
+    20%  { transform: translate3d(-5%, 0.5%, 0) rotate(0.6deg) scale(0.97); opacity: 1; }
+    52%  { transform: translate3d(-22%, 1.6%, 0) rotate(1.2deg) scale(0.82); opacity: 0.98; }
+    80%  { transform: translate3d(-40%, 2.6%, 0) rotate(1.8deg) scale(0.68); opacity: 0.94; }
+    100% { transform: translate3d(-46%, 3%, 0) rotate(2deg) scale(0.62); opacity: 0.88; }
 }
-/* A pine tree grows to fill the whole screen */
-@keyframes tree-cover {
-    0%   { transform: translateY(10%) scale(0.2); opacity: 0; }
-    100% { transform: translateY(0) scale(1); opacity: 1; }
+
+/* One continuous forest journey: the camera turns right, glides deeper into
+   the grove (trees slide past), then lifts diagonally up-RIGHT — still looking
+   right — through the canopy until the stars are revealed. */
+@keyframes forest-journey {
+    0%   { transform: translate3d(-44%, 3%, 0) rotate(2deg) scale(0.62); opacity: 0; }
+    15%  { transform: translate3d(-46%, 2.8%, 0) rotate(2deg) scale(0.66); opacity: 1; }
+    40%  { transform: translate3d(-50%, 2.4%, 0) rotate(2.3deg) scale(0.94); opacity: 1; }
+    62%  { transform: translate3d(-54%, 9%, 0) rotate(2.8deg) scale(1.16); opacity: 0.98; }
+    82%  { transform: translate3d(-59%, 28%, 0) rotate(3.2deg) scale(1.32); opacity: 0.9; }
+    100% { transform: translate3d(-64%, 54%, 0) rotate(3.6deg) scale(1.45); opacity: 0; }
 }
-/* Camera looks diagonally up — tree clears away, revealing the stars */
-@keyframes camera-look-up {
-    0%   { transform: translate3d(0, 0, 0) scale(1); opacity: 1; }
-    20%  { transform: translate3d(-3%, 2%, 0) scale(1.02); opacity: 1; }
-    58%  { transform: translate3d(-11%, 15%, 0) scale(1.1); opacity: 0.97; }
-    100% { transform: translate3d(-20%, 34%, 0) scale(1.2); opacity: 0; }
+
+/* Big pine boughs brush past the lens — the camera passes through the leaves */
+@keyframes leaf-pass {
+    0%   { transform: translate3d(115%, 5%, 0) rotate(-6deg) scale(1.6); opacity: 0; }
+    10%  { opacity: 0.95; }
+    50%  { transform: translate3d(35%, 2%, 0) rotate(0deg) scale(1.72); opacity: 0.95; }
+    90%  { transform: translate3d(-60%, 4%, 0) rotate(6deg) scale(1.8); opacity: 0.75; }
+    100% { transform: translate3d(-125%, 8%, 0) rotate(3deg) scale(1.85); opacity: 0; }
 }
+
 @keyframes star-zoom-in {
     0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0; }
     60% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
