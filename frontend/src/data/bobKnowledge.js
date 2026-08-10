@@ -2,10 +2,10 @@ export const bobKnowledge = {
   greetings: {
     keywords: ["hello", "hi", "hey", "greetings", "what's up", "sup", "howdy"],
     responses: [
-      "Hey there! I'm Nova — your Print Cosmos guide. Ask me anything about 3D printing, our platform, or how to get started!",
-      "Hello! Nova here, ready to help. Whether you're new to 3D printing or a seasoned maker, I can point you in the right direction.",
-      "Hi! I'm Nova, your onboard AI helper. What can I help you with today?",
-      "Greetings, maker! Nova here. I can help you navigate Print Cosmos — from listing your first design to troubleshooting prints.",
+      "Hey there! I'm Bob — your Print Cosmos guide. Ask me anything about 3D printing, our platform, or how to get started!",
+      "Hello! Bob here, ready to help. Whether you're new to 3D printing or a seasoned maker, I can point you in the right direction.",
+      "Hi! I'm Bob, your onboard AI helper. What can I help you with today?",
+      "Greetings, maker! Bob here. I can help you navigate Print Cosmos — from listing your first design to troubleshooting prints.",
     ],
   },
 
@@ -84,7 +84,7 @@ export const bobKnowledge = {
     responses: [
       "Print Cosmos Pro is our premium subscription that unlocks advanced features for makers and clubs! Benefits include: higher listing limits, priority marketplace visibility, reduced commission rates, access to premium thread colors and materials, club subscription management for recurring revenue, and expanded analytics for your store.",
       "To see what Pro includes or subscribe: 1) Go to your Dashboard, 2) Look for the 'Pro' section or 'Upgrade' button in the sidebar, 3) Choose your plan (monthly or annual), 4) Checkout using Stripe or PayPal — your Pro benefits activate instantly after payment!",
-      "Pro subscribers also get a custom Pro Nova avatar with a gold rim accessory visible across the platform, and a badge on their profile showing their Pro status.",
+      "Pro subscribers also get a custom Pro Bob avatar with a gold rim accessory visible across the platform, and a badge on their profile showing their Pro status.",
     ],
   },
 
@@ -121,15 +121,15 @@ export const bobKnowledge = {
   about_bob: {
     keywords: ["who are you", "what are you", "bob", "yourself", "about", "what is bob", "bob who", "tell me about"],
     responses: [
-      "I'm Nova — Print Cosmos's onboard AI helper! I live in the platform's starfield background and I'm here to guide makers through everything they need to know about 3D printing and the Print Cosmos marketplace. Ask me about nozzles, infill, supports, filament types, how to list a design, club subscriptions, or anything else!",
-      "Hi, I'm Nova, your Print Cosmos AI companion! I can help you with: 3D printing basics (nozzle, infill, supports, materials), platform features (design studio, threads, Pro, clubs, messaging), and troubleshooting common print issues. Just ask!",
+      "I'm Bob — Print Cosmos's onboard AI helper! I live in the platform's starfield background and I'm here to guide makers through everything they need to know about 3D printing and the Print Cosmos marketplace. Ask me about nozzles, infill, supports, filament types, how to list a design, club subscriptions, or anything else!",
+      "Hi, I'm Bob, your Print Cosmos AI companion! I can help you with: 3D printing basics (nozzle, infill, supports, materials), platform features (design studio, threads, Pro, clubs, messaging), and troubleshooting common print issues. Just ask!",
     ],
   },
 
   default_response: {
     keywords: [],  // catches everything else
     responses: [
-      "Hmm, that's outside my current knowledge base. I'm Nova, Print Cosmos's AI helper — I specialize in 3D printing questions and platform navigation. Try asking about infill, nozzles, supports, materials, the Design Studio, thread earning, Pro features, clubs, or listing on the marketplace!",
+      "Hmm, that's outside my current knowledge base. I'm Bob, Print Cosmos's AI helper — I specialize in 3D printing questions and platform navigation. Try asking about infill, nozzles, supports, materials, the Design Studio, thread earning, Pro features, clubs, or listing on the marketplace!",
       "I'm still learning about that topic! My expertise is 3D printing and Print Cosmos platform features. Here's what I can help with: nozzle and bed basics, infill and support structures, filament materials (PLA/PETG/ABS/TPU), the Design Studio, Threads/Pro/Clubs, messaging, and troubleshooting print issues.",
       "That's a great question! Unfortunately I don't have a detailed answer for it yet — but it might be covered in our community forums. The Design Studio, Clubs, and maker community are packed with knowledge from experienced printers who love to share!",
     ],

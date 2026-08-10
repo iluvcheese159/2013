@@ -12,7 +12,7 @@ import UserBadges from "@/components/UserBadges";
 import StarfieldRenderer from "@/components/StarfieldRenderer";
 import DaytimeScene, { getSeason } from "@/components/DaytimeScene";
 import ListingStar from "@/components/ListingStar";
-import NovaMascot from "@/components/NovaMascot";
+import Bob, { BobPro } from "@/components/Bob";
 import TentScene from "@/components/TentScene";
 import MoonViewer from "@/components/MoonViewer";
 import { useSparkleField } from "@/hooks/useAmbientLife";
@@ -748,7 +748,7 @@ export default function Browse() {
   // Click-anywhere sparkle feedback — the sky answers with cosmic dust
   const sparkles = useSparkleField();
 
-  // Mascot interactivity: click Nova to show a quick tip bubble
+  // Bob interactivity: click Bob to make him wave + speak a quick hello
   const [bobWave, setBobWave] = useState(false);
   const [bobGreeting, setBobGreeting] = useState("");
   const bobWaveTimer = useRef(null);
@@ -756,7 +756,7 @@ export default function Browse() {
     setBobWave(true);
     const hellos = [
       "Hi! Scroll to zoom into the stars.",
-      "I'm Nova! Ask me anything about Print Cosmos.",
+      "I'm Bob! Ask me anything about Print Cosmos.",
       "Zoom in to reveal listings, then click one!",
       "Try the sky mode toggle up top.",
       "Double-click a star to explore the marketplace.",
@@ -922,11 +922,11 @@ export default function Browse() {
     );
   };
 
-  // --- Render Mascot & Tent Scene ---
+  // --- Render Bob & Tent Scene ---
   const renderBobAndTent = () => {
     if (isDay) return null;
     const isVisible = bobState === "walking" || bobState === "introducing";
-    // After first-visit tour, keep Nova as idle and clickable near the tent
+    // After first-visit tour, show Bob as idle and clickable near the tent
     const isIdle = bobState === "in-tent";
     return (
       <>
@@ -947,7 +947,7 @@ export default function Browse() {
             tabIndex={0}
           >
             <div className={bobWave ? "bob-idle-wander auto-glow-pulse" : isIdle ? "bob-idle-wander" : "ambient-drift"}>
-              <NovaMascot />
+              {user?.is_pro ? <BobPro state={bobWave ? "introducing" : (bobState || "idle")} /> : <Bob state={bobWave ? "introducing" : (bobState || "idle")} />}
             </div>
             {/* Wave greeting bubble */}
             {bobWave && (
@@ -964,13 +964,13 @@ export default function Browse() {
                 className="absolute -top-16 left-1/2 -translate-x-1/2 bg-white text-black text-xs px-4 py-3 rounded-xl whitespace-nowrap font-tech max-w-xs"
                 style={{ animation: "fadeIn 0.5s ease-out" }}
               >
-                Hi, I&apos;m Nova! I&apos;m an AI helper -- ask me anything about Print Cosmos.
+                Hi, I&apos;m Bob! I&apos;m an AI helper -- ask me anything about Print Cosmos.
               </div>
             )}
           </div>
         )}
         <div className="pointer-events-auto">
-          <TentScene bobInside={false} onTentClick={handleBobClick} />
+          <TentScene bobInside={isIdle} onTentClick={handleBobClick} />
         </div>
       </>
     );
